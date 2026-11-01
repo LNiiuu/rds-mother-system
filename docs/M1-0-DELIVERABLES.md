@@ -1,14 +1,14 @@
-﻿# M1-0 交付清单（T-M1-0）
+# M1-0 交付清单（T-M1-0）
 
 - 依据：任务书 v1.3.1 + m00567 / m00800；单任务制，阶段交付统一登记在本文件。
-- 最近更新：2026-11-01 21:47
+- 最近更新：2026-11-01 22:00（本轮 AP-12 后续记录修正完成时间）
 
 ## 1. 已交付
 
 | # | 交付物 | 路径 | 状态 | 证据 |
 |---|---|---|---|---|
 | 1 | 母体系骨架 | `D:\M1\` | ✅ 完成 | 自检 PASS（`tests/self/run.ps1`） |
-| 2 | Git 空仓库（main，无 commit） | `D:\M1\.git` | ✅ 完成（AP-12 待身份） | `symbolic-ref --short HEAD`=main |
+| 2 | Git 首次本地提交（main，90 文件） | `D:\M1\.git` | ✅ 完成 | commit `fd48dd0`；`docs/checks/AP-12-first-commit-executed.md` |
 | 3 | ZIP 离线备份 | `D:\M1-backups\rds-20261101-2011-v0.1.0.zip` | ✅ 完成 | 42,939 B，SHA-256 `BAF48014…` |
 | 4 | 0A REA 基线审计 | `rea/baseline/audit-20261101.md` | ✅ 完成 | 0A 证据 |
 | 5 | JADX 接入与真实 APK 分析 | `rea/evidence/EV-20261101-001-b02-jadx.md` | ✅ PASS（L3） | 4 条 REA evidence_id |
@@ -20,8 +20,9 @@
 | 11 | W-01 运行记录 | `rea/evidence/EV-20261101-004-w01-code-understanding.md` | ✅ PASS | 业务小程序只读依赖分析 |
 | 12 | W-05 阻塞记录 | `rea/evidence/EV-20261101-005-w05-pcap.md` | ✅ BLOCKED 留证 | tshark/capinfos 4.2.2 就绪 |
 | 13 | 0C/0D 检查点 | `docs/checks/m1-0c-checkpoint.md`、`m1-0d-checkpoint.md` | ✅ 完成 | 六工作流状态、重复验证、回滚演练 |
-| 14 | 验收报告 | `docs/M1-0-ACCEPTANCE.md` | ✅ 完成 | 本文件 |
+| 14 | 验收报告 | `docs/M1-0-ACCEPTANCE.md` | ✅ 完成 | `docs/M1-0-ACCEPTANCE.md`（12 项对照，结论“有条件通过”） |
 | 15 | 进度账 | `docs/M1-0-PROGRESS.md` | ✅ 更新 | — |
+| 16 | 首次提交执行记录 | `docs/checks/AP-12-first-commit-executed.md` | ✅ 完成 | commit `fd48dd0` 全文信息 |
 
 ## 2. 未完成 / 阻塞
 
@@ -29,8 +30,7 @@
 |---|---|---|---|---|
 | 1 | PCAP 样本与 W-05 | BLOCKED | `secret.ext.pcap` 策略拦截，未绕过 | 等 AUTH-04 |
 | 2 | adb 真机链路 | 未验证 | 无真机，不得宣称通过 | 有设备后补 |
-| 3 | Git 首次 commit | 待批 | AP-12 身份未确认 | 等用户 |
-| 4 | GitHub 远程 | 待批 | AUTH-07 / AP-15 | 等用户 |
+| 3 | GitHub 远程 | 待批 | AUTH-07 / AP-15 | 等用户 |
 
 ## 3. 回滚索引
 
@@ -41,3 +41,4 @@
 | JAR 文件 | 删除 `/home/LNiiuu/rea-tools/jadx-headless-mcp-0.7.1-all.jar` |
 | 样本 | 删除 `/home/LNiiuu/rea-samples/UnCrackable-Level1.apk` |
 | 六套工作流 | 删除 `core/workflows/w-0*.md`（不影响其他流程） |
+| 首次 commit（已执行 `fd48dd0`） | 特殊恢复预案（非常规回滚，本轮未执行、不演练）：`git update-ref -d HEAD` 会**删除当前分支引用**（`main` 变为 unborn），提交历史随之消失，需重新初始化/重建索引或重新提交，属破坏性操作；常规回退应使用 `git revert` 生成反向提交，不得以本预案替代。 |
