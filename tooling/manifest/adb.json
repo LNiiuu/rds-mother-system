@@ -1,0 +1,14 @@
+{
+  "id": "adb",
+  "version": "37.0.1-15733141",
+  "path": "WSL2: /opt/android-tools/platform-tools/adb",
+  "probe": "REA inspect_adb_client",
+  "capabilities": ["android-device"],
+  "mcp_server": "rea",
+  "install": "已安装；REA_ADB_PATH 已注入",
+  "rollback": "移除 REA_ADB_PATH 并重建进程",
+  "level": "L2",
+  "evidence": "2026-11-01 inspect_adb_client path_source=environment",
+  "notes": "无真实设备时不宣称真机链路通过"
+}
+

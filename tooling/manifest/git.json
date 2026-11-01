@@ -1,0 +1,14 @@
+{
+  "id": "git",
+  "version": "2.56.0.windows.4",
+  "path": "D:\\Tools\\Git\\bin\\git.exe",
+  "probe": "git --version",
+  "capabilities": ["vcs"],
+  "mcp_server": null,
+  "install": "PortableGit（已存在，未入 PATH）",
+  "rollback": "只读调用，无需回滚",
+  "level": "L1",
+  "evidence": "2026-11-01 绝对路径实测",
+  "notes": "PATH 中不可用；所有命令用绝对路径"
+}
+

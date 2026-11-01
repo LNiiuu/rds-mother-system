@@ -1,0 +1,13 @@
+{
+  "id": "jadx",
+  "version": "0.7.1（jadx-headless-mcp-all.jar）",
+  "path": "WSL2: /home/LNiiuu/rea-tools/jadx-headless-mcp-0.7.1-all.jar",
+  "probe": "REA android provider status；inspect_android_package",
+  "capabilities": ["apk-static"],
+  "mcp_server": "rea",
+  "install": "AUTH-01：官方 JAR + SHA-256 校验 + REA_JADX_MCP_JAR + 重建进程",
+  "rollback": "移除 REA_JADX_MCP_JAR 并重建进程",
+  "level": "L3",
+  "evidence": "EV-20261101-001（REA 实调 + UnCrackable-Level1 包/类/方法分析）",
+  "notes": "JAR SHA-256 6e5eacf5…；来源由 REA JadxRelease.js 指定"
+}

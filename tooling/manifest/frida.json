@@ -1,0 +1,13 @@
+{
+  "id": "frida",
+  "version": "17.25.0（CLI）；17.23.2（REA binding，napi v8）",
+  "path": "WSL2: /opt/frida/venv；binding: C:\\Users\\liuch\\.dsh\\frida_binding.node",
+  "probe": "frida --version；REA list_frida_devices",
+  "capabilities": ["runtime"],
+  "mcp_server": "rea",
+  "install": "AUTH-01：部署官方预编译 binding，不覆盖 CLI、不升级 REA",
+  "rollback": "删除 C:\\Users\\liuch\\.dsh\\frida_binding.node",
+  "level": "L2",
+  "evidence": "EV-20261101-002（REA list_frida_devices 实调成功）",
+  "notes": "binding 112,775,824 B，SHA-256 5B2DB5AE…；无真机，注入未验证"
+}

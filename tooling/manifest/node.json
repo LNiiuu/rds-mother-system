@@ -1,0 +1,14 @@
+{
+  "id": "node",
+  "version": "24.21.0",
+  "path": "由 DSH 运行时提供",
+  "probe": "node --version",
+  "capabilities": ["runtime", "scripts"],
+  "mcp_server": null,
+  "install": "随 DSH 分发的 node",
+  "rollback": "不适用",
+  "level": "L1",
+  "evidence": "2026-11-01 实测",
+  "notes": "npm/pnpm 同源；无系统 Node"
+}
+

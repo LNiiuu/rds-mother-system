@@ -1,0 +1,14 @@
+{
+  "id": "tshark",
+  "version": "4.2.2（WSL）/ 4.6.9（Windows）",
+  "path": "WSL2: /usr/bin/tshark；Windows: %LOCALAPPDATA%\\Programs\\Wireshark\\tshark.exe",
+  "probe": "tshark -v",
+  "capabilities": ["pcap"],
+  "mcp_server": "rea(blocked)",
+  "install": "已安装",
+  "rollback": "不适用",
+  "level": "L1",
+  "evidence": "2026-11-01 P1-D/P1-E 记录",
+  "notes": "REA pcap 受安全策略拦截；先用 CLI 做允许范围验证"
+}
+

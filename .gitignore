@@ -1,0 +1,43 @@
+# 样本与二进制（只留索引与哈希）
+samples/
+*.apk
+*.apks
+*.dex
+*.jar
+*.so
+*.dll
+*.exe
+*.bin
+*.pcap
+*.pcapng
+*.cap
+*.zip
+
+# 日志、缓存、临时
+*.log
+*.tmp
+.cache/
+tmp/
+temp/
+_scratch/
+
+# 凭据与本地配置
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+credentials.*
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 仅保留样本索引（R-05 修正）：samples/ 会忽略整个目录，故先解除目录忽略，
+# 再忽略目录内其余文件，最后单独重新包含 index.md；不扩大其它样本文件的纳入范围。
+!rea/samples/
+rea/samples/*
+!rea/samples/index.md
+

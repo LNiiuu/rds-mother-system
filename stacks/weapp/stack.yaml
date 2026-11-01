@@ -1,0 +1,21 @@
+id: weapp
+name: 微信小程序
+tools:
+  runtime: node
+  ide: 微信开发者工具（未安装时 UI 自动化不可用，不得假装）
+  cli: miniprogram-ci（可选）
+paths:
+  src: miniprogram
+  tests: tests
+  dist: ''
+commands:
+  unit: node --test tests
+  lint: ''
+  verify: node --test tests
+checks:
+  - app.json 页面声明与文件是否齐全
+  - 静态结构测试不能替代真实渲染/交互
+  - UI 自动化不可用时如实记录未执行
+workflows: [wf1, wf2, wf3, wf4]
+notes: 无开发者工具时只能做逻辑层测试；发布准备需账号与 AppID（不属于母体系）
+

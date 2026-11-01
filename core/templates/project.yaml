@@ -1,0 +1,43 @@
+# project.yaml —— 项目接入配置（复制到项目根，按需修改）
+schema: rds/project/v1
+name: sample-project            # 项目名（仅用于展示与命名，不写入母体系）
+root: D:\Projects\sample        # 项目根（绝对路径，运行时替换）
+language: zh-CN
+stack: weapp                    # weapp | native-bin | web | android | ios | windows | electron | dotnet | embedded
+
+repo:
+  vcs: git
+  branch: main
+  remote: ""                    # 可空；母体系不同步项目仓库
+
+paths:
+  src: src
+  tests: tests
+  docs: docs
+  evidence: evidence
+  build: dist
+
+toolchain:
+  node: ""                      # 版本要求或可执行路径
+  packageManager: npm
+  buildCommand: ""
+  testCommand: ""
+  verifyCommand: ""
+
+agents:
+  roster: core/roles/roster.md
+  active: [R0, R1, R2, R3]
+  rotating: [R4, R5]
+
+workflows:
+  default: wf1
+  enabled: [wf1, wf2, wf3, wf4]
+
+boundaries:
+  forbiddenPaths: []            # 绝对禁止访问的路径（例如其他项目）
+  deniedRepos: []
+
+evidence:
+  dir: evidence
+  naming: "EV-YYYYMMDD-NNN"
+

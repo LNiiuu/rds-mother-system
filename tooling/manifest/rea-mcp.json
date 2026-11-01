@@ -1,0 +1,14 @@
+{
+  "id": "rea",
+  "version": "6.8.0",
+  "path": "WSL2: /opt/node-v24.22.2/lib/node_modules/rea-agents",
+  "probe": "mcp_load {name:rea} + binary_session",
+  "capabilities": ["native", "android", "pcap", "web", "frida"],
+  "mcp_server": "rea",
+  "install": "WSL2 内 npm 全局包；由 DSH profile 以 stdio 启动",
+  "rollback": "回滚 env 变更/恢复 registry 备份；不升级版本",
+  "level": "L2",
+  "evidence": "2026-11-01 binary_session：tools_sha256 见 rea/baseline/",
+  "notes": "on-demand；改配置后必须重建进程并验证环境注入"
+}
+

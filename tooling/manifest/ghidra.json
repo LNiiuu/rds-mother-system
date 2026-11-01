@@ -1,0 +1,14 @@
+{
+  "id": "ghidra",
+  "version": "12.1.4",
+  "path": "WSL2: /opt/ghidra/ghidra_12.1.4_PUBLIC",
+  "probe": "REA binary_session → providers.native.ghidra.status=available",
+  "capabilities": ["native-static"],
+  "mcp_server": "rea",
+  "install": "WSL2 解压安装；REA 通过 GHIDRA_INSTALL_DIR 接入",
+  "rollback": "移除 GHIDRA_INSTALL_DIR 并重建 REA 进程",
+  "level": "L2",
+  "evidence": "2026-11-01 REA binary_session available",
+  "notes": "provider available ≠ L3；需 W-02 实跑"
+}
+

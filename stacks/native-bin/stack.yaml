@@ -1,0 +1,20 @@
+id: native-bin
+name: 原生二进制与移动逆向
+tools:
+  rea: on-demand
+  native_static: ghidra
+  apk_static: jadx（待补齐）
+  runtime: frida（待补齐 bindings）
+  pcap: tshark（REA 受策略限制）
+paths:
+  samples: samples（仓库外，只留索引）
+  evidence: rea/evidence
+commands:
+  probe: pwsh -File tooling/probe.ps1
+verify:
+  - REA binary_session 可调用
+  - 样本哈希与来源已登记
+  - 结论带 evidence_id
+workflows: [w-01, w-02, w-03, w-04, w-05, w-06]
+notes: provider available ≠ 工作流通过；无设备不宣称真机链路
+
