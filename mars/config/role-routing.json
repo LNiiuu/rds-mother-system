@@ -1,0 +1,84 @@
+{
+  "version": "0.1.0",
+  "default": {
+    "allowed_types": ["L1", "L2", "L4"],
+    "max_visibility": "project",
+    "evidence_direct": false,
+    "budget_default": 4000,
+    "protections": ["decision", "security", "acceptance", "interface", "evidence"]
+  },
+  "roles": {
+    "R0": {
+      "role_name": "总控",
+      "allowed_types": ["L0", "L1", "L2", "L3", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": true,
+      "budget_default": 8000,
+      "prohibited": ["不得替专业角色作技术判断", "不得将 proposed 记忆升级为 approved", "不得绕过审批直接写入正式记忆"],
+      "notes": "全局协调与集成；可读取证据以核验交付"
+    },
+    "R1": {
+      "role_name": "架构",
+      "allowed_types": ["L2", "L3", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": false,
+      "budget_default": 6000,
+      "prohibited": ["不得引用 proposed 记忆", "不得读取 private 记忆", "不得修改实现代码"],
+      "notes": "架构与数据契约；证据以引用形式提供"
+    },
+    "R2": {
+      "role_name": "实现",
+      "allowed_types": ["L1", "L2", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": false,
+      "budget_default": 5000,
+      "prohibited": ["不得引用 proposed 记忆", "不得读取 private 记忆"],
+      "notes": "实现以接口契约与项目事实为准"
+    },
+    "R3": {
+      "role_name": "验证",
+      "allowed_types": ["L1", "L2", "L3", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": true,
+      "budget_default": 6000,
+      "prohibited": ["不得修改业务实现", "不得为了让测试通过而删弱验收"],
+      "notes": "必须可直接访问原始证据"
+    },
+    "R4": {
+      "role_name": "审查",
+      "allowed_types": ["L0", "L1", "L2", "L3", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": true,
+      "budget_default": 6000,
+      "prohibited": ["不得只看总结判定通过", "不得与实现角色合并自我审查"],
+      "notes": "独立复核；必须检查原始证据与源文件"
+    },
+    "R5": {
+      "role_name": "研究",
+      "allowed_types": ["L2", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": false,
+      "budget_default": 5000,
+      "prohibited": ["不得引用 proposed 记忆", "不得读取 private 记忆"],
+      "notes": "调研与外部核验；外部结论必须标注待核验"
+    },
+    "R6": {
+      "role_name": "逆向/安全",
+      "allowed_types": ["L2", "L3", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": true,
+      "budget_default": 5500,
+      "prohibited": ["不得读取凭据", "不得上传真实数据"],
+      "notes": "安全复核需要原始证据"
+    },
+    "R7": {
+      "role_name": "发布/基础设施",
+      "allowed_types": ["L1", "L2", "L4"],
+      "max_visibility": "project",
+      "evidence_direct": false,
+      "budget_default": 4500,
+      "prohibited": ["不得引用 proposed 记忆", "不得读取凭据"],
+      "notes": "构建、发布、回滚与备份"
+    }
+  }
+}

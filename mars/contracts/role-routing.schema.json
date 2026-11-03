@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mars/role-routing.schema.json",
+  "title": "MARS Role Routing Policy (v0)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "default", "roles"],
+  "properties": {
+    "version": { "const": "0.1.0" },
+    "default": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_types", "max_visibility", "evidence_direct", "budget_default", "protections"],
+      "properties": {
+        "allowed_types": { "type": "array", "items": { "enum": ["L0", "L1", "L2", "L3", "L4"] } },
+        "max_visibility": { "enum": ["project", "role", "private"] },
+        "evidence_direct": { "type": "boolean" },
+        "budget_default": { "type": "integer", "minimum": 0 },
+        "protections": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "patternProperties": {
+        "^R[0-7]$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role_name", "allowed_types", "max_visibility", "evidence_direct", "budget_default", "prohibited"],
+          "properties": {
+            "role_name": { "type": "string" },
+            "allowed_types": { "type": "array", "items": { "enum": ["L0", "L1", "L2", "L3", "L4"] } },
+            "max_visibility": { "enum": ["project", "role", "private"] },
+            "evidence_direct": { "type": "boolean" },
+            "budget_default": { "type": "integer", "minimum": 0 },
+            "prohibited": { "type": "array", "items": { "type": "string" } },
+            "notes": { "type": "string" }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

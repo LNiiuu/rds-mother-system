@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "principals": [
+    {
+      "token_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "principal_id": "dev-r0",
+      "project_ids": ["xingrixiao", "m1-dev"],
+      "roles": ["R0"],
+      "note": "示例占位：请勿使用该 token；实际部署由 R7 生成随机 token，仅存 SHA-256"
+    },
+    {
+      "token_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "principal_id": "dev-r2",
+      "project_ids": ["xingrixiao"],
+      "roles": ["R2"],
+      "note": "示例占位"
+    }
+  ]
+}

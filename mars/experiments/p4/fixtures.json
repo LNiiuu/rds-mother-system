@@ -1,0 +1,281 @@
+{
+    "project_id":  "rds-p4",
+    "corpus":  [
+                   {
+                       "id":  "D1",
+                       "type":  "L3",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "决策：订单事件采用 outbox 模式——业务事务内写 outbox 表，由投递器异步发送；理由是可重放、可审计，且不依赖外部消息队列。"
+                   },
+                   {
+                       "id":  "D2",
+                       "type":  "L3",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "决策：本阶段不引入 Kafka 或任何外部消息中间件；如需跨服务投递，先提交评估并等待批准。"
+                   },
+                   {
+                       "id":  "D3",
+                       "type":  "L3",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "决策：缓存 TTL 统一 60 秒；禁止缓存用户余额、支付状态和邀请码校验结果。"
+                   },
+                   {
+                       "id":  "F1",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "事实：orders 表主键 order_id（UUID），状态机 pending → paid → shipped → cancelled；非法迁移必须拒绝。"
+                   },
+                   {
+                       "id":  "F2",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "事实：支付回调入口 POST /api/pay/callback，必须校验 HMAC-SHA256 签名并做幂等处理。"
+                   },
+                   {
+                       "id":  "F3",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "事实：登录接口限流 60 次/分钟/IP；触发 429 时必须返回 Retry-After 头。"
+                   },
+                   {
+                       "id":  "F4",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "事实：幂等键长度限制 1..128 字符，指纹为 sha256；幂等记录由 sweeper 在 24 小时后清理，重复请求返回 409。"
+                   },
+                   {
+                       "id":  "K1",
+                       "type":  "L4",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "知识：幂等实现优先使用唯一索引 + 状态机，而不是先查后写；失败要释放占位。"
+                   },
+                   {
+                       "id":  "K2",
+                       "type":  "L4",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "知识：测试优先覆盖边界值、回滚路径和重复请求；每个修复至少配一条回归测试。"
+                   },
+                   {
+                       "id":  "S1",
+                       "type":  "L3",
+                       "visibility":  "role",
+                       "role_scope":  [
+                                          "R4"
+                                      ],
+                       "status":  "approved",
+                       "content":  "安全审查发现 F-05：回调验签失败时曾返回 500 而非 401；已要求修复并补测试（仅 R4 可见）。"
+                   },
+                   {
+                       "id":  "N1",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "proposed",
+                       "content":  "未验证猜测：也许可以用 Redis 做分布式限流（尚未评审，不得当作事实）。"
+                   },
+                   {
+                       "id":  "T1",
+                       "type":  "L2",
+                       "visibility":  "project",
+                       "role_scope":  [
+
+                                      ],
+                       "status":  "approved",
+                       "content":  "会议记录：周三讨论了发布窗口与值班安排，未形成技术决策。"
+                   }
+               ],
+    "tasks":  [
+                  {
+                      "task_id":  "P4-A1",
+                      "class":  "architecture-decision",
+                      "role":  "R1",
+                      "title":  "订单事件投递机制选型",
+                      "prompt":  "为订单服务决定事件投递机制。要求：引用已批准决策与事实，说明理由与风险；不得引入外部消息中间件。输出 JSON：{\"decision\":\"\",\"rationale\":\"\",\"evidence_ids\":[],\"risks\":[]}",
+                      "expected":  {
+                                       "must":  [
+                                                    "D1",
+                                                    "D2"
+                                                ],
+                                       "must_not":  [
+                                                        "N1",
+                                                        "S1"
+                                                    ],
+                                       "constraints":  [
+                                                           "outbox",
+                                                           "不引入 Kafka"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "D1",
+                                                            "D2",
+                                                            "F1"
+                                                        ]
+                                   },
+                      "query":  "outbox 事件 投递 外部消息"
+                  },
+                  {
+                      "task_id":  "P4-A2",
+                      "class":  "architecture-decision",
+                      "role":  "R1",
+                      "title":  "是否引入缓存层",
+                      "prompt":  "为订单服务决定是否引入缓存层及边界。要求：给出 TTL、禁止缓存的数据、失效策略与风险。输出 JSON：{\"decision\":\"\",\"ttl\":\"\",\"forbidden\":[],\"risks\":[]}",
+                      "expected":  {
+                                       "must":  [
+                                                    "D3",
+                                                    "F1"
+                                                ],
+                                       "must_not":  [
+                                                        "N1"
+                                                    ],
+                                       "constraints":  [
+                                                           "60 秒",
+                                                           "禁止缓存用户余额/支付状态"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "D3"
+                                                        ]
+                                   },
+                      "query":  "缓存 TTL 余额 支付状态"
+                  },
+                  {
+                      "task_id":  "P4-B1",
+                      "class":  "code-modification",
+                      "role":  "R2",
+                      "title":  "登录限流返回 Retry-After",
+                      "prompt":  "修改登录限流实现：超过 60 次/分钟/IP 时返回 429 且带 Retry-After；说明改动点、测试与风险。输出 JSON：{\"change\":\"\",\"files\":[],\"tests\":[],\"risks\":[]}",
+                      "expected":  {
+                                       "must":  [
+                                                    "F3",
+                                                    "K2"
+                                                ],
+                                       "must_not":  [
+                                                        "N1"
+                                                    ],
+                                       "constraints":  [
+                                                           "429",
+                                                           "Retry-After"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "F3"
+                                                        ]
+                                   },
+                      "query":  "限流 429 Retry-After 登录"
+                  },
+                  {
+                      "task_id":  "P4-B2",
+                      "class":  "code-modification",
+                      "role":  "R2",
+                      "title":  "幂等键长度校验修复",
+                      "prompt":  "修复幂等键长度校验：只允许 1..128 字符，使用 sha256 指纹；失败释放占位；说明测试与回滚。输出 JSON：{\"change\":\"\",\"validation\":\"\",\"tests\":[],\"rollback\":\"\"}",
+                      "expected":  {
+                                       "must":  [
+                                                    "F4",
+                                                    "K1"
+                                                ],
+                                       "must_not":  [
+                                                        "N1",
+                                                        "S1"
+                                                    ],
+                                       "constraints":  [
+                                                           "1..128",
+                                                           "sha256",
+                                                           "409"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "F4",
+                                                            "K1"
+                                                        ]
+                                   },
+                      "query":  "幂等 长度 sha256 409 释放"
+                  },
+                  {
+                      "task_id":  "P4-C1",
+                      "class":  "test-review",
+                      "role":  "R3",
+                      "title":  "支付回调测试计划",
+                      "prompt":  "为支付回调 POST /api/pay/callback 编写测试计划：验签、幂等、重复回调、非法状态迁移。输出 JSON：{\"cases\":[{\"name\":\"\",\"expected\":\"\"}],\"coverage\":[],\"risks\":[]}",
+                      "expected":  {
+                                       "must":  [
+                                                    "F2",
+                                                    "F1",
+                                                    "K2"
+                                                ],
+                                       "must_not":  [
+                                                        "N1"
+                                                    ],
+                                       "constraints":  [
+                                                           "HMAC",
+                                                           "幂等",
+                                                           "409"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "F2",
+                                                            "F1"
+                                                        ]
+                                   },
+                      "query":  "支付回调 验签 幂等 重复"
+                  },
+                  {
+                      "task_id":  "P4-C2",
+                      "class":  "test-review",
+                      "role":  "R3",
+                      "title":  "审查订单状态机补丁",
+                      "prompt":  "审查补丁：把 paid 直接改为 shipped（跳过库存检查），并删除一条重复回调测试。列出 findings、严重程度与缺失测试。输出 JSON：{\"findings\":[{\"issue\":\"\",\"severity\":\"\"}],\"missing_tests\":[]}",
+                      "expected":  {
+                                       "must":  [
+                                                    "F1",
+                                                    "K2"
+                                                ],
+                                       "must_not":  [
+                                                        "N1"
+                                                    ],
+                                       "constraints":  [
+                                                           "非法迁移",
+                                                           "补回重复回调测试"
+                                                       ],
+                                       "evidence_ids":  [
+                                                            "F1",
+                                                            "K2"
+                                                        ]
+                                   },
+                      "query":  "状态机 迁移 测试 重复回调"
+                  }
+              ]
+}

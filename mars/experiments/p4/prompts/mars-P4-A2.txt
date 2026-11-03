@@ -1,0 +1,23 @@
+P4-RUN:P4-A2:mars
+任务：是否引入缓存层
+为订单服务决定是否引入缓存层及边界。要求：给出 TTL、禁止缓存的数据、失效策略与风险。输出 JSON：{"decision":"","ttl":"","forbidden":[],"risks":[]}
+
+上下文（MARS role=R1 packet=pkt_0bccd698a1f0，仅角色授权记忆与禁止事项）：
+## 任务要求 [task]
+任务: P4-A2
+目标: 是否引入缓存层
+验收标准:
+- 输出 JSON 且字段完整
+范围: order-service
+## 当前状态 [state]
+p4 benchmark
+## 已批准决策 [decisions]
+- [mem_8874f64b2321] (L3, experiments/p4/fixtures.json@v1) 决策：缓存 TTL 统一 60 秒；禁止缓存用户余额、支付状态和邀请码校验结果。
+## 禁止事项 [prohibitions]
+- 不得引用 proposed 记忆
+- 不得读取 private 记忆
+- 不得修改实现代码
+## 证据引用 [evidence]
+（未提供证据引用）
+
+只输出 JSON，不要使用任何工具，不要解释。

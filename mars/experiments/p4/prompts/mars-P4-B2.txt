@@ -1,0 +1,25 @@
+P4-RUN:P4-B2:mars
+任务：幂等键长度校验修复
+修复幂等键长度校验：只允许 1..128 字符，使用 sha256 指纹；失败释放占位；说明测试与回滚。输出 JSON：{"change":"","validation":"","tests":[],"rollback":""}
+
+上下文（MARS role=R2 packet=pkt_ab2ec899301f，仅角色授权记忆与禁止事项）：
+## 任务要求 [task]
+任务: P4-B2
+目标: 幂等键长度校验修复
+验收标准:
+- 输出 JSON 且字段完整
+范围: order-service
+## 当前状态 [state]
+p4 benchmark
+## 相关项目事实 [facts]
+- [mem_b39b0a72cf0f] (L2, experiments/p4/fixtures.json@v1) 事实：幂等键长度限制 1..128 字符，指纹为 sha256；幂等记录由 sweeper 在 24 小时后清理，重复请求返回 409。
+- [mem_6d039d424f49] (L2, experiments/p4/fixtures.json@v1) 事实：支付回调入口 POST /api/pay/callback，必须校验 HMAC-SHA256 签名并做幂等处理。
+## 必要知识 [knowledge]
+- [mem_8484015021ea] (L4, experiments/p4/fixtures.json@v1) 知识：幂等实现优先使用唯一索引 + 状态机，而不是先查后写；失败要释放占位。
+## 禁止事项 [prohibitions]
+- 不得引用 proposed 记忆
+- 不得读取 private 记忆
+## 证据引用 [evidence]
+（未提供证据引用）
+
+只输出 JSON，不要使用任何工具，不要解释。

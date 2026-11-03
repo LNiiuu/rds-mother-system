@@ -1,0 +1,154 @@
+{
+  "base": {
+    "runs": 6,
+    "input": 77779,
+    "output": 11452,
+    "cacheRead": 529536,
+    "cacheWrite": 0,
+    "total": 618767,
+    "avg_total": 103128
+  },
+  "mars": {
+    "runs": 6,
+    "input": 73381,
+    "output": 12246,
+    "cacheRead": 616576,
+    "cacheWrite": 0,
+    "total": 702203,
+    "avg_total": 117034
+  },
+  "runs": [
+    {
+      "task": "P4-C2",
+      "arm": "mars",
+      "session_id": "0571cc92-8b00-4f16-b4d2-c05b7fc9b012",
+      "usage_events": 3,
+      "input": 12288,
+      "output": 1996,
+      "cacheRead": 117504,
+      "cacheWrite": 0,
+      "total": 131788
+    },
+    {
+      "task": "P4-C1",
+      "arm": "mars",
+      "session_id": "16619cc1-9771-425b-aeaa-8c31836264dc",
+      "usage_events": 3,
+      "input": 12401,
+      "output": 3631,
+      "cacheRead": 118400,
+      "cacheWrite": 0,
+      "total": 134432
+    },
+    {
+      "task": "P4-A2",
+      "arm": "mars",
+      "session_id": "2fb5ff1b-0ac9-4f73-968a-e8a743ae9bc0",
+      "usage_events": 2,
+      "input": 12017,
+      "output": 1243,
+      "cacheRead": 73344,
+      "cacheWrite": 0,
+      "total": 86604
+    },
+    {
+      "task": "P4-B1",
+      "arm": "base",
+      "session_id": "36fff74a-ea94-4099-8224-e8a3002e1782",
+      "usage_events": 2,
+      "input": 12899,
+      "output": 1580,
+      "cacheRead": 73088,
+      "cacheWrite": 0,
+      "total": 87567
+    },
+    {
+      "task": "P4-A1",
+      "arm": "mars",
+      "session_id": "4848c39b-da84-4a8a-9af7-ed637a41ec9e",
+      "usage_events": 3,
+      "input": 12229,
+      "output": 1731,
+      "cacheRead": 117504,
+      "cacheWrite": 0,
+      "total": 131464
+    },
+    {
+      "task": "P4-A2",
+      "arm": "base",
+      "session_id": "4a8a1a73-404f-4eee-8e1a-a5fb6a15b5b3",
+      "usage_events": 2,
+      "input": 12829,
+      "output": 961,
+      "cacheRead": 73344,
+      "cacheWrite": 0,
+      "total": 87134
+    },
+    {
+      "task": "P4-B1",
+      "arm": "mars",
+      "session_id": "5cb5c5fa-9fe4-44d6-8f60-eaf0723c8b00",
+      "usage_events": 3,
+      "input": 12261,
+      "output": 1393,
+      "cacheRead": 116736,
+      "cacheWrite": 0,
+      "total": 130390
+    },
+    {
+      "task": "P4-C2",
+      "arm": "base",
+      "session_id": "6ddaf666-0ff5-43fb-918a-14857803b95d",
+      "usage_events": 3,
+      "input": 13126,
+      "output": 2964,
+      "cacheRead": 119168,
+      "cacheWrite": 0,
+      "total": 135258
+    },
+    {
+      "task": "P4-B2",
+      "arm": "base",
+      "session_id": "aee6c158-84b5-404f-987d-290645aeed56",
+      "usage_events": 2,
+      "input": 12949,
+      "output": 1620,
+      "cacheRead": 72960,
+      "cacheWrite": 0,
+      "total": 87529
+    },
+    {
+      "task": "P4-C1",
+      "arm": "base",
+      "session_id": "bce77a5e-a602-45b0-94bf-aafbd3508239",
+      "usage_events": 2,
+      "input": 12871,
+      "output": 2644,
+      "cacheRead": 73088,
+      "cacheWrite": 0,
+      "total": 88603
+    },
+    {
+      "task": "P4-B2",
+      "arm": "mars",
+      "session_id": "cdcd242a-2f6d-4139-84e3-f9c2740f863f",
+      "usage_events": 2,
+      "input": 12185,
+      "output": 2252,
+      "cacheRead": 73088,
+      "cacheWrite": 0,
+      "total": 87525
+    },
+    {
+      "task": "P4-A1",
+      "arm": "base",
+      "session_id": "f19eb245-712c-49d4-9276-98cf27d363b9",
+      "usage_events": 3,
+      "input": 13105,
+      "output": 1683,
+      "cacheRead": 117888,
+      "cacheWrite": 0,
+      "total": 132676
+    }
+  ]
+}

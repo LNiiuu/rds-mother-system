@@ -1,0 +1,22 @@
+P4-RUN:P4-B1:mars
+任务：登录限流返回 Retry-After
+修改登录限流实现：超过 60 次/分钟/IP 时返回 429 且带 Retry-After；说明改动点、测试与风险。输出 JSON：{"change":"","files":[],"tests":[],"risks":[]}
+
+上下文（MARS role=R2 packet=pkt_c523097173d6，仅角色授权记忆与禁止事项）：
+## 任务要求 [task]
+任务: P4-B1
+目标: 登录限流返回 Retry-After
+验收标准:
+- 输出 JSON 且字段完整
+范围: order-service
+## 当前状态 [state]
+p4 benchmark
+## 相关项目事实 [facts]
+- [mem_aa9cf05b2d13] (L2, experiments/p4/fixtures.json@v1) 事实：登录接口限流 60 次/分钟/IP；触发 429 时必须返回 Retry-After 头。
+## 禁止事项 [prohibitions]
+- 不得引用 proposed 记忆
+- 不得读取 private 记忆
+## 证据引用 [evidence]
+（未提供证据引用）
+
+只输出 JSON，不要使用任何工具，不要解释。

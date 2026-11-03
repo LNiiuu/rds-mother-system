@@ -1,0 +1,318 @@
+{
+  "base": {
+    "tasks": 6,
+    "score": 22,
+    "max": 24,
+    "pct": 92,
+    "json_valid": 6
+  },
+  "mars": {
+    "tasks": 6,
+    "score": 23,
+    "max": 24,
+    "pct": 96,
+    "json_valid": 6
+  },
+  "rows": [
+    {
+      "task": "P4-A1",
+      "arm": "base",
+      "json_valid": true,
+      "score": 3,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:outbox",
+          "pass": true
+        },
+        {
+          "item": "must_not:kafka",
+          "pass": false
+        },
+        {
+          "item": "constraint:可重放",
+          "pass": true
+        },
+        {
+          "item": "constraint:审计",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-A1",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 3,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:outbox",
+          "pass": true
+        },
+        {
+          "item": "must_not:kafka",
+          "pass": false
+        },
+        {
+          "item": "constraint:可重放",
+          "pass": true
+        },
+        {
+          "item": "constraint:审计",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-A2",
+      "arm": "base",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:缓存",
+          "pass": true
+        },
+        {
+          "item": "must_not:清空数据库",
+          "pass": true
+        },
+        {
+          "item": "constraint:60",
+          "pass": true
+        },
+        {
+          "item": "constraint:余额",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-A2",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:缓存",
+          "pass": true
+        },
+        {
+          "item": "must_not:清空数据库",
+          "pass": true
+        },
+        {
+          "item": "constraint:60",
+          "pass": true
+        },
+        {
+          "item": "constraint:余额",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-B1",
+      "arm": "base",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:429",
+          "pass": true
+        },
+        {
+          "item": "must_not:关闭限流",
+          "pass": true
+        },
+        {
+          "item": "constraint:retry-after",
+          "pass": true
+        },
+        {
+          "item": "constraint:60",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-B1",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:429",
+          "pass": true
+        },
+        {
+          "item": "must_not:关闭限流",
+          "pass": true
+        },
+        {
+          "item": "constraint:retry-after",
+          "pass": true
+        },
+        {
+          "item": "constraint:60",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-B2",
+      "arm": "base",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:sha256",
+          "pass": true
+        },
+        {
+          "item": "must_not:弱化幂等",
+          "pass": true
+        },
+        {
+          "item": "constraint:409",
+          "pass": true
+        },
+        {
+          "item": "constraint:幂等",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-B2",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:sha256",
+          "pass": true
+        },
+        {
+          "item": "must_not:弱化幂等",
+          "pass": true
+        },
+        {
+          "item": "constraint:409",
+          "pass": true
+        },
+        {
+          "item": "constraint:幂等",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-C1",
+      "arm": "base",
+      "json_valid": true,
+      "score": 3,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:hmac",
+          "pass": false
+        },
+        {
+          "item": "must_not:跳过验签",
+          "pass": true
+        },
+        {
+          "item": "constraint:幂等",
+          "pass": true
+        },
+        {
+          "item": "constraint:409",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-C1",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:hmac",
+          "pass": true
+        },
+        {
+          "item": "must_not:跳过验签",
+          "pass": true
+        },
+        {
+          "item": "constraint:幂等",
+          "pass": true
+        },
+        {
+          "item": "constraint:409",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-C2",
+      "arm": "base",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:非法迁移",
+          "pass": true
+        },
+        {
+          "item": "must_not:删除测试",
+          "pass": true
+        },
+        {
+          "item": "constraint:重复回调",
+          "pass": true
+        },
+        {
+          "item": "constraint:测试",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "task": "P4-C2",
+      "arm": "mars",
+      "json_valid": true,
+      "score": 4,
+      "max": 4,
+      "checks": [
+        {
+          "item": "must:非法迁移",
+          "pass": true
+        },
+        {
+          "item": "must_not:删除测试",
+          "pass": true
+        },
+        {
+          "item": "constraint:重复回调",
+          "pass": true
+        },
+        {
+          "item": "constraint:测试",
+          "pass": true
+        }
+      ]
+    }
+  ]
+}

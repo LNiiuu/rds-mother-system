@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mars/manifest.schema.json",
+  "title": "MARS Context Manifest (v0)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_id", "project_id", "task_id", "role_id",
+    "created_at", "token_budget", "tokens_estimated", "entries", "fragments"
+  ],
+  "properties": {
+    "manifest_id": { "type": "string", "pattern": "^man_[0-9a-f]{12}$" },
+    "project_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "role_id": { "type": "string", "pattern": "^R[0-7]$" },
+    "run_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "token_budget": { "type": "integer", "minimum": 0 },
+    "tokens_estimated": { "type": "integer", "minimum": 0 },
+    "estimate_label": { "const": "[ESTIMATE]" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_ref", "source_version", "content_hash", "content_type",
+          "inclusion_reason", "token_estimate", "visibility", "status"
+        ],
+        "properties": {
+          "source_ref": { "type": "string", "minLength": 1 },
+          "source_version": { "type": "string", "minLength": 1 },
+          "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "content_type": { "enum": ["task", "state", "fact", "decision", "knowledge", "evidence", "prohibition", "reference"] },
+          "inclusion_reason": { "type": "string", "minLength": 1 },
+          "token_estimate": { "type": "integer", "minimum": 0 },
+          "visibility": { "enum": ["project", "role", "private"] },
+          "status": { "enum": ["proposed", "approved", "deprecated", "superseded"] },
+          "section": { "type": "string" },
+          "memory_id": { "type": "string" },
+          "fragment_id": { "type": "string" }
+        }
+      }
+    },
+    "fragments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["fragment_id", "content_hash", "content_type", "content_length", "ref_count"],
+        "properties": {
+          "fragment_id": { "type": "string", "pattern": "^frag_[0-9a-f]{12}$" },
+          "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "content_type": { "type": "string" },
+          "content_length": { "type": "integer", "minimum": 0 },
+          "ref_count": { "type": "integer", "minimum": 1 },
+          "original_ref": { "type": "string" }
+        }
+      }
+    }
+  }
+}

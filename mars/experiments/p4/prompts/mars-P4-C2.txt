@@ -1,0 +1,25 @@
+P4-RUN:P4-C2:mars
+任务：审查订单状态机补丁
+审查补丁：把 paid 直接改为 shipped（跳过库存检查），并删除一条重复回调测试。列出 findings、严重程度与缺失测试。输出 JSON：{"findings":[{"issue":"","severity":""}],"missing_tests":[]}
+
+上下文（MARS role=R3 packet=pkt_a82786d5ec95，仅角色授权记忆与禁止事项）：
+## 任务要求 [task]
+任务: P4-C2
+目标: 审查订单状态机补丁
+验收标准:
+- 输出 JSON 且字段完整
+范围: order-service
+## 当前状态 [state]
+p4 benchmark
+## 相关项目事实 [facts]
+- [mem_8d8d8a883b10] (L2, experiments/p4/fixtures.json@v1) 事实：orders 表主键 order_id（UUID），状态机 pending → paid → shipped → cancelled；非法迁移必须拒绝。
+## 必要知识 [knowledge]
+- [mem_8484015021ea] (L4, experiments/p4/fixtures.json@v1) 知识：幂等实现优先使用唯一索引 + 状态机，而不是先查后写；失败要释放占位。
+- [mem_6276d039d68e] (L4, experiments/p4/fixtures.json@v1) 知识：测试优先覆盖边界值、回滚路径和重复请求；每个修复至少配一条回归测试。
+## 禁止事项 [prohibitions]
+- 不得修改业务实现
+- 不得为了让测试通过而删弱验收
+## 证据引用 [evidence]
+（未提供证据引用）
+
+只输出 JSON，不要使用任何工具，不要解释。

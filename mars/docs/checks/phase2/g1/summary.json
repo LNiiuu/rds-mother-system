@@ -1,0 +1,341 @@
+{
+  "generated_at": "2026-11-03T12:10:58.842Z",
+  "roles": {
+    "R0": {
+      "initialize_ok": true,
+      "tool_count": 5,
+      "stats": {
+        "ok": true,
+        "data": {
+          "project_id": "rds-m1",
+          "memories": 8,
+          "approved": 7,
+          "proposed": 1,
+          "aliases": 0
+        }
+      },
+      "packet": {
+        "tokens": 304,
+        "sections": [
+          {
+            "id": "sec_task",
+            "kind": "task",
+            "tokens": 4
+          },
+          {
+            "id": "sec_facts",
+            "kind": "facts",
+            "tokens": 97
+          },
+          {
+            "id": "sec_decisions",
+            "kind": "decisions",
+            "tokens": 102
+          },
+          {
+            "id": "sec_knowledge",
+            "kind": "knowledge",
+            "tokens": 67
+          },
+          {
+            "id": "sec_prohibitions",
+            "kind": "prohibitions",
+            "tokens": 28
+          },
+          {
+            "id": "sec_evidence",
+            "kind": "evidence",
+            "tokens": 6
+          }
+        ],
+        "missing": [
+          {
+            "kind": "state",
+            "blocking": false
+          },
+          {
+            "kind": "evidence",
+            "blocking": true
+          }
+        ],
+        "evidence_direct": true
+      },
+      "proposed_visible": [
+        "mem_251512804a4f"
+      ],
+      "cross_project": {
+        "ok": false,
+        "code": "AUTH_DENIED"
+      }
+    },
+    "R1": {
+      "initialize_ok": true,
+      "tool_count": 5,
+      "stats": {
+        "ok": true,
+        "data": {
+          "project_id": "rds-m1",
+          "memories": 8,
+          "approved": 7,
+          "proposed": 1,
+          "aliases": 0
+        }
+      },
+      "packet": {
+        "tokens": 296,
+        "sections": [
+          {
+            "id": "sec_task",
+            "kind": "task",
+            "tokens": 4
+          },
+          {
+            "id": "sec_facts",
+            "kind": "facts",
+            "tokens": 97
+          },
+          {
+            "id": "sec_decisions",
+            "kind": "decisions",
+            "tokens": 102
+          },
+          {
+            "id": "sec_knowledge",
+            "kind": "knowledge",
+            "tokens": 67
+          },
+          {
+            "id": "sec_prohibitions",
+            "kind": "prohibitions",
+            "tokens": 20
+          },
+          {
+            "id": "sec_evidence",
+            "kind": "evidence",
+            "tokens": 6
+          }
+        ],
+        "missing": [
+          {
+            "kind": "state",
+            "blocking": false
+          }
+        ],
+        "evidence_direct": false
+      },
+      "proposed_visible": [],
+      "cross_project": {
+        "ok": false,
+        "code": "AUTH_DENIED"
+      }
+    },
+    "R2": {
+      "initialize_ok": true,
+      "tool_count": 5,
+      "stats": {
+        "ok": true,
+        "data": {
+          "project_id": "rds-m1",
+          "memories": 8,
+          "approved": 7,
+          "proposed": 1,
+          "aliases": 0
+        }
+      },
+      "packet": {
+        "tokens": 188,
+        "sections": [
+          {
+            "id": "sec_task",
+            "kind": "task",
+            "tokens": 4
+          },
+          {
+            "id": "sec_facts",
+            "kind": "facts",
+            "tokens": 97
+          },
+          {
+            "id": "sec_knowledge",
+            "kind": "knowledge",
+            "tokens": 67
+          },
+          {
+            "id": "sec_prohibitions",
+            "kind": "prohibitions",
+            "tokens": 14
+          },
+          {
+            "id": "sec_evidence",
+            "kind": "evidence",
+            "tokens": 6
+          }
+        ],
+        "missing": [
+          {
+            "kind": "state",
+            "blocking": false
+          },
+          {
+            "kind": "decisions",
+            "blocking": true
+          }
+        ],
+        "evidence_direct": false
+      },
+      "proposed_visible": [
+        "mem_251512804a4f"
+      ],
+      "cross_project": {
+        "ok": false,
+        "code": "AUTH_DENIED"
+      }
+    },
+    "R3": {
+      "initialize_ok": true,
+      "tool_count": 5,
+      "stats": {
+        "ok": true,
+        "data": {
+          "project_id": "rds-m1",
+          "memories": 8,
+          "approved": 7,
+          "proposed": 1,
+          "aliases": 0
+        }
+      },
+      "packet": {
+        "tokens": 344,
+        "sections": [
+          {
+            "id": "sec_task",
+            "kind": "task",
+            "tokens": 4
+          },
+          {
+            "id": "sec_facts",
+            "kind": "facts",
+            "tokens": 97
+          },
+          {
+            "id": "sec_decisions",
+            "kind": "decisions",
+            "tokens": 102
+          },
+          {
+            "id": "sec_knowledge",
+            "kind": "knowledge",
+            "tokens": 120
+          },
+          {
+            "id": "sec_prohibitions",
+            "kind": "prohibitions",
+            "tokens": 15
+          },
+          {
+            "id": "sec_evidence",
+            "kind": "evidence",
+            "tokens": 6
+          }
+        ],
+        "missing": [
+          {
+            "kind": "state",
+            "blocking": false
+          },
+          {
+            "kind": "evidence",
+            "blocking": true
+          }
+        ],
+        "evidence_direct": true
+      },
+      "proposed_visible": [],
+      "cross_project": {
+        "ok": false,
+        "code": "AUTH_DENIED"
+      }
+    },
+    "R4": {
+      "initialize_ok": true,
+      "tool_count": 5,
+      "stats": {
+        "ok": true,
+        "data": {
+          "project_id": "rds-m1",
+          "memories": 8,
+          "approved": 7,
+          "proposed": 1,
+          "aliases": 0
+        }
+      },
+      "packet": {
+        "tokens": 292,
+        "sections": [
+          {
+            "id": "sec_task",
+            "kind": "task",
+            "tokens": 4
+          },
+          {
+            "id": "sec_facts",
+            "kind": "facts",
+            "tokens": 97
+          },
+          {
+            "id": "sec_decisions",
+            "kind": "decisions",
+            "tokens": 102
+          },
+          {
+            "id": "sec_knowledge",
+            "kind": "knowledge",
+            "tokens": 67
+          },
+          {
+            "id": "sec_prohibitions",
+            "kind": "prohibitions",
+            "tokens": 16
+          },
+          {
+            "id": "sec_evidence",
+            "kind": "evidence",
+            "tokens": 6
+          }
+        ],
+        "missing": [
+          {
+            "kind": "state",
+            "blocking": false
+          },
+          {
+            "kind": "evidence",
+            "blocking": true
+          }
+        ],
+        "evidence_direct": true
+      },
+      "proposed_visible": [
+        "mem_251512804a4f"
+      ],
+      "cross_project": {
+        "ok": false,
+        "code": "AUTH_DENIED"
+      }
+    }
+  },
+  "negatives": {
+    "unknown_token": {
+      "ok": false,
+      "code": "AUTH_DENIED"
+    },
+    "missing_token": {
+      "ok": false,
+      "code": "AUTH_DENIED"
+    },
+    "role_mismatch": {
+      "ok": false,
+      "code": "AUTH_DENIED"
+    }
+  }
+}

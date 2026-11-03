@@ -1,0 +1,370 @@
+{
+  "role": "R0",
+  "responses": {
+    "packet": {
+      "ok": true,
+      "data": {
+        "packet": {
+          "packet_id": "pkt_5c16a330f086",
+          "manifest_id": "man_4f6bc096099d",
+          "project_id": "rds-m1",
+          "task_id": "UNKNOWN",
+          "role_id": "R0",
+          "role_profile": "总控",
+          "created_at": "2026-11-03T12:10:58.937Z",
+          "compiler_version": "mars-compiler/0.1.0",
+          "token_budget": 4000,
+          "tokens_estimated": 304,
+          "estimate_label": "[ESTIMATE]",
+          "sections": [
+            {
+              "id": "sec_task",
+              "title": "任务要求",
+              "kind": "task",
+              "content": "任务: UNKNOWN",
+              "token_estimate": 4,
+              "source_refs": [
+                "task-card:unknown"
+              ],
+              "truncated": false
+            },
+            {
+              "id": "sec_facts",
+              "title": "相关项目事实",
+              "kind": "facts",
+              "content": "- [mem_da263b7afe65] (L2, mars/docs/phase1-review-round2.md@2026-11-03) Phase 1 残余限制：review 无状态迁移校验（P10）、测试报告未同步 remediation 用例（P12）；MCP 尚无 token 轮换与吊销。\n- [mem_cac528b1b6c1] (L2, mars/docs/phase1-acceptance.md@2026-11-03) MARS 运行于 Node 24 内置 node:sqlite（SQLite 3.53.4，FTS5 可用），无第三方依赖，全部测试离线执行。",
+              "token_estimate": 97,
+              "source_refs": [
+                "mars/docs/phase1-review-round2.md@2026-11-03",
+                "mars/docs/phase1-acceptance.md@2026-11-03"
+              ],
+              "truncated": false
+            },
+            {
+              "id": "sec_decisions",
+              "title": "已批准决策",
+              "kind": "decisions",
+              "content": "- [mem_3bc9a242489d] (L3, mars/src/mcp-stdio.js@0.2.0) MCP 默认禁用；通过 G1 后仅开放 memory.get/list/stats/context.compile 与 memory.propose（只写 proposed，审批仍在服务端之外）。\n- [mem_28a69d6965da] (L3, mars/docs/security.md@2026-11-03) 接入 DSH 采用 profile cordis.patch.yml 的 dsh-mcp-client stdio 注册；MARS 进程绑定单角色 token，客户端传入的 role/project 不作为授权依据。",
+              "token_estimate": 102,
+              "source_refs": [
+                "mars/src/mcp-stdio.js@0.2.0",
+                "mars/docs/security.md@2026-11-03"
+              ],
+              "truncated": false
+            },
+            {
+              "id": "sec_knowledge",
+              "title": "必要知识",
+              "kind": "knowledge",
+              "content": "- [mem_ed4161d14f43] (L4, mars/config/role-routing.json@2026-11-03) Context Compiler 角色路由：R1 架构/历史决策/接口，R2 任务卡/实现约束，R3 验收标准/测试证据，R4 原始需求/独立证据，R0 状态/审批；R0/R3/R4 的 evidence_direct=true 可恢复原文。",
+              "token_estimate": 67,
+              "source_refs": [
+                "mars/config/role-routing.json@2026-11-03"
+              ],
+              "truncated": false
+            },
+            {
+              "id": "sec_prohibitions",
+              "title": "禁止事项",
+              "kind": "prohibitions",
+              "content": "- 不得替专业角色作技术判断\n- 不得将 proposed 记忆升级为 approved\n- 不得绕过审批直接写入正式记忆",
+              "token_estimate": 28,
+              "source_refs": [
+                "role-routing:R0"
+              ],
+              "truncated": false
+            },
+            {
+              "id": "sec_evidence",
+              "title": "证据引用",
+              "kind": "evidence",
+              "content": "（未提供证据引用）",
+              "token_estimate": 6,
+              "source_refs": [],
+              "truncated": false
+            }
+          ],
+          "missing": [
+            {
+              "kind": "state",
+              "description": "未提供当前任务状态",
+              "blocking": false
+            },
+            {
+              "kind": "evidence",
+              "description": "本角色需要可直接访问的原始证据，但未提供",
+              "blocking": true
+            }
+          ],
+          "prohibited": [
+            "不得替专业角色作技术判断",
+            "不得将 proposed 记忆升级为 approved",
+            "不得绕过审批直接写入正式记忆"
+          ],
+          "evidence_refs": []
+        },
+        "manifest": {
+          "manifest_id": "man_4f6bc096099d",
+          "project_id": "rds-m1",
+          "task_id": "UNKNOWN",
+          "role_id": "R0",
+          "created_at": "2026-11-03T12:10:58.935Z",
+          "token_budget": 4000,
+          "tokens_estimated": 304,
+          "estimate_label": "[ESTIMATE]",
+          "entries": [
+            {
+              "source_ref": "task-card:unknown",
+              "source_version": "current",
+              "content_hash": "8167eceef4e3319b48df56aac249b985dbbfb085eda3befc9c428b96d85f9628",
+              "content_type": "task",
+              "inclusion_reason": "任务要求",
+              "token_estimate": 4,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_task",
+              "fragment_id": "frag_553e030177f8"
+            },
+            {
+              "source_ref": "mars/docs/phase1-review-round2.md@2026-11-03",
+              "source_version": "2026-11-03",
+              "content_hash": "04e47438341b6c7efb456f153f4733b204303c23d05df0a3c0398b927b63817f",
+              "content_type": "fact",
+              "inclusion_reason": "相关项目事实",
+              "token_estimate": 97,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_facts",
+              "fragment_id": "frag_4879665b5704"
+            },
+            {
+              "source_ref": "mars/src/mcp-stdio.js@0.2.0",
+              "source_version": "0.2.0",
+              "content_hash": "4860a11ce471ed823bf3cfe6a845f93870630fcaa4990b255321d76ff26eac05",
+              "content_type": "decision",
+              "inclusion_reason": "已批准决策",
+              "token_estimate": 102,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_decisions",
+              "fragment_id": "frag_7cc494f6ab59"
+            },
+            {
+              "source_ref": "mars/config/role-routing.json@2026-11-03",
+              "source_version": "2026-11-03",
+              "content_hash": "0d196ff03a6f06cbabdc7094e65db844e0adf353d6ca9f56c514c698ced69a45",
+              "content_type": "knowledge",
+              "inclusion_reason": "必要知识",
+              "token_estimate": 67,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_knowledge",
+              "fragment_id": "frag_90fffe8698f3"
+            },
+            {
+              "source_ref": "role-routing:R0",
+              "source_version": "current",
+              "content_hash": "ec7fe2fed7357e5b1971099da9cd7cc4c1e151244052197ea897355db370551f",
+              "content_type": "prohibition",
+              "inclusion_reason": "禁止事项",
+              "token_estimate": 28,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_prohibitions",
+              "fragment_id": "frag_cb24f04543d5"
+            },
+            {
+              "source_ref": "packet:sec_evidence",
+              "source_version": "current",
+              "content_hash": "8235eb400e57b22e13a770ed4fba6bf5226b6f248d226c067034be30067fecf7",
+              "content_type": "evidence",
+              "inclusion_reason": "证据引用",
+              "token_estimate": 6,
+              "visibility": "project",
+              "status": "approved",
+              "section": "sec_evidence",
+              "fragment_id": "frag_66dbb9ebfd71"
+            }
+          ],
+          "fragments": [
+            {
+              "fragment_id": "frag_553e030177f8",
+              "content_hash": "8167eceef4e3319b48df56aac249b985dbbfb085eda3befc9c428b96d85f9628",
+              "content_type": "task",
+              "content_length": 11,
+              "ref_count": 8,
+              "original_ref": "task-card:unknown"
+            },
+            {
+              "fragment_id": "frag_4879665b5704",
+              "content_hash": "04e47438341b6c7efb456f153f4733b204303c23d05df0a3c0398b927b63817f",
+              "content_type": "fact",
+              "content_length": 293,
+              "ref_count": 7,
+              "original_ref": "mars/docs/phase1-review-round2.md@2026-11-03"
+            },
+            {
+              "fragment_id": "frag_7cc494f6ab59",
+              "content_hash": "4860a11ce471ed823bf3cfe6a845f93870630fcaa4990b255321d76ff26eac05",
+              "content_type": "decision",
+              "content_length": 322,
+              "ref_count": 6,
+              "original_ref": "mars/src/mcp-stdio.js@0.2.0"
+            },
+            {
+              "fragment_id": "frag_90fffe8698f3",
+              "content_hash": "0d196ff03a6f06cbabdc7094e65db844e0adf353d6ca9f56c514c698ced69a45",
+              "content_type": "knowledge",
+              "content_length": 189,
+              "ref_count": 3,
+              "original_ref": "mars/config/role-routing.json@2026-11-03"
+            },
+            {
+              "fragment_id": "frag_cb24f04543d5",
+              "content_hash": "ec7fe2fed7357e5b1971099da9cd7cc4c1e151244052197ea897355db370551f",
+              "content_type": "prohibition",
+              "content_length": 61,
+              "ref_count": 4,
+              "original_ref": "role-routing:R0"
+            },
+            {
+              "fragment_id": "frag_66dbb9ebfd71",
+              "content_hash": "8235eb400e57b22e13a770ed4fba6bf5226b6f248d226c067034be30067fecf7",
+              "content_type": "evidence",
+              "content_length": 9,
+              "ref_count": 8,
+              "original_ref": "packet:sec_evidence"
+            }
+          ]
+        },
+        "budget": {
+          "sections": [
+            {
+              "id": "sec_task",
+              "title": "任务要求",
+              "kind": "task",
+              "content": "任务: UNKNOWN",
+              "token_estimate": 4,
+              "source_refs": [
+                "task-card:unknown"
+              ],
+              "protected": true,
+              "truncated": false
+            },
+            {
+              "id": "sec_facts",
+              "title": "相关项目事实",
+              "kind": "facts",
+              "content": "- [mem_da263b7afe65] (L2, mars/docs/phase1-review-round2.md@2026-11-03) Phase 1 残余限制：review 无状态迁移校验（P10）、测试报告未同步 remediation 用例（P12）；MCP 尚无 token 轮换与吊销。\n- [mem_cac528b1b6c1] (L2, mars/docs/phase1-acceptance.md@2026-11-03) MARS 运行于 Node 24 内置 node:sqlite（SQLite 3.53.4，FTS5 可用），无第三方依赖，全部测试离线执行。",
+              "token_estimate": 97,
+              "source_refs": [
+                "mars/docs/phase1-review-round2.md@2026-11-03",
+                "mars/docs/phase1-acceptance.md@2026-11-03"
+              ],
+              "source_version": "2026-11-03",
+              "visibility": "project",
+              "status": "approved",
+              "protected": false,
+              "truncated": false
+            },
+            {
+              "id": "sec_decisions",
+              "title": "已批准决策",
+              "kind": "decisions",
+              "content": "- [mem_3bc9a242489d] (L3, mars/src/mcp-stdio.js@0.2.0) MCP 默认禁用；通过 G1 后仅开放 memory.get/list/stats/context.compile 与 memory.propose（只写 proposed，审批仍在服务端之外）。\n- [mem_28a69d6965da] (L3, mars/docs/security.md@2026-11-03) 接入 DSH 采用 profile cordis.patch.yml 的 dsh-mcp-client stdio 注册；MARS 进程绑定单角色 token，客户端传入的 role/project 不作为授权依据。",
+              "token_estimate": 102,
+              "source_refs": [
+                "mars/src/mcp-stdio.js@0.2.0",
+                "mars/docs/security.md@2026-11-03"
+              ],
+              "source_version": "0.2.0",
+              "visibility": "project",
+              "status": "approved",
+              "protected": true,
+              "truncated": false
+            },
+            {
+              "id": "sec_knowledge",
+              "title": "必要知识",
+              "kind": "knowledge",
+              "content": "- [mem_ed4161d14f43] (L4, mars/config/role-routing.json@2026-11-03) Context Compiler 角色路由：R1 架构/历史决策/接口，R2 任务卡/实现约束，R3 验收标准/测试证据，R4 原始需求/独立证据，R0 状态/审批；R0/R3/R4 的 evidence_direct=true 可恢复原文。",
+              "token_estimate": 67,
+              "source_refs": [
+                "mars/config/role-routing.json@2026-11-03"
+              ],
+              "source_version": "2026-11-03",
+              "visibility": "project",
+              "status": "approved",
+              "protected": false,
+              "truncated": false
+            },
+            {
+              "id": "sec_prohibitions",
+              "title": "禁止事项",
+              "kind": "prohibitions",
+              "content": "- 不得替专业角色作技术判断\n- 不得将 proposed 记忆升级为 approved\n- 不得绕过审批直接写入正式记忆",
+              "token_estimate": 28,
+              "source_refs": [
+                "role-routing:R0"
+              ],
+              "protected": true,
+              "truncated": false
+            },
+            {
+              "id": "sec_evidence",
+              "title": "证据引用",
+              "kind": "evidence",
+              "content": "（未提供证据引用）",
+              "token_estimate": 6,
+              "source_refs": [],
+              "protected": true,
+              "truncated": false
+            }
+          ],
+          "tokens": 304,
+          "truncated": [],
+          "protected_kept": [
+            "sec_task",
+            "sec_decisions",
+            "sec_prohibitions",
+            "sec_evidence"
+          ],
+          "over_budget": false
+        }
+      }
+    },
+    "proposed": {
+      "ok": true,
+      "data": [
+        {
+          "memory_id": "mem_251512804a4f",
+          "project_id": "rds-m1",
+          "memory_type": "L2",
+          "content": "Phase 2 要求建立真实任务 Token A/B 对照：对照组为原 DSH 上下文传递，实验组为 MARS 角色专属上下文，每组至少三次并记录 usage 五字段。",
+          "source_ref": "mars/docs/token-baseline.md",
+          "source_version": "2026-11-03",
+          "content_hash": "3e3112d0fc6f268af81a8bca8b47b50d93389564301120e090af47025e6abbca",
+          "status": "proposed",
+          "confidence": 0.9,
+          "visibility": "project",
+          "role_scope": [],
+          "tags": [],
+          "relations": [],
+          "evidence_refs": [],
+          "provenance": {
+            "origin": "agent",
+            "collected_at": "2026-11-03T12:06:10.642Z",
+            "agent_role": "R2"
+          },
+          "created_by": "mcp-R2",
+          "created_at": "2026-11-03T12:06:10.642Z",
+          "updated_at": "2026-11-03T12:06:10.642Z"
+        }
+      ]
+    },
+    "cross": {
+      "ok": false,
+      "code": "AUTH_DENIED"
+    }
+  }
+}

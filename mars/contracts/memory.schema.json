@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mars/memory.schema.json",
+  "title": "MARS Memory Record (v0)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "memory_id", "project_id", "memory_type", "content", "source_ref",
+    "source_version", "content_hash", "status", "confidence", "visibility",
+    "created_at", "updated_at", "provenance"
+  ],
+  "properties": {
+    "memory_id": { "type": "string", "pattern": "^mem_[0-9a-f]{12}$" },
+    "project_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "memory_type": { "enum": ["L0", "L1", "L2", "L3", "L4"] },
+    "content": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "source_ref": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "source_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "status": { "enum": ["proposed", "approved", "rejected", "deprecated", "superseded"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "visibility": { "enum": ["project", "role", "private"] },
+    "role_scope": { "type": "array", "items": { "type": "string" }, "maxItems": 16 },
+    "tags": { "type": "array", "items": { "type": "string" }, "maxItems": 32 },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "enum": ["supersedes", "superseded_by", "related", "derived_from"] },
+          "target": { "type": "string" }
+        }
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "provenance": {
+      "type": "object",
+      "required": ["origin", "collected_at"],
+      "additionalProperties": true,
+      "properties": {
+        "origin": { "enum": ["agent", "user", "decision", "import", "baseline"] },
+        "collected_at": { "type": "string", "format": "date-time" },
+        "agent_role": { "type": "string" },
+        "approved_by": { "type": "string" },
+        "approved_at": { "type": "string" },
+        "run_id": { "type": "string" }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "oneOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }] }
+  }
+}

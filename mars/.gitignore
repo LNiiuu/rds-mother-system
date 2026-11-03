@@ -1,0 +1,5 @@
+# MARS 运行时产物（本地，不提交）
+var/
+*.log
+# 本地身份文件（含 token 哈希，仍属运行配置）
+config/principals.json
