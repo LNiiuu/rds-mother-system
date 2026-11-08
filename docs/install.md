@@ -264,13 +264,15 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | Windows 78/80 通过、2 个 `ledger` 用例失败；Linux 73/80、3 失败 4 跳过 | 失败用例绑定了作者的 DSH 会话快照，属测试环境耦合，不是引擎缺陷；修复在路线图 M2 |
-| `tests/self/run.ps1` | 有 1 项 FAIL：历史文档含具体项目名 | 属文档清理（M5）；活跃资产已清零 |
-| 版本号 | `VERSION` = `package.json` = 0.1.0，但 MCP `serverInfo.version` 为 0.2.0 | 三处对齐在 M5 |
+| 测试状态 | **88 项全通过，fail=0，skipped=0**（Windows 实机）。Linux 由 CI 覆盖，本机未实跑 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
+| 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
+| `tests/self/run.ps1` | 有 1 项 FAIL：历史文档含具体项目名 | 属文档清理（M5）；活跃资产已清零。CI 中设为非阻塞并标注 known-red |
+| 版本号 | `VERSION` = `package.json` = 0.1.0，但 MCP `serverInfo.version` 为 0.2.0 | 属 M5；未在本轮强行统一，因为尚未确认两者是否同一版本体系 |
 | macOS | 未实机验证 | 不作承诺 |
 | `rds principal` | 无此子命令 | 审批身份需按 §7 的脚本追加 |
 | 发布渠道 | 未发布到 npm | 用本地路径安装 |
-| `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用 | 想跑测试请用源码树 |
+| `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用；`--raw` 查看未加工输出 | 想跑测试请用源码树 |
+| CI | 工作流已就绪（Windows + Ubuntu × Node 22/24） | 需 push 到 GitHub 后才会真正运行；本轮未 push，故无远程执行结果 |
 
 ---
 
@@ -301,4 +303,5 @@ rds init                                   # 输出包含 stats，无异常
 rds put ... && rds list --status proposed   # 能写、能查
 ```
 
-`node --test` 的双平台绿灯是**质量门槛**，不是安装门槛：当前仍有 2 个环境耦合用例为红，见 §11。
+`npm test` 的双平台绿灯是**质量门槛**，不是安装门槛。当前源码树为 88 项全通过（fail=0 / skipped=0），
+门禁细节见 [docs/testing.md](testing.md)。

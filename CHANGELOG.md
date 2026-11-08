@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## Unreleased — M2 测试可靠性
+
+目标是"两个平台、同一份代码，`fail=0 && skipped=0`"。不改 MARS 存储结构、Schema 与治理规则。
+
+新增
+- `tooling/test-gate.mjs`：Required 门禁。判据 `tests>0 && fail=0 && skipped=0 && 计数自洽`，失败时打印原始 TAP
+- `tooling/test-gate-selfcheck.mjs`：门禁反向验证（全绿 / 失败 / 跳过 / 空集四种场景）
+- `tooling/pack-check.mjs`：发行包内容断言（必需文件齐全 + 禁止项 0 命中）
+- `tooling/config-check.mjs`：JSON 严格解析 + YAML 结构性 lint
+- `tooling/ci-smoke.sh`：打包 → 内容检查 → 干净前缀安装 → doctor → 写入 → 审批 → 检索 → 编译
+- `mars/tests/fixtures/ledger/make-session.js`：确定性多帧 zstd 会话生成器（不复制真实会话）
+- `mars/tests/external/dsh-real-session.external.js`：真实会话核对，显式 opt-in，不进 Required 门禁
+- `mars/scripts/mars-rollback.js`：跨平台回滚实现
+- `docs/testing.md`：测试分类、门禁判据、fixture 约定
+- `.github/workflows/ci.yml`：Windows + Ubuntu × Node 22/24，含 G1（仅 Windows）与非阻塞的历史自检
+
+修复
+- `phase1/ledger-reconcile.test.js`：去掉作者真实会话路径与硬编码总量 `41,597,577`，改为 8 个 fixture 用例；缺文件/坏行/空会话均为硬断言
+- `phase2/wp1.test.js`：不再用 `DSH.exe` 当 Node 运行时，改 `process.execPath`（`RDS_NODE_BIN` 可覆盖）
+- `phase1/rollback-offline.test.js`：不再硬编码 `powershell.exe` 与 `D:\M1`；改为验证 `mars-rollback.js`
+- `mars/scripts/mars-rollback.ps1`：改为转调 `mars-rollback.js`，避免两份实现分叉
+- 消灭全部静默 `skip`：`ledger.test.js`、`phase1/lifecycle.test.js` 改为 `assert.fail` 并说明原因
+- `package.json`：`test` 走门禁，新增 `test:raw` / `test:external` / `config` / `smoke`
+
+结果
+- Required：88 tests / 88 pass / 0 fail / 0 skipped（Windows 实机，Node 22.22.2）
+- 发行包：87 文件，内容断言通过，干净前缀安装后全链路通过
+
 ## Unreleased — M1 可部署化
 
 目标是"外部开发者在干净机器上只读 `docs/install.md` 就能跑到 `node --test` 有结果"。不改存储层与治理模型。

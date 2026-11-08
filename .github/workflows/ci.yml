@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 必需门禁：两个平台 × 两个 Node 版本。
+  # 判据是 tests>0 且 fail=0 且 skipped=0（由 tooling/test-gate.mjs 强制），
+  # 不是「node --test 退出码为 0」。
+  required:
+    name: required (${{ matrix.os }} / node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['22.x', '24.x']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 环境信息
+        shell: bash
+        run: |
+          node --version
+          npm --version
+          git --version
+
+      - name: 自检（doctor）
+        shell: bash
+        run: node bin/rds.mjs doctor
+
+      - name: 配置校验（JSON 严格 / YAML lint）
+        shell: bash
+        run: npm run config
+
+      - name: Required 测试门禁
+        shell: bash
+        run: npm test
+
+      - name: 门禁反向验证（注入 fail / skip 必须变红）
+        shell: bash
+        run: npm run test:gate-selfcheck
+
+      - name: 发行包端到端（打包→检查→安装→doctor→写入→审批→检索→编译）
+        shell: bash
+        run: bash tooling/ci-smoke.sh
+
+  # G1（WF5 Git 审查）用 Windows PowerShell 5.1 实现，只在 Windows 上跑。
+  # 这是平台相关能力，不伪装成跨平台。
+  g1-powershell:
+    name: g1 (windows-latest / powershell)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: G1 六个夹具
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests/git-review/run.ps1
+
+  # 母体系结构自检：已知 1 项 FAIL（历史文档含具体项目名，属 M5 文档清理）。
+  # 设为非阻塞以免掩盖真实回归，但保留可见性。
+  legacy-selfcheck:
+    name: legacy self-check (advisory, known-red)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: tests/self/run.ps1
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests/self/run.ps1

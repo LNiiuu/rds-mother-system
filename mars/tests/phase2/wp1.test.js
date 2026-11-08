@@ -16,7 +16,9 @@ const { createGateway } = require('../../src/mcp-stdio');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const ROUTING = path.join(ROOT, 'config', 'role-routing.json');
-const DSH = process.env.DSH_EXE || 'C:\\Users\\liuch\\AppData\\Local\\Programs\\DSH\\DSH.exe';
+// 被测脚本是普通 Node 脚本，用当前 Node 运行即可；不再依赖 DSH.exe。
+// 需要指定其他运行时（例如 Electron 内置 Node）时用 RDS_NODE_BIN 覆盖。
+const NODE_BIN = process.env.RDS_NODE_BIN || process.execPath;
 const TMP = () => fs.mkdtempSync(path.join(os.tmpdir(), 'mars-wp1-'));
 
 function principal(id, roles) { return { principal_id: id, roles, project_ids: ['rds-m1'] }; }
@@ -127,8 +129,8 @@ test('migration is idempotent and revoke removes principal plus token file', () 
   fs.mkdirSync(tokenDir, { recursive: true });
   fs.writeFileSync(path.join(tokenDir, 'R1.token'), 'x'.repeat(44));
   const script = path.join(ROOT, 'scripts', 'mars-issue-mcp-identity.js');
-  const r = spawnSync(DSH, [script, '--role', 'R1', '--revoke', '--principals', principals, '--token-dir', tokenDir], {
-    env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: '1' }), encoding: 'utf8'
+  const r = spawnSync(NODE_BIN, [script, '--role', 'R1', '--revoke', '--principals', principals, '--token-dir', tokenDir], {
+    encoding: 'utf8'
   });
   assert.equal(r.status, 0, r.stderr);
   assert.equal(JSON.parse(r.stdout).revoked, true);

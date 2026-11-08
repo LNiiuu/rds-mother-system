@@ -28,8 +28,13 @@
   ],
   "scripts": {
     "doctor": "node bin/rds.mjs doctor",
-    "test": "node --test \"mars/tests/**/*.test.js\"",
-    "verify": "npm run doctor && npm test",
+    "config": "node tooling/config-check.mjs",
+    "test": "node tooling/test-gate.mjs",
+    "test:raw": "node --test \"mars/tests/**/*.test.js\"",
+    "test:external": "node --test \"mars/tests/external/*.external.js\"",
+    "test:gate-selfcheck": "node tooling/test-gate-selfcheck.mjs",
+    "smoke": "bash tooling/ci-smoke.sh",
+    "verify": "npm run doctor && npm run config && npm run test",
     "pack:check": "npm pack --dry-run"
   },
   "keywords": [

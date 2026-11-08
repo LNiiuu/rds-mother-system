@@ -111,11 +111,13 @@ if (cmd === 'test') {
       2
     );
   }
-  const child = spawn(
-    process.execPath,
-    ['--test', path.join(testsDir, '**', '*.test.js')],
-    { cwd: ROOT, stdio: 'inherit', shell: false }
-  );
+  // 默认走 Required 门禁（fail=0 且 skipped=0）；--raw 直接看 node --test 原始输出。
+  const gate = path.join(ROOT, 'tooling', 'test-gate.mjs');
+  const raw = argv.includes('--raw');
+  const childArgs = raw || !fs.existsSync(gate)
+    ? ['--test', path.join(testsDir, '**', '*.test.js')]
+    : [gate];
+  const child = spawn(process.execPath, childArgs, { cwd: ROOT, stdio: 'inherit', shell: false });
   child.on('exit', (code) => process.exit(code === null ? 1 : code));
 } else {
   // ---------- 3. 其余命令转交既有 CLI（子进程，零逻辑复制） ----------

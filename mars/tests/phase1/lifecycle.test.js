@@ -61,14 +61,12 @@ test('G2 symlink escaping the allowed root is denied', (t) => {
   fs.mkdirSync(outside, { recursive: true });
   fs.writeFileSync(path.join(outside, 'secret.md'), 'outside secret', 'utf8');
   const link = path.join(env.dir, 'link-outside');
+  // 目录符号链接：Windows 用 junction（无需管理员权限），POSIX 用 dir。
+  // 创建失败属于「安全断言无法验证」，必须显式失败；静默跳过会让越界防护形同虚设。
   try {
-    fs.symlinkSync(outside, link, 'junction');
+    fs.symlinkSync(outside, link, process.platform === 'win32' ? 'junction' : 'dir');
   } catch (err) {
-    if (['EPERM', 'EACCES', 'ENOTSUP', 'EINVAL'].includes(err.code)) {
-      t.skip('junction unavailable on this host: ' + err.code);
-      return;
-    }
-    throw err;
+    assert.fail('SECURITY_TEST_UNAVAILABLE: 无法创建目录符号链接（' + err.code + '），越界防护未被验证');
   }
   assert.throws(
     () => propose(env, 'R3', { content: 'x', source_ref: 'link-outside/secret.md' }),

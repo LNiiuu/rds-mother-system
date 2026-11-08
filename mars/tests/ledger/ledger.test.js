@@ -39,10 +39,13 @@ test('parseSession reads plain JSONL and sums only present usage fields', () => 
 });
 
 test('parseSession reads concatenated zstd frames', () => {
-  if (typeof zlib.zstdCompressSync !== 'function') {
-    test.skip('node:zlib zstdCompressSync unavailable');
-    return;
-  }
+  // 缺少 zstd 压缩能力时无法构造多帧样本 —— 必须失败，不能跳过，
+  // 否则「多帧解析」这条核心能力在部分 Node 版本上会变成未验证却显示绿灯。
+  assert.equal(
+    typeof zlib.zstdCompressSync,
+    'function',
+    'FIXTURE_UNAVAILABLE: 当前 Node 缺少 zlib.zstdCompressSync，无法生成多帧 zstd 样本（要求 Node >= 22.15 / 24.x）'
+  );
   const dir = tmpdir();
   const file = path.join(dir, 'session.v4.jsonl.zstd');
   const text = jsonlFixture();
