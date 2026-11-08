@@ -1,7 +1,14 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
-const { DatabaseSync } = require('node:sqlite');
+let DatabaseSync;
+try {
+  ({ DatabaseSync } = require('node:sqlite'));
+} catch (err) {
+  throw new Error(
+    `需要 Node.js >= 22.5（当前 ${process.version}）：内置模块 node:sqlite 不可用。原始错误：${err.message}`
+  );
+}
 const { ensureDir } = require('./util');
 
 const SCHEMA_VERSION = 4;

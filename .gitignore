@@ -41,3 +41,6 @@ Thumbs.db
 rea/samples/*
 !rea/samples/index.md
 
+
+# 本机工具链覆盖（机器相关路径，不随仓库分发）
+tooling/toolchain.local.json

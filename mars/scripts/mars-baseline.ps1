@@ -1,12 +1,16 @@
 ﻿param(
-  [string]$Repo = 'D:\M1',
-  [string]$Git  = 'D:\Tools\Git\bin\git.exe',
+  [string]$Repo = '',
+  [string]$Git  = '',
   [int]$ExpectUntracked = 70,
   [int]$ExpectModified = 1,
   [string]$Out = ''
 )
 $ErrorActionPreference = 'Stop'
-if (-not (Test-Path $Git)) { throw "git 不存在: $Git" }
+if (-not $Repo) { $Repo = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path } }
+if (-not $Git) { $Git = $env:RDS_GIT }
+if (-not $Git) { $c = Get-Command git -ErrorAction SilentlyContinue; if ($c) { $Git = $c.Source } }
+if (-not $Git) { $localCfg = Join-Path $Repo 'tooling\toolchain.local.json'; if (Test-Path -LiteralPath $localCfg) { $Git = (Get-Content -Raw -Encoding UTF8 -LiteralPath $localCfg | ConvertFrom-Json).git } }
+if (-not $Git -or -not (Test-Path $Git)) { throw "git 未找到：设置 RDS_GIT 环境变量，或在 tooling\toolchain.local.json 中配置 { `"git`": `"<git 路径>`" }" }
 $statusLines = & $Git -C $Repo status --porcelain -uall
 $text = ($statusLines | ForEach-Object { $_ }) -join "`n"
 $sha = [System.Security.Cryptography.SHA256]::Create()

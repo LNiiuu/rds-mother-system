@@ -1,0 +1,43 @@
+{
+  "name": "rds-mother-system",
+  "version": "0.1.0",
+  "description": "RDS —— 可独立部署的研发流程资产与本地记忆引擎（MARS）：零第三方依赖、离线可运行",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LNiiuu/rds-mother-system.git"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "rds": "bin/rds.mjs"
+  },
+  "files": [
+    "bin/",
+    "mars/src/",
+    "mars/contracts/",
+    "mars/config/role-routing.json",
+    "mars/config/principals.example.json",
+    "core/",
+    "stacks/",
+    "tooling/manifest/",
+    "docs/install.md",
+    "VERSION",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "doctor": "node bin/rds.mjs doctor",
+    "test": "node --test \"mars/tests/**/*.test.js\"",
+    "verify": "npm run doctor && npm test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "rds",
+    "mars",
+    "agent",
+    "workflow",
+    "local-first"
+  ],
+  "private": false
+}

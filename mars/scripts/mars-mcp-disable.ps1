@@ -4,10 +4,12 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
   [string]$Registry = (Join-Path $env:USERPROFILE '.dsh\skill-mcp-manager\registry.json'),
-  [string]$BackupDir = 'D:\M1\mars\var\mcp',
+  [string]$BackupDir = '',
   [switch]$Yes
 )
 $ErrorActionPreference = 'Stop'
+
+if (-not $BackupDir) { $BackupDir = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'mars\var\mcp') }
 
 if (-not (Test-Path -LiteralPath $Registry)) { Write-Error "registry not found: $Registry"; exit 2 }
 

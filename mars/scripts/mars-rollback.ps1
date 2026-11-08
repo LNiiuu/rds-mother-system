@@ -1,10 +1,11 @@
 ﻿param(
-  [string]$Repo = 'D:\M1',
+  [string]$Repo = '',
   [switch]$RemovePrincipals,
   [switch]$RemoveTokens,
   [switch]$Yes
 )
 $ErrorActionPreference = 'Stop'
+if (-not $Repo) { $Repo = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path } }
 $mars = Join-Path $Repo 'mars'
 if (-not (Test-Path $mars)) { throw "MARS 目录不存在: $mars" }
 $resolved = (Resolve-Path $mars).Path

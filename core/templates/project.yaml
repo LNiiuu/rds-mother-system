@@ -1,9 +1,9 @@
 # project.yaml —— 项目接入配置（复制到项目根，按需修改）
 schema: rds/project/v1
-name: sample-project            # 项目名（仅用于展示与命名，不写入母体系）
-root: D:\Projects\sample        # 项目根（绝对路径，运行时替换）
+name: <PROJECT_NAME>            # 项目名（仅用于展示与命名，不写入母体系）
+root: <PROJECT_ROOT>            # 项目根（绝对路径，运行时替换）
 language: zh-CN
-stack: weapp                    # weapp | native-bin | web | android | ios | windows | electron | dotnet | embedded
+stack: <STACK>                  # weapp | native-bin | web | android | ios | windows | electron | dotnet | embedded
 
 repo:
   vcs: git

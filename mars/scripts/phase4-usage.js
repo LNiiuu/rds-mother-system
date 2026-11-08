@@ -2,9 +2,10 @@
 // Maps P4 subagent sessions to (task, arm) by their embedded marker and sums real usage.
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const { parseSession, sessionText } = require('../src/ledger');
 
-const ROOT = 'C:/Users/liuch/.dsh/sessions';
+const ROOT = process.env.RDS_SESSIONS_ROOT || path.join(os.homedir(), '.dsh', 'sessions');
 const OUT = path.resolve(__dirname, '..', 'experiments', 'p4');
 const since = Date.now() - 60 * 60 * 1000; // last hour
 const rows = [];
@@ -32,6 +33,11 @@ function walk(dir) {
       });
     }
   }
+}
+if (!fs.existsSync(ROOT)) {
+  console.error('未找到会话目录：' + ROOT);
+  console.error('请用 RDS_SESSIONS_ROOT 指定包含 session.v4.jsonl.zstd 的目录。');
+  process.exit(2);
 }
 walk(ROOT);
 

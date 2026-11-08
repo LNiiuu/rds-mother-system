@@ -6,11 +6,14 @@ $rows = @()
 function Add-Row($id, $cmd, $ok, $detail) {
   $script:rows += [pscustomobject]@{ id=$id; ok=$ok; detail=$detail }
 }
-$git = 'D:\Tools\Git\bin\git.exe'
-if (Test-Path -LiteralPath $git) {
+$git = $env:RDS_GIT
+if (-not $git) { $c = Get-Command git -ErrorAction SilentlyContinue; if ($c) { $git = $c.Source } }
+if (-not $git) { $localCfg = Join-Path $PSScriptRoot 'toolchain.local.json'; if (Test-Path -LiteralPath $localCfg) { $git = (Get-Content -Raw -Encoding UTF8 -LiteralPath $localCfg | ConvertFrom-Json).git } }
+$git = if ($git) { $git } else { '' }
+if ($git -and (Test-Path -LiteralPath $git)) {
   $v = & $git --version 2>&1
   Add-Row 'git' $git $true ($v -join ' ')
-} else { Add-Row 'git' $git $false 'not found' }
+} else { Add-Row 'git' 'git' $false 'not found in PATH' }
 foreach ($c in @('node','npm')) {
   $p = Get-Command $c -ErrorAction SilentlyContinue
   if ($p) { Add-Row $c $p.Source $true (& $c --version 2>&1) } else { Add-Row $c '' $false 'not found' }

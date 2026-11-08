@@ -1,50 +1,98 @@
 # RDS 母体系（Reusable Development System）
 
-跨项目复用的研发母体系：新项目挂载本体系即可获得统一的角色、流程、任务协议、证据规范与工具链管理，无需每次重写提示词与流程。
+**RDS 不是服务，不监听端口，也不需要联网。** 它是一套可以复制进你自己项目的研发流程资产，外加一个可直接运行、可独立部署的记忆与上下文引擎（MARS）。
 
-- **版本**：见 `VERSION`（当前 0.1.0，M1-A 骨架）
-- **范围**：只含通用资产（A 类）；不含任何具体项目的业务代码、数据与需求。
-- **状态**：骨架可用；端到端验证进度见 `docs/acceptance/`。**未验证的能力不得宣称为已验证。**
+- **版本**：见 `VERSION`（当前 0.1.0）
+- **许可**：MIT（见 `LICENSE`）
+- **安装**：`npm install -g .`（Node >= 22.5，无第三方依赖）→ 详见 **[docs/install.md](docs/install.md)**
+- **范围**：只含通用资产；不含任何具体项目的业务代码、数据与需求
 
-## 三条底线
+## 它是什么 / 不是什么
 
-1. **不绑定项目**：本仓库内不得出现具体项目名、业务路径、业务数据。项目差异全部由 `project.yaml` 注入。
-2. **不冒充权限隔离**：角色卡的只读/可写是提示词级约定；系统级边界只有 DSH 沙箱与审批。任何"已实现权限隔离"的表述都必须附系统级证据。
-3. **不把安装当能力**：工具装好≠可用；provider available≠工作流通过；一次成功≠可复用。结论按 E1–E4 标注证据强度。
+| 是 | 不是 |
+|---|---|
+| 一套角色卡、流程、任务协议、证据规范（Markdown 资产） | 不是 Agent 运行时——**不会**装完就自己跑起来干活 |
+| 一个可独立运行的本地记忆引擎 MARS（SQLite + FTS5，零依赖、零网络） | 不是云服务，不做同步、不做多租户 |
+| 一个把提示词资产渲染成交付物的素材库 | 不绑定任何特定 AI 客户端；DSH 只是参考实现之一 |
+
+> 关键区分：`core/roles/` 里的 8 席角色是**提示词与职责约定**，消费主体是"会读文件的 AI 会话"或人，不是调度器。
+> 行为保证来自证据校验与审批流，不来自提示词本身。
+
+## 5 步跑通
+
+```bash
+git clone https://github.com/LNiiuu/rds-mother-system.git && cd rds-mother-system
+
+npm install -g .                                  # 1. 安装（Node >= 22.5）
+rds doctor                                        # 2. 自检：Node / sqlite+FTS5 / 版本 / 路径卫生
+
+export MARS_DB=./mars-data/mars.db                 # 3. 指定数据位置（Windows: $env:MARS_DB="...\mars.db"）
+export MARS_PRINCIPALS=./mars-data/principals.json
+rds init                                          #    建库
+rds init-dev --principal dev-r0 --projects demo --roles R0   # 4. 生成身份（token 只显示一次）
+export MARS_TOKEN=<DEV_TOKEN>
+rds put --project demo --type L3 \
+  --content "示例决策" --source docs/d.md --version v1        # 5. 写入一条 proposed 记忆
+```
+
+完整链路（含检索、上下文包、审批、MCP 接入、卸载、故障排查）见 **[docs/install.md](docs/install.md)**。
+
+## 两种用法
+
+**A. 当模板用**——把 `core/`、`stacks/` 复制进你的项目，用 `project.yaml` 注入项目差异：
+
+```powershell
+powershell -NoProfile -File core/scripts/new-project.ps1 -Target D:\Projects\my-app -Stack weapp
+```
+
+生成骨架 + `project.yaml`，并自动用 `rds validate` 校验顶层契约。
+
+**B. 当引擎用**——只用 MARS 管理"什么被批准为事实"：
+
+```bash
+rds put      # 写入 → proposed
+rds review   # 由**另一个身份**审批 → approved（自审会被拒绝）
+rds search   # 只返回 approved
+rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
+```
 
 ## 结构
 
 | 目录 | 内容 |
 |---|---|
+| `bin/` | 统一入口 `rds`（版本门禁、`doctor`、`validate`、子命令分发） |
 | `core/policies` | 权限、任务管理、验收、MCP、下载、Git 远程、交接、冲突 |
-| `core/protocols` | 任务卡、证据协议 |
+| `core/protocols` | 任务卡、证据协议（E1–E4 分级） |
 | `core/roles` | 8 席角色卡（4 常设 + 4 轮换）与变量化模板 |
 | `core/workflows` | WF1 需求交付、WF2 多方向研究、WF3 缺陷修复、WF4 方案评审 |
-| `core/templates` | project.yaml、交接单、验收单、测试报告、缺陷单 |
-| `core/bootstrap` | 新项目加载流程 |
-| `core/scripts` | 初始化脚本 |
-| `stacks/` | 技术栈适配（weapp、native-bin；后续扩展） |
+| `core/templates` | `project.yaml`、交接单、验收单、测试报告、缺陷单 |
+| `stacks/` | 技术栈适配（weapp、native-bin） |
+| `mars/src` | MARS 引擎：存储、鉴权、检索、上下文编译、账本、MCP 服务 |
 | `tooling/` | 工具清单、探针、备份/恢复、同步守卫 |
-| `rea/` | REA 能力基线与六套分析工作流（W-01…W-06） |
-| `docs/` | 任务书、检查记录、验收证据 |
-| `tests/self` | 母体系自检 |
+| `rea/` | REA 能力基线与六套分析工作流（文档层） |
+| `tests/self` | 母体系结构自检（PowerShell） |
 
-## 快速开始
+## 当前状态（诚实表）
 
-```powershell
-# 1. 只读自检（结构、模板、禁用串、JSON 合法性）
-powershell -NoProfile -ExecutionPolicy Bypass -File tests/self/run.ps1
+| 能力 | 状态 | 证据等级 |
+|---|---|---|
+| `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
+| MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
+| MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
+| 测试绿灯 | **未达成**：Windows 78/80、Linux 73/80 | E1 |
+| macOS | **未验证** | E3 |
+| `render-role` 等投递命令 | **未实现**（路线图 M4） | — |
 
-# 2. 新项目初始化（在项目目录生成 project.yaml 与骨架，不碰母体系）
-powershell -NoProfile -ExecutionPolicy Bypass -File core/scripts/new-project.ps1 -Target D:\Projects\<name> -Stack weapp
+测试为红的 2 个用例绑定了作者的 DSH 会话快照（`ledger-reconcile.test.js` 锁死路径与绝对字节数），属测试环境耦合，不是引擎缺陷；修复在路线图 M2。
 
-# 3. 加载到会话：把 project.yaml、core/roles/roster.md、core/workflows/README.md
-#    与对应 stack.yaml 交给总控角色，按 WF 执行
-```
+## 三条底线
+
+1. **不绑定项目**：仓库内不得出现具体项目名、业务路径、业务数据。项目差异全部由 `project.yaml` 注入。
+2. **不冒充权限隔离**：角色卡的只读/可写是提示词级约定；系统级边界只有沙箱与审批。任何"已实现权限隔离"的表述都必须附系统级证据。
+3. **不把安装当能力**：工具装好 ≠ 可用；provider available ≠ 工作流通过；一次成功 ≠ 可复用。结论按 E1–E4 标注证据强度。
 
 ## 版本与备份
 
-- Git：本目录为独立仓库；远程为 GitHub Private（接入进度见 `docs/checks/GITHUB.md`）。
-- ZIP：`tooling/backup.ps1` → `D:\M1-backups`（仓库外，带 SHA-256）；GitHub 不替代 ZIP。
-- 变更：`CHANGELOG.md`；破坏性变更升次版本并写迁移说明。
-
+- 变更记录：`CHANGELOG.md`；破坏性变更升次版本并写迁移说明。
+- 备份：`tooling/backup.ps1`（输出仓库外的 ZIP + SHA-256）。GitHub 不替代 ZIP。
+- 0.x 期间可能破坏兼容；1.0 才承诺 SemVer。

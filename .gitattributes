@@ -1,0 +1,17 @@
+# 统一行尾，避免跨平台 diff 噪音。
+# 注：本仓库的 .ps1 一直以 LF 存储并已在 Windows PowerShell 5.1 实测可用，
+#     故不强制 CRLF；真正影响 PS 5.1 的是 UTF-8 **BOM**，不是行尾。
+* text=auto eol=lf
+*.ps1 text eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# 二进制：不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.db binary
+*.zstd binary

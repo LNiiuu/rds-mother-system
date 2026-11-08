@@ -1,10 +1,12 @@
 ﻿param(
-  [string]$Root = 'D:\M1',
-  [string]$OutDir = 'D:\M1-backups',
+  [string]$Root = '',
+  [string]$OutDir = '',
   [string]$Tag = ''
 )
 $ErrorActionPreference = 'Stop'
+if (-not $Root) { $Root = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..')).Path } }
 if (-not (Test-Path -LiteralPath $Root)) { throw "root not found: $Root" }
+if (-not $OutDir) { $OutDir = Join-Path (Split-Path -Parent $Root) ((Split-Path -Leaf $Root) + '-backups') }
 if (-not (Test-Path -LiteralPath $OutDir)) { New-Item -ItemType Directory -Path $OutDir | Out-Null }
 $stamp = Get-Date -Format 'yyyyMMdd-HHmm'
 $ver = ''

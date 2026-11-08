@@ -1,5 +1,6 @@
-﻿param([string]$Root = 'D:\M1')
+﻿param([string]$Root = '')
 $ErrorActionPreference = 'Stop'
+if (-not $Root) { $Root = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path } }
 $fail = 0
 function Check($name, $ok, $detail = '') {
   if ($ok) { "[PASS] $name $detail" } else { $script:fail++; "[FAIL] $name $detail" }

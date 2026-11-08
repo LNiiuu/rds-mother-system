@@ -1,12 +1,19 @@
 ﻿param(
-  [string]$Repo = 'D:\M1',
+  [string]$Repo = '',
   [string]$Remote = 'origin',
   [string]$Branch = 'main',
   [switch]$Approve,
   [switch]$Force
 )
 $ErrorActionPreference = 'Stop'
-$git = 'D:\Tools\Git\bin\git.exe'
+if (-not $Repo) { $Repo = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..')).Path } }
+$git = $env:RDS_GIT
+if (-not $git) { $c = Get-Command git -ErrorAction SilentlyContinue; if ($c) { $git = $c.Source } }
+$localCfg = Join-Path $Repo 'tooling\toolchain.local.json'
+if (-not $git -and (Test-Path -LiteralPath $localCfg)) { $git = (Get-Content -Raw -Encoding UTF8 -LiteralPath $localCfg | ConvertFrom-Json).git }
+if (-not $git -or -not (Test-Path -LiteralPath $git)) {
+  throw "git 未找到：设置 RDS_GIT 环境变量，或在 tooling\toolchain.local.json 中配置 { `"git`": `"<git 路径>`" }"
+}
 if ($Force) { throw 'force push is forbidden by policy' }
 if (-not (Test-Path -LiteralPath (Join-Path $Repo '.git'))) { throw "not a git repo: $Repo" }
 $status = & $git -C $Repo status --porcelain

@@ -34,10 +34,12 @@ function die(message, code = 2) {
 }
 
 function paths(args) {
+  // 优先级：命令行参数 > 环境变量 > 仓库内默认值。
+  // 环境变量名与 mcp-stdio.js 保持一致，避免"CLI 一套、服务端另一套"。
   return {
-    db: path.resolve(args.db || path.join(ROOT, 'var', 'mars.db')),
-    principals: path.resolve(args.principals || path.join(ROOT, 'config', 'principals.json')),
-    routing: path.resolve(args.routing || path.join(ROOT, 'config', 'role-routing.json'))
+    db: path.resolve(args.db || process.env.MARS_DB || path.join(ROOT, 'var', 'mars.db')),
+    principals: path.resolve(args.principals || process.env.MARS_PRINCIPALS || path.join(ROOT, 'config', 'principals.json')),
+    routing: path.resolve(args.routing || process.env.MARS_ROUTING || path.join(ROOT, 'config', 'role-routing.json'))
   };
 }
 
@@ -51,7 +53,7 @@ function loadAuth(args) {
   const p = paths(args);
   if (!fs.existsSync(p.principals)) die('principals 文件不存在：' + p.principals + '（先运行 init-dev 或复制 config/principals.example.json）');
   const principals = loadPrincipals(p.principals);
-  const auth = authenticate(principals, args.token);
+  const auth = authenticate(principals, args.token || process.env.MARS_TOKEN);
   if (!auth.ok) die('认证失败：' + auth.reason, 3);
   const routing = loadRouting(p.routing);
   return { ...p, principals, principal: auth.principal, routing };
@@ -61,7 +63,8 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   const cmd = args._[0];
   if (!cmd || cmd === 'help') {
-    console.log('用法: node src/cli.js <init|init-dev|put|get|list|search|review|alias|compile|fragment|stats|audit|ledger|mcp|project|share> [选项]');
+    console.log('用法: rds <init|init-dev|put|get|list|search|review|alias|compile|fragment|stats|audit|ledger|mcp|project|share> [选项]');
+    console.log('（rds 为统一入口；也可直接运行 node mars/src/cli.js）');
     process.exit(0);
   }
   const p = paths(args);
@@ -74,13 +77,13 @@ function main() {
 
   if (cmd === 'init-dev') {
     const token = crypto.randomBytes(24).toString('hex');
-    const out = path.resolve(args.out || path.join(ROOT, 'config', 'principals.json'));
+    const out = path.resolve(args.out || p.principals);
     const value = {
       version: '0.1.0',
       principals: [{
         token_sha256: sha256(token),
         principal_id: args.principal || 'dev-r0',
-        project_ids: (args.projects || 'xingrixiao,m1-dev').split(','),
+        project_ids: (args.projects || 'demo').split(','),
         roles: (args.roles || 'R0').split(','),
         note: 'dev 本地身份；token 仅在创建时显示一次'
       }]
