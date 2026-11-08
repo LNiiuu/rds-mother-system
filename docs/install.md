@@ -273,7 +273,7 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 | `rds principal` | 无此子命令 | 审批身份需按 §7 的脚本追加 |
 | 发布渠道 | 未发布到 npm | 用本地路径安装 |
 | `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用；`--raw` 查看未加工输出 | 想跑测试请用源码树 |
-| CI | **四组全绿**（Windows/Ubuntu × Node 22/24）。G1 job 通过但夹具未执行——`tests/git-review/` 尚未纳入版本库 | G1 整体入库后该 job 自动转为真实执行 |
+| CI | **全部绿**（Windows/Ubuntu × Node 22/24 四组 + 结构自检 + G1）。G1 六个夹具已真实执行（步骤耗时 12s，非跳过） | 详见 `docs/checks/productization/G1-adoption-report.md` |
 
 ---
 
