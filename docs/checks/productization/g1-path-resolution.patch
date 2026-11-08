@@ -1,0 +1,93 @@
+G1 / WF5 路径解析修复（归档补丁，不随文件提交）
+
+原因：tooling/git-review 与 tests/git-review 属于 M1 开工前就存在的未跟踪工作，
+     本轮不将其纳入提交（避免把 20 个文件的既有工作切成碎片）。
+     但其中 3 个文件硬编码了 D:\M1 与 D:\Tools\Git\bin\git.exe，
+     会让「路径卫生」门禁长期为红，故做了机械修复，并以补丁形式归档。
+
+应用方式：git apply docs/checks/productization/g1-path-resolution.patch
+（在已包含 G1 文件的树上；本工作区已应用，无需重复应用）
+
+验证：tests/git-review/run.ps1 -> 6 个夹具全部 PASS
+
+diff --git a/tests/git-review/run.ps1 b/tests/git-review/run.ps1
+--- a/tests/git-review/run.ps1
++++ b/tests/git-review/run.ps1
+@@ -1,11 +1,18 @@
+ ﻿# run.ps1 - G1 Git 审查固定夹具 F1-F6（隔离临时仓库，离线）
+ [CmdletBinding()]
+ param(
+-    [string]$Repo = 'D:\M1'
++    [string]$Repo = ''
+ )
+ 
+ $ErrorActionPreference = 'Stop'
+-$git = 'D:\Tools\Git\bin\git.exe'
++if (-not $Repo) { $Repo = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path } }
++$git = $env:RDS_GIT
++if (-not $git) { $c = Get-Command git -ErrorAction SilentlyContinue; if ($c) { $git = $c.Source } }
++$localCfg = Join-Path $Repo 'tooling\toolchain.local.json'
++if (-not $git -and (Test-Path -LiteralPath $localCfg)) { $git = (Get-Content -Raw -Encoding UTF8 -LiteralPath $localCfg | ConvertFrom-Json).git }
++if (-not $git -or -not (Test-Path -LiteralPath $git)) {
++  throw "git 未找到：设置 RDS_GIT 环境变量，或在 tooling\toolchain.local.json 中配置 { `"git`": `"<git 路径>`" }"
++}
+ $review = Join-Path $Repo 'tooling\git-review\review.ps1'
+ $expectedPath = Join-Path $PSScriptRoot 'fixtures\expected.json'
+ $utf8 = New-Object System.Text.UTF8Encoding($false)
+diff --git a/tooling/git-review/review.ps1 b/tooling/git-review/review.ps1
+--- a/tooling/git-review/review.ps1
++++ b/tooling/git-review/review.ps1
+@@ -4,11 +4,12 @@
+     [ValidateSet('status')][string]$Mode = 'status',
+     [string]$Task = 'UNKNOWN',
+     [string]$Auth = '',
+-    [string]$Repo = 'D:\M1',
++    [string]$Repo = '',
+     [string]$Out = ''
+ )
+ 
+ $ErrorActionPreference = 'Stop'
++if (-not $Repo) { $Repo = if ($env:RDS_HOME) { $env:RDS_HOME } else { (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path } }
+ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+ . (Join-Path $scriptDir 'lib\Git.ps1')
+ . (Join-Path $scriptDir 'lib\Scope.ps1')
+diff --git a/tooling/git-review/lib/Git.ps1 b/tooling/git-review/lib/Git.ps1
+--- a/tooling/git-review/lib/Git.ps1
++++ b/tooling/git-review/lib/Git.ps1
+@@ -1,9 +1,25 @@
+ ﻿# Git.ps1 - RDS Git 只读封装与摘要计算（PowerShell 5.1）
+ Set-StrictMode -Version 2.0
+ 
+-$script:RdsGitExe = 'D:\Tools\Git\bin\git.exe'
++$script:RdsGitExe = $env:RDS_GIT
+ 
+-function Get-RdsGitExe { return $script:RdsGitExe }
++function Get-RdsGitExe {
++    if ($script:RdsGitExe) { return $script:RdsGitExe }
++    $candidate = $env:RDS_GIT
++    if (-not $candidate) {
++        $cmd = Get-Command git -ErrorAction SilentlyContinue
++        if ($cmd) { $candidate = $cmd.Source }
++    }
++    if (-not $candidate) {
++        $localCfg = Join-Path $PSScriptRoot '..\..\..\tooling\toolchain.local.json'
++        if (Test-Path -LiteralPath $localCfg) { $candidate = (Get-Content -Raw -Encoding UTF8 -LiteralPath $localCfg | ConvertFrom-Json).git }
++    }
++    if (-not $candidate -or -not (Test-Path -LiteralPath $candidate)) {
++        throw "git 未找到：设置 RDS_GIT 环境变量，或在 tooling\toolchain.local.json 中配置 git 路径"
++    }
++    $script:RdsGitExe = $candidate
++    return $script:RdsGitExe
++}
+ 
+ function Invoke-RdsGit {
+     param(
+@@ -17,7 +33,7 @@
+     $code = 1
+     $raw = @()
+     try {
+-        $raw = & $script:RdsGitExe -C $Repo @Arguments 2>$null
++        $raw = & (Get-RdsGitExe) -C $Repo @Arguments 2>$null
+         $code = $LASTEXITCODE
+     }
+     finally {
