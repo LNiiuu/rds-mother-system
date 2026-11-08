@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RDS Git Review Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "taskId", "reviewId", "timestamp", "repository", "branch", "head",
+    "authorizationLevel", "verdict", "findings", "checks", "indexBefore", "indexAfter",
+    "worktreeBefore", "worktreeAfter", "evidence", "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "taskId": { "type": "string", "minLength": 3 },
+    "reviewId": { "type": "string", "pattern": "^RV-[0-9]{8}-[0-9]{3}$" },
+    "timestamp": { "type": "string", "minLength": 10 },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "headBefore", "headAfter"],
+      "properties": {
+        "root": { "type": "string" },
+        "remoteUrl": { "type": "string" },
+        "headBefore": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "headAfter": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "branch": { "type": "string", "minLength": 1 },
+    "head": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "authorizationLevel": { "enum": ["L0"] },
+    "verdict": { "enum": ["PASS", "PARTIAL", "BLOCKED", "FAIL"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "ruleId", "severity", "category", "reason"],
+        "properties": {
+          "id": { "type": "string" },
+          "ruleId": { "type": "string" },
+          "severity": { "enum": ["blocker", "high", "medium", "low", "info"] },
+          "category": { "enum": ["scope", "diff", "secret", "binary", "encoding", "quality", "other"] },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 0 },
+          "maskedSnippet": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["passed", "failed", "skipped", "not_run"] },
+          "command": { "type": "string" },
+          "exitCode": { "type": "integer" },
+          "evidenceId": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "indexBefore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stagedCount", "indexDigest", "diffCachedDigest"],
+      "properties": {
+        "stagedCount": { "type": "integer", "minimum": 0 },
+        "indexDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "diffCachedDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "indexAfter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stagedCount", "indexDigest", "diffCachedDigest"],
+      "properties": {
+        "stagedCount": { "type": "integer", "minimum": 0 },
+        "indexDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "diffCachedDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "worktreeBefore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changedCount", "untrackedCount", "worktreeDigest"],
+      "properties": {
+        "changedCount": { "type": "integer", "minimum": 0 },
+        "untrackedCount": { "type": "integer", "minimum": 0 },
+        "worktreeDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "worktreeAfter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changedCount", "untrackedCount", "worktreeDigest"],
+      "properties": {
+        "changedCount": { "type": "integer", "minimum": 0 },
+        "untrackedCount": { "type": "integer", "minimum": 0 },
+        "worktreeDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

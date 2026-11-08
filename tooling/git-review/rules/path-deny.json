@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "patterns": [
+    { "id": "DENY-ENV", "glob": "**/.env", "reason": "环境变量文件不得入库" },
+    { "id": "DENY-ENV-LOCAL", "glob": "**/.env.*", "reason": "环境变量文件不得入库" },
+    { "id": "DENY-KEY", "glob": "**/*.key", "reason": "私钥文件不得入库" },
+    { "id": "DENY-PEM", "glob": "**/*.pem", "reason": "证书/私钥不得入库" },
+    { "id": "DENY-PFX", "glob": "**/*.pfx", "reason": "证书容器不得入库" },
+    { "id": "DENY-SSHKEY", "glob": "**/id_rsa*", "reason": "SSH 私钥不得入库" },
+    { "id": "DENY-APK", "glob": "**/*.apk", "reason": "二进制样本不得进入母体系仓库" },
+    { "id": "DENY-PCAP", "glob": "**/*.pcap", "reason": "抓包样本不得进入母体系仓库" },
+    { "id": "DENY-ZIP", "glob": "**/*.zip", "reason": "压缩包不得进入母体系仓库" }
+  ]
+}

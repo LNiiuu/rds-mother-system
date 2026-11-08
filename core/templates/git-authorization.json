@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "M1-G1-GIT-REVIEW",
+  "level": "L0",
+  "approvalId": "AP-XX",
+  "issuedBy": "R0",
+  "issuedAt": "2026-11-01T00:00:00+08:00",
+  "allowedPaths": [
+    "core/**",
+    "tooling/git-review/**",
+    "tests/git-review/**",
+    "docs/checks/git-review/**",
+    "tests/self/run.ps1"
+  ],
+  "deleteAllowed": false,
+  "notes": "L0 只读审查；不暂存、不提交、不推送。每次任务单独签发，禁止沿用历史授权。"
+}

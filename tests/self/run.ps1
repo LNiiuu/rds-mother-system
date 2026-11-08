@@ -77,5 +77,49 @@ if (Test-Path -LiteralPath $py) {
   Check 'project.yaml has schema' ($t -match 'schema: rds/project/v1')
 }
 
+# G1 Git 审查（WF5）实现检查
+$g1Required = @(
+  'core/policies/git-review.md',
+  'core/workflows/wf5-git-review.md',
+  'core/templates/git-authorization.json',
+  'core/templates/git-review-report.md',
+  'core/templates/git-review-report.schema.json',
+  'tooling/git-review/README.md',
+  'tooling/git-review/review.ps1',
+  'tooling/git-review/lib/Git.ps1',
+  'tooling/git-review/lib/Scope.ps1',
+  'tooling/git-review/lib/Diff.ps1',
+  'tooling/git-review/lib/Secret.ps1',
+  'tooling/git-review/lib/Report.ps1',
+  'tooling/git-review/rules/secret-rules.json',
+  'tooling/git-review/rules/path-deny.json',
+  'tooling/git-review/rules/allowlist.json',
+  'tests/git-review/run.ps1',
+  'tests/git-review/fixtures/README.md',
+  'tests/git-review/fixtures/expected.json',
+  'docs/checks/git-review/README.md'
+)
+foreach ($f in $g1Required) { Check "git-review file: $f" (Test-Path -LiteralPath (Join-Path $Root $f)) }
+
+$expectedJson = Join-Path $Root 'tests/git-review/fixtures/expected.json'
+if (Test-Path -LiteralPath $expectedJson) {
+  try {
+    $exp = Get-Content -Raw -Encoding UTF8 -LiteralPath $expectedJson | ConvertFrom-Json
+    Check 'git-review fixtures F1-F6' (@($exp.fixtures).Count -eq 6) ('count=' + @($exp.fixtures).Count)
+    $ids = (@($exp.fixtures | ForEach-Object { $_.id }) -join ',')
+    Check 'git-review expected ids' ($ids -eq 'F1,F2,F3,F4,F5,F6') $ids
+  }
+  catch { Check 'git-review expected.json' $false $_.Exception.Message }
+}
+
+$schemaFile = Join-Path $Root 'core/templates/git-review-report.schema.json'
+if (Test-Path -LiteralPath $schemaFile) {
+  try {
+    $sc = Get-Content -Raw -Encoding UTF8 -LiteralPath $schemaFile | ConvertFrom-Json
+    Check 'git-review schema required fields' (@($sc.required).Count -ge 15) ('count=' + @($sc.required).Count)
+  }
+  catch { Check 'git-review schema json' $false $_.Exception.Message }
+}
+
 "----"
 if ($fail -gt 0) { "RESULT: FAIL ($fail)"; exit 1 } else { "RESULT: PASS"; exit 0 }

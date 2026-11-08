@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "exemptPaths": [
+    {
+      "glob": "tooling/git-review/rules/**",
+      "reason": "规则定义文件包含正则字面量，但本身不含真实凭据"
+    }
+  ],
+  "hashAllowlist": [],
+  "notes": "hashAllowlist 按命中内容的 SHA-256 放行，不按明文放行；新增条目必须写明原因与复核人。"
+}

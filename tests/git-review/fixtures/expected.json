@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtures": [
+    { "id": "F1", "verdict": "PASS", "exitCode": 0, "ruleIds": [], "indexUnchanged": true },
+    { "id": "F2", "verdict": "FAIL", "exitCode": 3, "ruleIds": ["SCOPE-OUTSIDE"], "indexUnchanged": true },
+    { "id": "F3", "verdict": "FAIL", "exitCode": 3, "ruleIds": ["DELETE-UNAUTHORIZED"], "indexUnchanged": true },
+    { "id": "F4", "verdict": "FAIL", "exitCode": 3, "ruleIds": ["SECRET-TOKEN-GITHUB"], "indexUnchanged": true },
+    { "id": "F5", "verdict": "BLOCKED", "exitCode": 2, "ruleIds": ["BINARY-LARGE"], "indexUnchanged": true },
+    { "id": "F6", "verdict": "PARTIAL", "exitCode": 1, "ruleIds": ["ENCODING-FORMAT"], "indexUnchanged": true }
+  ]
+}
