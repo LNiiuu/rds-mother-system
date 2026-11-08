@@ -73,13 +73,12 @@ jobs:
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File tests/self/run.ps1
 
-  # G1（WF5 Git 审查）目前**不在版本库里**（属开工前未提交的工作）。
-  # 因此这里显式检测：文件存在才执行，不存在则打印 SKIP 并给出 warning 注解。
-  # 一旦 G1 整体入库，本 job 自动转为真实执行，无需改 workflow。
+  # G1（WF5 Git 审查）已整体入库（提交 a41c650），这里真实执行六个夹具。
+  # 任何夹具失败 -> 脚本非零退出 -> 本 job 失败；不使用 continue-on-error。
   #
   # 注意：本步骤的脚本正文必须是纯 ASCII。
   # GitHub 把 run 块写成 UTF-8 无 BOM 的 .ps1，而 Windows PowerShell 5.1 按 ANSI 解析，
-  # 中文会把引号吃掉并导致语法错误（首轮 CI 就栽在这里）。
+  # 中文会把引号吃掉并导致语法错误（M2.1 首轮 CI 就栽在这里）。
   g1-powershell:
     name: g1 (windows-latest / powershell)
     runs-on: windows-latest
@@ -89,10 +88,7 @@ jobs:
       - name: G1 六个夹具
         shell: powershell
         run: |
-          if (-not (Test-Path 'tests/git-review/run.ps1')) {
-            Write-Output "::warning title=G1 SKIPPED::tests/git-review/run.ps1 is not tracked in git (G1 workflow is still uncommitted), fixtures were not executed"
-            Write-Output "SKIP: tests/git-review/run.ps1 not found"
-            exit 0
-          }
           powershell -NoProfile -ExecutionPolicy Bypass -File tests/git-review/run.ps1
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $code = $LASTEXITCODE
+          Write-Output "g1 fixtures exit code: $code"
+          exit $code
