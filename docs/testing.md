@@ -8,7 +8,7 @@
 
 | 类别 | 定义 | 是否进 CI 门禁 | 当前位置 |
 |---|---|---|---|
-| **Required** | 不依赖真实用户数据、不依赖开发者本机状态；任何失败都必须让门禁变红 | 是（Windows + Ubuntu） | `mars/tests/**/*.test.js` |
+| **Required** | 不依赖真实用户数据、不依赖开发者本机状态；任何失败都必须让门禁变红 | 设计上覆盖 Windows + Ubuntu；**当前仅 Windows 实跑**（CI 未执行） | `mars/tests/**/*.test.js` |
 | **Integration** | 验证多个模块之间的真实交互（CLI 子进程、SQLite 文件、MCP 握手），但仍用临时目录与合成数据 | 是（包含在 Required 通配里，但需自建隔离环境） | 同上（如 `phase1/mcp-server.test.js`、`phase1/ledger-reconcile.test.js` 的 CLI 用例） |
 | **External** | 依赖本机外部环境：真实 DSH 会话、真实客户端、真实设备 | **否** | `mars/tests/external/*.external.js` |
 

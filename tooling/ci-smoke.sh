@@ -8,15 +8,17 @@ cd "$ROOT"
 
 WORK=$(mktemp -d)
 TGZ=""
+# 清理不能影响退出码：某些环境（沙箱 / 只读挂载）下 rm 会失败，
+# 但脚本的成败只应由测试断言决定。
 cleanup() {
-  [ -n "$TGZ" ] && [ -f "$TGZ" ] && rm -f "$TGZ"
-  rm -rf "$WORK"
+  rm -f "$TGZ" 2>/dev/null || true
+  rm -rf "$WORK" 2>/dev/null || true
 }
 trap cleanup EXIT
 
 echo "== 1) 打包 =="
 npm pack --silent >/dev/null
-TGZ=$(ls -t rds-mother-system-*.tgz 2>/dev/null | head -1)
+TGZ=$(ls -t rds-mother-system-*.tgz 2>/dev/null | head -1 || true)
 [ -n "$TGZ" ] || { echo "FAIL 未生成 tarball"; exit 1; }
 
 echo "== 2) 包内容检查 =="
