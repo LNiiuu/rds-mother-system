@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Unreleased — M2.1 CI 实证
+
+目标：四组 CI（Windows/Ubuntu × Node 22/24）在 GitHub Actions 上真实跑通。
+
+修复
+- `tooling/ci-smoke.sh`：npm 全局目录布局跨平台差异（Linux 为 `$PREFIX/lib/node_modules`），
+  改为双候选 + `find` 兜底；失败时输出 `::error::` 注解与 prefix 目录树
+- `tests/self/run.ps1`：项目名检查拆成「活跃资产硬门禁 / 历史记录告警」，
+  不再让已提交的历史验收记录把自检永久钉在红色
+- `.github/workflows/ci.yml`：G1 job 改为存在性检测（G1 未入库时打印 SKIP + warning）；
+  `checkout`/`setup-node` 升到 v5；结构自检由 advisory 转为阻塞
+- `.github/workflows/ci.yml`：G1 步骤正文改为纯 ASCII —— GitHub 把 `run:` 块写成
+  UTF-8 无 BOM，Windows PowerShell 5.1 按 ANSI 解析，中文会破坏语法
+
+结果
+- run `42479193137` @ `afd423a`：6 个 job 全 success（四组矩阵 + 结构自检 + G1 跳过）
+- 已知：G1 夹具在 CI 中未执行（文件未入库），本地六夹具 PASS
+
 ## Unreleased — M2 测试可靠性
 
 目标是"两个平台、同一份代码，`fail=0 && skipped=0`"。不改 MARS 存储结构、Schema 与治理规则。

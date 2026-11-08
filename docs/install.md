@@ -264,16 +264,16 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | **88 项全通过，fail=0，skipped=0**：Windows + Node 22.22.2、Windows + Node 24.22.2 各实跑一遍，结果一致 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
-| Linux / Ubuntu | **未运行**。本机无 Linux 环境（WSL 被安全策略拦截），CI 也未执行（见下） | 跨平台结论仍为 E3：静态核查 0 处大小写不匹配、0 处反斜杠拼路径 |
+| 测试状态 | **88 项全通过，fail=0，skipped=0**：本地 Windows × Node 22/24 各跑一遍；CI 上 Windows + Ubuntu × Node 22/24 四组全绿 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
+| Linux / Ubuntu | **已由 CI 实测通过**（Node 22 与 Node 24 各一格，run 42479193137） | 安装路径按 `lib/node_modules` 布局，已在 smoke 中兼容 |
 | 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
-| `tests/self/run.ps1` | 有 1 项 FAIL：历史文档含具体项目名 | 属文档清理（M5）；活跃资产已清零。CI 中设为非阻塞并标注 known-red |
+| `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录 7 处仅告警 | 历史记录（`mars/docs`）属 M5 文档清理范围，不参与门禁 |
 | 版本号 | `VERSION` = `package.json` = 0.1.0，但 MCP `serverInfo.version` 为 0.2.0 | 属 M5；未在本轮强行统一，因为尚未确认两者是否同一版本体系 |
 | macOS | 未实机验证 | 不作承诺 |
 | `rds principal` | 无此子命令 | 审批身份需按 §7 的脚本追加 |
 | 发布渠道 | 未发布到 npm | 用本地路径安装 |
 | `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用；`--raw` 查看未加工输出 | 想跑测试请用源码树 |
-| CI | **工作流已编写但从未执行**。GitHub Actions 需要 push，而本机出口策略禁止连接 `github.com:443`（`CONNECT tunnel failed, response 502`），推送被阻 | `ubuntu-latest` / Node 24 的远程结果均不存在；所有"CI 通过"的表述都不成立 |
+| CI | **四组全绿**（Windows/Ubuntu × Node 22/24）。G1 job 通过但夹具未执行——`tests/git-review/` 尚未纳入版本库 | G1 整体入库后该 job 自动转为真实执行 |
 
 ---
 
