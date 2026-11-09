@@ -97,8 +97,9 @@
 | 文档 | 内容 |
 |---|---|
 | [productization/M5-docs-audit.md](productization/M5-docs-audit.md) | B0 只读审计：44 项发现（1 项 S1） |
+| [productization/M5-information-architecture.md](productization/M5-information-architecture.md) | B1 信息架构：四类分离、状态图例、为什么用索引而不是移动文件 |
 
-本行以下文档随 M5 各批次产出后回填：信息架构报告（B1）、CLI 帮助覆盖报告（B3）、路径可移植性报告（B4）、干净克隆验证 / 测试报告 / CI 验证 / 最终验收（B6）。
+本行以下文档随 M5 各批次产出后回填：CLI 帮助覆盖报告（B3）、路径可移植性报告（B4）、干净克隆验证 / 测试报告 / CI 验证 / 最终验收（B6）。
 
 ---
 
