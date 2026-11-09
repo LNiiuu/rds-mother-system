@@ -76,7 +76,11 @@ function main() {
   } catch (err) {
     const code = (err && err.code) || 'HOST_WRITE_REFUSED';
     if (json) console.log(JSON.stringify({ ok: false, code, detail: err && err.message }, null, 2));
-    else console.error(`ERROR ${code}: ${err && err.message}`);
+    else {
+      // 错误信息里通常已经带了码（AppError 的 message 以码开头），别打印成 `CODE: CODE …`。
+      const msg = String((err && err.message) || err);
+      console.error(msg.startsWith(code) ? `ERROR ${msg}` : `ERROR ${code}: ${msg}`);
+    }
     return 2;
   }
 }

@@ -54,10 +54,10 @@ function readSchemaVersion(db) {
 }
 
 function openDb(file) {
-  if (file !== ':memory:') ensureDir(path.dirname(file));
-
   let db;
   try {
+    // 建目录也可能失败（父路径是个文件、盘满、权限不足），一并翻译成可读错误。
+    if (file !== ':memory:') ensureDir(path.dirname(file));
     db = new DatabaseSync(file);
     db.exec('PRAGMA journal_mode = WAL');
     db.exec('PRAGMA foreign_keys = ON');

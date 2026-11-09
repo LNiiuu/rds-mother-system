@@ -29,6 +29,30 @@ function parseArgs(argv) {
   return out;
 }
 
+/**
+ * 把异常描述成一行可读文本。
+ *
+ * 规则：
+ *   - AppError 自带码，格式为 `CODE 说明`（码在前，便于 grep 与分支）；
+ *   - 普通 Error 只出 message，不出栈；
+ *   - 加 --debug 时附上栈，供维护者排查（默认不输出，避免把安装路径甩给用户）。
+ */
+function describeError(err, debug = false) {
+  const message = String((err && err.message) || err || 'unknown error');
+  const code = err && err.code && /^[A-Z][A-Z0-9_]+$/.test(String(err.code)) ? err.code : null;
+  const head = code && !message.startsWith(code) ? `${code} ${message}` : message;
+  // 栈只给维护者：rds <命令> --debug。默认不输出，避免把安装路径甩给普通用户。
+  // （刻意不读环境变量：入口是分层规则 L4-env 的边界对象，多一个 env 读取就要多一条豁免。）
+  if (debug && err && err.stack) return head + '\n' + err.stack;
+  return head;
+}
+
+/** 运行期错误统一 exit 4（2=用法错误 3=认证失败 4=运行期失败 5=策略拒绝）。 */
+function exitCodeFor(err) {
+  const n = err && Number(err.exitCode);
+  return Number.isInteger(n) && n > 0 ? n : 4;
+}
+
 function die(message, code = 2) {
   console.error('ERROR ' + message);
   process.exit(code);
@@ -60,8 +84,34 @@ function main() {
     console.log('（rds 为统一入口；也可直接运行 node mars/src/cli.js）');
     process.exit(0);
   }
+  // M4 / B5：顶层异常出口覆盖**所有**子命令。
+  // 此前 try 从第 176 行才开始，init / init-dev / ledger 等路径上的异常
+  // 会以「Node 栈 + 安装绝对路径」的形式直接甩给用户。
+  try {
+    return run(args);
+  } catch (err) {
+    die(describeError(err, args.debug === true || args.debug === '1'), exitCodeFor(err));
+  }
+}
+
+// 与 dispatch 分支保持一致；新增子命令时必须同步这里（有测试守着）。
+const KNOWN_COMMANDS = new Set([
+  'init', 'init-dev', 'put', 'get', 'list', 'search', 'review', 'alias',
+  'compile', 'fragment', 'stats', 'audit', 'ledger', 'mcp', 'project',
+  'share', 'orchestrate', 'help'
+]);
+
+function run(args) {
+  const cmd = args._[0];
   // 组合根：路径、契约、配置快照与身份来源的唯一出处。
   // fail-fast —— 发行包缺 contracts 或路由配置非法时，在这里就失败，而不是等某次 put。
+  // M4 / B5：先认命令，再谈身份。
+  // 此前未知命令会先走 loadAuth，于是 `rds typo` 报的是「认证失败：TOKEN_MISSING」——
+  // 一个拼写错误被诊断成凭证问题，是最容易误导人的一类错误。
+  if (!KNOWN_COMMANDS.has(cmd)) {
+    die('未知命令: ' + cmd + '（rds --help 查看命令）', 2);
+  }
+
   const runtime = createRuntime({ argv: args });
   const p = runtime.paths;
   const assets = runtime.assets;
@@ -108,10 +158,20 @@ function main() {
 
   if (cmd === 'ledger') {
     const ledger = require('./ledger');
-    if (!args.session) die('ledger 需要 --session <文件>', 2);
+    if (args.help) {
+      console.log('用法: rds ledger --session <文件> [--source <kind>] [--out <目录>] [--project <id>]');
+      console.log('');
+      console.log('  --session  会话文件（.jsonl 或 .jsonl.zstd）');
+      console.log('  --source   数据源 kind；省略时按内容嗅探。已注册来源见 rds ledger 报错信息');
+      console.log('  --out      写出 ledger.json / ledger.csv 到该目录；省略则打印到 stdout');
+      console.log('');
+      console.log('只读：不会创建数据库；库已存在时写一条 audit（principal 记为 local）。');
+      return;
+    }
+    if (!args.session) die('ledger 需要 --session <文件>（--help 查看用法）', 2);
     const sessionFile = path.resolve(String(args.session));
     // 先检查文件，再做任何有副作用的事（B3 之前是先建库、后报「文件不存在」）。
-    if (!fs.existsSync(sessionFile)) die('会话文件不存在: ' + args.session);
+    if (!fs.existsSync(sessionFile)) die('会话文件不存在: ' + sessionFile + '（相对路径按当前目录解析）');
 
     let parsed;
     try {
@@ -173,7 +233,7 @@ function main() {
   const db = runtime.openDb(p.db);
   const role = auth.role;
 
-  try {
+  {
     if (cmd === 'put') {
       const r = store.propose(db, auth.principal, {
         project_id: args.project, memory_type: args.type || 'L2', content: args.content,
@@ -336,8 +396,6 @@ function main() {
       return;
     }
     die('未知命令: ' + cmd);
-  } catch (err) {
-    die(err.message, 4);
   }
 }
 
