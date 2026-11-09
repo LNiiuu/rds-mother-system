@@ -31,12 +31,13 @@
     "config": "node tooling/config-check.mjs",
     "layers": "node tooling/layering-check.mjs",
     "baseline": "node tooling/baseline-capture.mjs --check",
+    "docs:check": "node tooling/docs-check.mjs",
     "test": "node tooling/test-gate.mjs",
     "test:raw": "node --test \"mars/tests/**/*.test.js\"",
     "test:external": "node --test \"mars/tests/external/*.external.js\"",
     "test:gate-selfcheck": "node tooling/test-gate-selfcheck.mjs",
     "smoke": "bash tooling/ci-smoke.sh",
-    "verify": "npm run doctor && npm run config && npm run layers && npm run test",
+    "verify": "npm run doctor && npm run config && npm run layers && npm run docs:check && npm run test",
     "pack:check": "npm pack --dry-run"
   },
   "keywords": [

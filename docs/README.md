@@ -151,7 +151,7 @@ MARS 的历史设计与评审记录，共 40 份。索引见 [mars/docs/README.m
 2. **新增验收证据**必须放进 `docs/checks/` 并在 [docs/checks/README.md](checks/README.md) 索引一行。
 3. **不改写带日期的证据**。发现证据有事实错误时，新增勘误段落，并在此页 §4 登记。
 4. **不把历史材料移入正式文档区**。历史材料的价值在于「原样保留」。
-5. **链接必须可点**。提交前自查相对链接是否指向真实文件（自动化检查在 M5-B6 加入 `tooling/docs-check.mjs`）。
+5. **链接必须可点**。提交前跑 `npm run docs:check`：它扫描全部 Markdown 的相对链接，指向不存在的文件就报 `DOCS FAIL` 并给出 `file:line`。
 
 ---
 
