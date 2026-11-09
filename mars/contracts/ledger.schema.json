@@ -4,34 +4,94 @@
   "title": "MARS Usage Ledger (v0)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "generated_at", "source", "sessions", "totals", "cost", "reconcile", "warnings"],
+  "required": [
+    "version",
+    "generated_at",
+    "source",
+    "sessions",
+    "totals",
+    "cost",
+    "reconcile",
+    "warnings"
+  ],
   "properties": {
-    "version": { "const": "0.1.0" },
-    "generated_at": { "type": "string", "format": "date-time" },
-    "source": { "const": "dsh-session" },
+    "version": {
+      "const": "0.1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,31}$",
+      "description": "已注册的数据源 kind（见 mars/src/session-registry.js）；形状由此约束，取值由注册表保证"
+    },
     "sessions": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["session_id", "path", "usage_events", "usage", "source_kind"],
+        "required": [
+          "session_id",
+          "path",
+          "usage_events",
+          "usage",
+          "source_kind"
+        ],
         "properties": {
-          "session_id": { "type": "string" },
-          "path": { "type": "string" },
-          "usage_events": { "type": "integer", "minimum": 0 },
-          "source_kind": { "const": "dsh-session" },
-          "model": { "type": "string" },
-          "provider": { "type": "string" },
+          "session_id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "usage_events": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_kind": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,31}$",
+            "description": "已注册的数据源 kind（见 mars/src/session-registry.js）；形状由此约束，取值由注册表保证"
+          },
+          "model": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
           "usage": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["input", "output", "cacheRead", "cacheWrite", "total"],
+            "required": [
+              "input",
+              "output",
+              "cacheRead",
+              "cacheWrite",
+              "total"
+            ],
             "properties": {
-              "input": { "type": "integer", "minimum": 0 },
-              "output": { "type": "integer", "minimum": 0 },
-              "cacheRead": { "type": "integer", "minimum": 0 },
-              "cacheWrite": { "type": "integer", "minimum": 0 },
-              "total": { "type": "integer", "minimum": 0 }
+              "input": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "output": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cacheRead": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cacheWrite": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           }
         }
@@ -40,37 +100,99 @@
     "totals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["input", "output", "cacheRead", "cacheWrite", "total", "cache_hit_rate"],
+      "required": [
+        "input",
+        "output",
+        "cacheRead",
+        "cacheWrite",
+        "total",
+        "cache_hit_rate"
+      ],
       "properties": {
-        "input": { "type": "integer", "minimum": 0 },
-        "output": { "type": "integer", "minimum": 0 },
-        "cacheRead": { "type": "integer", "minimum": 0 },
-        "cacheWrite": { "type": "integer", "minimum": 0 },
-        "total": { "type": "integer", "minimum": 0 },
-        "cache_hit_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+        "input": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cacheRead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cacheWrite": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cache_hit_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
       }
     },
     "cost": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["estimate", "currency", "rates", "basis"],
+      "required": [
+        "estimate",
+        "currency",
+        "rates",
+        "basis"
+      ],
       "properties": {
-        "estimate": { "type": "number", "minimum": 0 },
-        "currency": { "const": "USD" },
-        "rates": { "type": "object", "additionalProperties": { "type": "number" } },
-        "basis": { "type": "string" }
+        "estimate": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "const": "USD"
+        },
+        "rates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "basis": {
+          "type": "string"
+        }
       }
     },
     "reconcile": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["checked", "matched", "diff_ratio"],
+      "required": [
+        "checked",
+        "matched",
+        "diff_ratio"
+      ],
       "properties": {
-        "checked": { "type": "integer", "minimum": 0 },
-        "matched": { "type": "integer", "minimum": 0 },
-        "diff_ratio": { "type": "number", "minimum": 0 }
+        "checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "matched": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "diff_ratio": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     },
-    "warnings": { "type": "array", "items": { "type": "string" } }
-  }
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "description": "MARS token 账本契约。约束 buildLedger() 的聚合输出；rds ledger 单文件模式输出的是 sessions[] 的单项，按 properties.sessions.items 校验。"
 }

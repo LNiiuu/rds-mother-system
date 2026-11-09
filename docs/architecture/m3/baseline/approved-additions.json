@@ -42,5 +42,13 @@
     "mars/src/db/ratelimit.js": "B5：固定窗口限流，从 db.js 拆出（SQL 未改）",
     "mars/src/db/schema.js": "B5：建表与增量迁移，从 db.js 拆出（DDL 逐字节一致）",
     "mars/src/db/stats.js": "B5：统计查询，从 db.js 拆出"
-  }
+  },
+  "contractChanges": [
+    {
+      "file": "mars/contracts/ledger.schema.json",
+      "sha256": "4088f7150e0993f2d9e25e60c229b7a7862a4675538c970cb869f4eee784606c",
+      "batch": "m4-b1",
+      "reason": "source / source_kind 由 const: dsh-session 放宽为 pattern（形状约束），使契约与已支持多数据源的 session-registry 一致；旧输出仍通过校验"
+    }
+  ]
 }

@@ -237,7 +237,8 @@ function writeBaseline(data) {
     fs.writeFileSync(approved, JSON.stringify({
       note: 'M3 期间允许的对外增项。每加一条必须写清批次与理由；只允许新增，不允许修改或删除既有项。',
       errorCodes: [],
-      packFiles: []
+      packFiles: [],
+      contractChanges: []
     }, null, 2) + '\n');
   }
 }
@@ -247,6 +248,29 @@ function readBaseline(name) {
   if (!fs.existsSync(p)) return null;
   const text = fs.readFileSync(p, 'utf8');
   return name.endsWith('.json') ? JSON.parse(text) : text;
+}
+
+function diffContracts(base, cur, approved) {
+  // 契约哈希默认不允许漂移。允许**显式登记**的变更：approved.contractChanges 里
+  // 每条 {file, sha256, reason, batch}，sha256 必须是变更后的值。
+  // 这样「改了契约」会留下审阅痕迹，而不是靠重新采集基线把差异抹掉。
+  const problems = [];
+  const ok = new Map((approved || []).map((e) => [e.file, e.sha256]));
+  const stale = (approved || []).filter((e) => cur[e.file] !== e.sha256);
+  for (const e of stale) {
+    problems.push(`契约变更登记已过期（当前哈希不匹配）-> ${e.file}`);
+  }
+  const names = new Set([...Object.keys(base || {}), ...Object.keys(cur || {})]);
+  for (const f of [...names].sort()) {
+    const b = (base || {})[f];
+    const c = (cur || {})[f];
+    if (b === c) continue;
+    if (!b) { problems.push(`契约新增未登记 -> ${f}`); continue; }
+    if (!c) { problems.push(`契约被删除 -> ${f}`); continue; }
+    if (ok.get(f) === c) continue;
+    problems.push(`契约内容变化但未登记批准 -> ${f}（base=${String(b).slice(0, 8)} cur=${String(c).slice(0, 8)}）`);
+  }
+  return problems;
 }
 
 function diffSets(label, base, cur, approved) {
@@ -273,8 +297,8 @@ function check() {
   if (helpBase === null) problems.push('缺少基线 cli-help.txt');
   else if (helpBase !== cur['cli-help.txt']) problems.push('cli-help.txt 与基线不一致（子命令或 flag 拼写发生变化）');
 
-  // 2/6/7. JSON 严格相等
-  for (const name of ['cli-json-keys.json', 'contracts-sha256.json', 'exit-codes.json', 'mcp-tools.json']) {
+  // 2/6/7. JSON 严格相等（契约单独处理：允许经登记的变更，见 diffContracts）
+  for (const name of ['cli-json-keys.json', 'exit-codes.json', 'mcp-tools.json']) {
     const base = readBaseline(name);
     if (base === null) {
       problems.push('缺少基线 ' + name);
@@ -286,6 +310,8 @@ function check() {
   }
 
   // 3/5. 集合：只允许登记过的增项
+  problems.push(...diffContracts(readBaseline('contracts-sha256.json') || {}, cur['contracts-sha256.json'], approved.contractChanges || []));
+
   problems.push(...diffSets('error-codes', readBaseline('error-codes.json') || [], cur['error-codes.json'], approved.errorCodes || []));
   const packBase = (readBaseline('pack-files.txt') || '').split('\n').filter(Boolean);
   const packCur = cur['pack-files.txt'].split('\n').filter(Boolean);

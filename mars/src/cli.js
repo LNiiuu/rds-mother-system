@@ -12,6 +12,7 @@ const { restoreFragment } = require('./manifest');
 const sharing = require('./sharing');
 const { sha256, writeJsonAtomic } = require('./util');
 const { createRuntime } = require('./composition');
+const { validate } = require('./validate');
 
 
 function parseArgs(argv) {
@@ -120,6 +121,21 @@ function main() {
       parsed = source.parse({ bytes, ref: sessionFile });
     } catch (err) {
       die(err.message, 4);
+    }
+
+    // M4 / B1：契约要有执行点。单文件模式输出的是 sessions[] 的单项，
+    // 因此按 ledger.schema.json 里 sessions.items 的定义校验；
+    // 聚合输出（buildLedger）由契约测试单独校验。
+    const ledgerContract = assets.contract('ledger');
+    const ledgerSchema = ledgerContract && ledgerContract.value;
+    const sessionSchema = ledgerSchema && ledgerSchema.properties &&
+      ledgerSchema.properties.sessions && ledgerSchema.properties.sessions.items;
+    if (sessionSchema) {
+      const check = validate(parsed, sessionSchema);
+      if (!check.valid) {
+        const head = check.errors.slice(0, 3).map(e => `${e.path}: ${e.message}`).join('; ');
+        die('LEDGER_CONTRACT_INVALID ' + head, 4);
+      }
     }
 
     if (args.out) {
