@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
+const { resolvePaths } = require(path.join(ROOT, 'mars', 'src', 'composition.js'));
 
 // node:sqlite 在 22.x 会打印 ExperimentalWarning，诊断输出里不该出现这条噪音。
 const originalEmit = process.emit;
@@ -189,7 +190,9 @@ export function collect() {
   );
 
   // 8) 数据库
-  const dbPath = process.env.MARS_DB ? path.resolve(process.env.MARS_DB) : path.join(dbDefault, 'mars.db');
+  // M3 / B2：路径由组合根的 resolvePaths 统一解析（与 rds put / MCP 走同一套优先级），
+  // 不再在这里单独读 MARS_DB —— 否则 doctor 报的库和实际写入的库可能不是同一个。
+  const dbPath = resolvePaths({ env: process.env }).db;
   if (fs.existsSync(dbPath)) {
     const size = fs.statSync(dbPath).size;
     add('database', 'info', `${dbPath}（${size} B）`);

@@ -1,11 +1,11 @@
 'use strict';
 // M7 MCP Gateway — single-process JSON request handler with server-side authz.
 // Phase 1 is deliberately NOT registered with DSH; CLI is the supported entry.
-const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
-const { openDb, audit } = require('./db');
+const { openDb, audit, attachAuditSink } = require('./db');
 const { loadPrincipals, loadRouting, authenticate, authorize } = require('./authz');
+const { toPublicCode } = require('./errors');
 const store = require('./store');
 const { compileContext } = require('./compiler');
 
@@ -23,10 +23,10 @@ function deny(code) {
 }
 
 function errorResponse(err) {
-  const message = String((err && err.message) || '');
-  const known = message.match(/^(AUTHZ_DENIED|PROJECT_DENIED|ROLE_DENIED|MEMORY_DENIED|MEMORY_NOT_FOUND|CONTENT_REQUIRED|SOURCE_REF_DENIED|SOURCE_VERSION_REQUIRED|ROLE_SCOPE_REQUIRED|MEMORY_SCHEMA_INVALID|REVIEW_DENIED|SELF_REVIEW_DENIED|DECISION_INVALID|PACKET_SCHEMA_INVALID)/);
+  // 统一错误码映射（M3/B0）：与 mcp-stdio.js 共用同一份白名单，
+  // 不再各自内联正则 —— 两份清单曾经漂移，6 个码在这里退化成了 INTERNAL_ERROR。
   // Never echo err.stack, SQL, filesystem paths or raw messages to callers.
-  return deny(known ? known[1] : 'INTERNAL_ERROR');
+  return deny(toPublicCode(err));
 }
 
 function projectStats(db, project_id) {
@@ -46,14 +46,18 @@ function projectStats(db, project_id) {
   };
 }
 
-function createServer({ dbPath, principalsPath, routingPath, allowedRoots } = {}) {
+function createServer({ dbPath, principalsPath, routingPath, allowedRoots, assets, auditSinkFactory } = {}) {
   if (!dbPath || !principalsPath) throw new Error('DB_AND_PRINCIPALS_REQUIRED');
+  if (!assets || typeof assets.contract !== 'function') throw new Error('ASSET_MISSING');
   const db = openDb(path.resolve(dbPath));
+  // 生产路径由调用方注入 sink；缺省时保持历史的直写行为（见 db.js 的说明）。
+  if (typeof auditSinkFactory === 'function') attachAuditSink(db, auditSinkFactory(db));
   const principals = loadPrincipals(path.resolve(principalsPath));
   const resolvedRoutingPath = routingPath || path.join(ROOT, 'config', 'role-routing.json');
   let routing = null;
   try {
-    if (fs.existsSync(resolvedRoutingPath)) routing = loadRouting(resolvedRoutingPath);
+    // 不做 existsSync 探测：读失败（不存在/非法）统一落到 null，再由调用点返回 ROUTING_UNAVAILABLE。
+    routing = loadRouting(resolvedRoutingPath);
   } catch (err) {
     routing = null;
   }
@@ -106,7 +110,7 @@ function createServer({ dbPath, principalsPath, routingPath, allowedRoots } = {}
         const result = store.propose(db, principal, Object.assign({}, input, {
           project_id,
           role_id
-        }), { allowedRoots });
+        }), { allowedRoots, routing, assets });
         return { ok: true, data: result };
       }
 
@@ -114,7 +118,8 @@ function createServer({ dbPath, principalsPath, routingPath, allowedRoots } = {}
         if (!routing) return deny('ROUTING_UNAVAILABLE');
         const result = compileContext(db, principal, routing, Object.assign({}, params, {
           project_id,
-          role_id
+          role_id,
+          assets
         }));
         return { ok: true, data: result };
       }
@@ -133,11 +138,11 @@ function createServer({ dbPath, principalsPath, routingPath, allowedRoots } = {}
   };
 }
 
-function start({ dbPath, principalsPath, routingPath, allowedRoots } = {}) {
+function start({ dbPath, principalsPath, routingPath, allowedRoots, assets, auditSinkFactory } = {}) {
   // Default-disabled: do not silently pretend this gateway is registered with DSH.
   console.error('MARS_MCP_NOT_REGISTERED: MCP gateway is not registered with DSH; ' +
     'this stdio server must be explicitly enabled by the caller (Phase 1: CLI --enable).');
-  const server = createServer({ dbPath, principalsPath, routingPath, allowedRoots });
+  const server = createServer({ dbPath, principalsPath, routingPath, allowedRoots, assets, auditSinkFactory });
   const rl = readline.createInterface({ input: process.stdin, crlfDelay: Infinity });
   rl.on('line', (line) => {
     const text = String(line || '').trim();

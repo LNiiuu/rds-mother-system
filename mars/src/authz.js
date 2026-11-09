@@ -1,9 +1,13 @@
 'use strict';
 const { readJson, sha256 } = require('./util');
 
+// M3 / B2：移除「账本读取」这一授权动作。
+// 原因：ledger 是本地只读能力（读一个会话文件、算 token），从未被 authorize() 校验过；
+// 保留一个「声明但永不执行」的动作会让权限模型不可信。若将来要把它纳入授权，
+// 应连同 MCP 工具面一起设计，而不是留一个空条目。
 const ACTIONS = new Set([
   'memory.get', 'memory.list', 'memory.stats', 'memory.propose',
-  'memory.review', 'context.compile', 'ledger.read', 'audit.read'
+  'memory.review', 'context.compile', 'audit.read'
 ]);
 
 function loadPrincipals(file) {

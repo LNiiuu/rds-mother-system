@@ -3,16 +3,16 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { openDb, audit, dbStats } = require('./db');
-const { loadPrincipals, loadRouting, authenticate, authorize } = require('./authz');
+const { audit, dbStats } = require('./db');
+const { loadPrincipals, authenticate, authorize } = require('./authz');
 const store = require('./store');
 const { retrieve } = require('./retrieval');
 const { compileContext } = require('./compiler');
 const { restoreFragment } = require('./manifest');
 const sharing = require('./sharing');
 const { sha256, writeJsonAtomic } = require('./util');
+const { createRuntime } = require('./composition');
 
-const ROOT = path.resolve(__dirname, '..');
 
 function parseArgs(argv) {
   const out = { _: [] };
@@ -33,30 +33,22 @@ function die(message, code = 2) {
   process.exit(code);
 }
 
-function paths(args) {
-  // 优先级：命令行参数 > 环境变量 > 仓库内默认值。
-  // 环境变量名与 mcp-stdio.js 保持一致，避免"CLI 一套、服务端另一套"。
-  return {
-    db: path.resolve(args.db || process.env.MARS_DB || path.join(ROOT, 'var', 'mars.db')),
-    principals: path.resolve(args.principals || process.env.MARS_PRINCIPALS || path.join(ROOT, 'config', 'principals.json')),
-    routing: path.resolve(args.routing || process.env.MARS_ROUTING || path.join(ROOT, 'config', 'role-routing.json'))
-  };
-}
-
-function allowedRoots() {
-  const env = process.env.MARS_ALLOWED_ROOTS;
-  if (env) return env.split(';').filter(Boolean);
-  return [path.resolve(ROOT, '..')];
-}
-
-function loadAuth(args) {
-  const p = paths(args);
+// 路径解析、配置快照与身份来源统一由组合根负责（M3 / B2）。
+// 本文件不再直接读 process.env，也不再自行拼默认路径。
+function loadAuth(runtime) {
+  const p = runtime.paths;
   if (!fs.existsSync(p.principals)) die('principals 文件不存在：' + p.principals + '（先运行 init-dev 或复制 config/principals.example.json）');
+
+  const credential = runtime.identity.resolve();
+  if (!credential.ok) die('认证失败：' + credential.code, 3);
+
   const principals = loadPrincipals(p.principals);
-  const auth = authenticate(principals, args.token || process.env.MARS_TOKEN);
+  const auth = authenticate(principals, credential.token);
   if (!auth.ok) die('认证失败：' + auth.reason, 3);
-  const routing = loadRouting(p.routing);
-  return { ...p, principals, principal: auth.principal, routing };
+
+  // 角色优先级：命令行 / 身份来源给出的角色 > 该 principal 的第一个角色
+  const role = credential.role || auth.principal.roles[0];
+  return { ...p, principals, principal: auth.principal, role, routing: runtime.routing };
 }
 
 function main() {
@@ -67,10 +59,15 @@ function main() {
     console.log('（rds 为统一入口；也可直接运行 node mars/src/cli.js）');
     process.exit(0);
   }
-  const p = paths(args);
+  // 组合根：路径、契约、配置快照与身份来源的唯一出处。
+  // fail-fast —— 发行包缺 contracts 或路由配置非法时，在这里就失败，而不是等某次 put。
+  const runtime = createRuntime({ argv: args });
+  const p = runtime.paths;
+  const assets = runtime.assets;
+  const allowedRoots = runtime.allowedRoots;
 
   if (cmd === 'init') {
-    const db = openDb(p.db);
+    const db = runtime.openDb(p.db);
     console.log(JSON.stringify({ db: p.db, stats: dbStats(db) }, null, 2));
     return;
   }
@@ -96,24 +93,35 @@ function main() {
   }
 
   if (cmd === 'stats') {
-    const auth = loadAuth(args);
+    const auth = loadAuth(runtime);
     const project_id = args.project;
     if (!project_id) die('stats 需要 --project（并提供 --token，服务端鉴权）', 2);
     const role_id = args.role || auth.principal.roles[0];
     const a = authorize(auth.principal, { project_id, role_id, action: 'memory.stats', routing: auth.routing });
     if (!a.ok) die('无权访问该项目统计：' + a.reason, 3);
-    const db = openDb(auth.db);
+    const db = runtime.openDb(auth.db);
     audit(db, { principal_id: auth.principal.principal_id, project_id, role_id, action: 'memory.stats', target: 'cli', result: 'ok' });
     console.log(JSON.stringify(dbStats(db, project_id), null, 2));
     return;
   }
 
   if (cmd === 'ledger') {
-    let ledger;
-    try { ledger = require('./ledger'); } catch (err) { die('ledger 模块不可用（R2 实现）：' + err.message); }
-    const db = openDb(p.db);
-    if (!fs.existsSync(args.session)) die('会话文件不存在: ' + args.session);
-    const parsed = ledger.parseSession(args.session);
+    const ledger = require('./ledger');
+    if (!args.session) die('ledger 需要 --session <文件>', 2);
+    const sessionFile = path.resolve(String(args.session));
+    // 先检查文件，再做任何有副作用的事（B3 之前是先建库、后报「文件不存在」）。
+    if (!fs.existsSync(sessionFile)) die('会话文件不存在: ' + args.session);
+
+    let parsed;
+    try {
+      const bytes = fs.readFileSync(sessionFile);
+      const sourceKind = typeof args.source === 'string' ? args.source : undefined;
+      const source = runtime.sessions.resolve({ kind: sourceKind, bytes });
+      parsed = source.parse({ bytes, ref: sessionFile });
+    } catch (err) {
+      die(err.message, 4);
+    }
+
     if (args.out) {
       const outDir = path.resolve(args.out);
       fs.mkdirSync(outDir, { recursive: true });
@@ -121,7 +129,17 @@ function main() {
       if (typeof ledger.toCsv === 'function') fs.writeFileSync(path.join(outDir, 'ledger.csv'), ledger.toCsv(parsed));
       console.log('已写出 ' + outDir);
     } else console.log(JSON.stringify(parsed, null, 2));
-    audit(db, { principal_id: 'cli', project_id: args.project || '-', role_id: args.role || null, action: 'ledger.read', target: path.basename(args.session), result: 'ok' });
+
+    // 只读动作不创建数据库：库不存在就跳过审计，而不是顺手建一个空的（M3 / B3）。
+    // M3 / B2：本地未认证调用不得伪装成已认证主体 —— 'local' 是哨兵，不是 principal。
+    if (fs.existsSync(p.db)) {
+      const db = runtime.openDb(p.db);
+      try {
+        audit(db, { principal_id: 'local', project_id: args.project || '-', role_id: args.role || null, action: 'ledger.parse', target: path.basename(sessionFile), result: 'ok' });
+      } finally {
+        db.close();
+      }
+    }
     return;
   }
 
@@ -131,13 +149,13 @@ function main() {
     if (!args.enable) {
       die('MCP 网关默认禁用（Phase 1 安全要求）。确认身份链路可用后加 --enable 显式启动；本仓库未注册 DSH MCP。', 5);
     }
-    mcp.start({ dbPath: p.db, principalsPath: p.principals, allowedRoots: allowedRoots() });
+    mcp.start({ dbPath: p.db, principalsPath: p.principals, allowedRoots, assets });
     return;
   }
 
-  const auth = loadAuth(args);
-  const db = openDb(p.db);
-  const role = args.role || auth.principal.roles[0];
+  const auth = loadAuth(runtime);
+  const db = runtime.openDb(p.db);
+  const role = auth.role;
 
   try {
     if (cmd === 'put') {
@@ -148,7 +166,7 @@ function main() {
         visibility: args.visibility || 'project',
         tags: args.tags ? String(args.tags).split(',') : [],
         evidence_refs: args.evidence ? String(args.evidence).split(',') : []
-      }, { allowedRoots: allowedRoots(), routing: auth.routing });
+      }, { allowedRoots, routing: auth.routing, assets });
       console.log(JSON.stringify(r));
       return;
     }
@@ -190,7 +208,8 @@ function main() {
       const result = compileContext(db, auth.principal, auth.routing, {
         project_id: args.project, task_id: task.id, role_id: role,
         budget: args.budget ? Number(args.budget) : undefined,
-        query: args.query, state: args.state, task, evidence
+        query: args.query, state: args.state, task, evidence,
+        assets
       });
       if (args.out) {
         const out = path.resolve(args.out);
@@ -203,9 +222,9 @@ function main() {
       return;
     }
     if (cmd === 'project') {
-      const auth = loadAuth(args);
-      const db = openDb(auth.db);
-      const role = args.role || auth.principal.roles[0];
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const role = auth.role;
       if (!auth.principal.roles.includes(role)) die('角色未授权：' + role, 3);
       const sub = args._[1];
       if (sub === 'register') {
@@ -220,9 +239,9 @@ function main() {
       die('未知 project 子命令: ' + sub);
     }
     if (cmd === 'share') {
-      const auth = loadAuth(args);
-      const db = openDb(auth.db);
-      const role = args.role || auth.principal.roles[0];
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const role = auth.role;
       if (!auth.principal.roles.includes(role)) die('角色未授权：' + role, 3);
       const sub = args._[1];
       if (sub === 'create') {
@@ -252,7 +271,7 @@ function main() {
     }
     if (cmd === 'orchestrate') {
       const orch = require('./orchestrator');
-      const db = openDb(path.resolve(process.env.MARS_DB || path.join(__dirname, '..', 'var', 'mars.db')));
+      const db = runtime.openDb(p.db);
       const allowed = db.prepare('SELECT project_id FROM projects ORDER BY project_id').all().map((r) => r.project_id);
       const sub = args._[1];
       if (sub === 'plan') {

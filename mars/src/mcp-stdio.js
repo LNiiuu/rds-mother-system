@@ -9,11 +9,12 @@
 //
 // Transport: newline-delimited JSON-RPC 2.0 over stdio (MCP stdio transport).
 // Safety limits: request line cap, per-process call rate limit, compile budget.
-const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
-const { openDb, audit, consumeRateLimit } = require('./db');
+const { openDb, audit, consumeRateLimit, attachAuditSink } = require('./db');
 const { loadPrincipals, loadRouting, authenticate, authorize } = require('./authz');
+const { toPublicCode } = require('./errors');
+const { createRuntime, createTokenFileIdentity } = require('./composition');
 const { compileContext } = require('./compiler');
 const store = require('./store');
 
@@ -24,23 +25,8 @@ const PROTOCOL_VERSION = '2024-11-05';
 const MAX_LINE_BYTES = 256 * 1024;
 const MAX_CALLS_PER_MINUTE = 120;
 
-function env(name, fallback) {
-  const v = process.env[name];
-  return (v === undefined || v === '') ? fallback : v;
-}
-
-function tokenFromEnv() {
-  const file = env('MARS_TOKEN_FILE');
-  if (file) {
-    try {
-      const raw = fs.readFileSync(path.resolve(file), 'utf8').trim();
-      return raw || null;
-    } catch (err) {
-      return null;
-    }
-  }
-  return null; // tokens are never passed through command-line args or tool args
-}
+// 身份来源与路径解析已移出本文件（M3 / B2）：见 adapters/token-file-identity.js 与 composition.js。
+// 约束不变：token 只从 MARS_TOKEN_FILE 读，绝不通过命令行参数或工具参数传入。
 
 const TOOLS = [
   {
@@ -191,7 +177,8 @@ function validateToolArgs(name, args) {
   return { ok: false, code: 'METHOD_NOT_FOUND' };
 }
 
-function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, token, role } = {}) {
+function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, token, role, assets, auditSinkFactory } = {}) {
+  if (!assets || typeof assets.contract !== 'function') throw new Error('ASSET_MISSING');
   // Fail closed before touching the database: the gateway must bind an explicit
   // routing config at startup. A missing/invalid routing file must not silently
   // fall back to permissive defaults, and must not leak an open DB handle.
@@ -205,6 +192,7 @@ function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, toke
     throw e;
   }
   const db = openDb(path.resolve(dbPath));
+  if (typeof auditSinkFactory === 'function') attachAuditSink(db, auditSinkFactory(db));
   let principals;
   try {
     principals = loadPrincipals(path.resolve(principalsPath));
@@ -304,7 +292,7 @@ function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, toke
           const input = Object.assign({}, params, { project_id });
           delete input.token;
           delete input.role_id;
-          return { ok: true, data: store.propose(db, principal, input, { allowedRoots, routing }) };
+          return { ok: true, data: store.propose(db, principal, input, { allowedRoots, routing, assets }) };
         }
         if (name === 'context_compile') {
           if (!routing) return { ok: false, code: 'ROUTING_UNAVAILABLE' };
@@ -312,13 +300,13 @@ function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, toke
           // MCP 调用方常用的 task 结构是 {task_id,title,...}，而 compiler 读 task.id/objective。
           // 在边界层做一次显式规范化，避免 packet 里出现 UNKNOWN 任务。
           if (params.task && typeof params.task === 'object') params2.task = normalizeTask(params.task);
+          params2.assets = assets;
           return { ok: true, data: compileContext(db, principal, routing, params2) };
         }
         return { ok: false, code: 'METHOD_NOT_FOUND' };
       } catch (err) {
-        const message = String((err && err.message) || '');
-        const known = message.match(/^(AUTHZ_DENIED|PROJECT_DENIED|ROLE_DENIED|ROLE_TYPE_DENIED|MEMORY_DENIED|MEMORY_NOT_FOUND|CONTENT_REQUIRED|SOURCE_REF_DENIED|SOURCE_VERSION_REQUIRED|ROLE_SCOPE_REQUIRED|MEMORY_SCHEMA_INVALID|REVIEW_DENIED|SELF_REVIEW_DENIED|DECISION_INVALID|INVALID_TRANSITION|STATE_UNCHANGED|PACKET_SCHEMA_INVALID|ROUTING_UNAVAILABLE|EXPIRES_AT_INVALID|RATE_LIMITED)/);
-        return { ok: false, code: known ? known[1] : 'INTERNAL_ERROR' };
+        // 统一错误码映射（M3/B0）：唯一真相在 errors.js，两个网关共用。
+        return { ok: false, code: toPublicCode(err) };
       }
     })();
 
@@ -414,19 +402,22 @@ function serve(options) {
 }
 
 function main() {
-  const dbPath = env('MARS_DB', path.join(ROOT, 'var', 'mars.db'));
-  const principalsPath = env('MARS_PRINCIPALS', path.join(ROOT, 'config', 'principals.json'));
-  const routingPath = env('MARS_ROUTING', path.join(ROOT, 'config', 'role-routing.json'));
-  const role = env('MARS_ROLE', '');
-  const allowedRoots = env('MARS_ALLOWED_ROOTS', '');
   try {
+    // 组合根负责路径、配置快照与契约解析；身份来源显式选择「token 文件」适配器。
+    const runtime = createRuntime({ identity: createTokenFileIdentity() });
+    const paths = runtime.paths;
+    const credential = runtime.identity.resolve();
+    // token 缺失/不可读**不阻止启动**：每次工具调用返回 AUTH_DENIED。
+    // 这是 docs/install.md §9 的对外承诺，重构不得改成启动失败。
     serve({
-      dbPath,
-      principalsPath,
-      routingPath,
-      allowedRoots: allowedRoots ? allowedRoots.split(';').filter(Boolean) : undefined,
-      token: tokenFromEnv(),
-      role
+      dbPath: paths.db,
+      principalsPath: paths.principals,
+      routingPath: paths.routing,
+      allowedRoots: paths.allowedRootsFromEnv || undefined,
+      token: credential.ok ? credential.token : null,
+      role: credential.role || '',
+      assets: runtime.assets,
+      auditSinkFactory: runtime.auditSinkFactory
     });
   } catch (err) {
     process.stderr.write('[mars] ' + (err && err.message ? err.message : String(err)) + '\n');
