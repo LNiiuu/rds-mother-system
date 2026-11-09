@@ -2,10 +2,16 @@
 // Maps P4 subagent sessions to (task, arm) by their embedded marker and sums real usage.
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
-const { parseSession, sessionText } = require('../src/ledger');
+const { parseSessionFile, sessionText } = require('../src/adapters/dsh-session-source');
+const DSH_SOURCE = require('../src/adapters/dsh-session-source').createDshSessionSource();
+const parseSession = (file) => parseSessionFile(file, DSH_SOURCE);
 
-const ROOT = process.env.RDS_SESSIONS_ROOT || path.join(os.homedir(), '.dsh', 'sessions');
+// M3 / B5：不再默认猜 ~/.dsh/sessions。会话目录与宿主相关，必须由调用方给出。
+const ROOT = process.env.RDS_SESSIONS_ROOT;
+if (!ROOT) {
+  console.error('ERROR RDS_SESSIONS_ROOT_REQUIRED: 需要显式指定会话目录（例如 RDS_SESSIONS_ROOT=~/.dsh/sessions）');
+  process.exit(2);
+}
 const OUT = path.resolve(__dirname, '..', 'experiments', 'p4');
 const since = Date.now() - 60 * 60 * 1000; // last hour
 const rows = [];

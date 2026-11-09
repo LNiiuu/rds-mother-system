@@ -6,6 +6,13 @@ const os = require('node:os');
 const path = require('node:path');
 const zlib = require('node:zlib');
 const ledger = require('../../src/ledger');
+// M3 / B3：会话解析已从 ledger.js 移到 adapters/dsh-session-source.js。
+// 测试仍按「给一个文件路径、拿一个会话记录」的方式调用，这里做一层薄封装。
+const dsh = require('../../src/adapters/dsh-session-source');
+const dshSource = dsh.createDshSessionSource();
+const parseSession = (file) => dsh.parseSessionFile(file, dshSource);
+const zstdFrames = dsh.zstdFrames;
+
 const { validate } = require('../../src/validate');
 
 const LEDGER_SCHEMA = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'contracts', 'ledger.schema.json'), 'utf8'));
@@ -29,7 +36,7 @@ test('parseSession reads plain JSONL and sums only present usage fields', () => 
   const dir = tmpdir();
   const file = path.join(dir, 'session.v4.jsonl');
   fs.writeFileSync(file, jsonlFixture(), 'utf8');
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   assert.equal(parsed.session_id, 'sess-test-1');
   assert.equal(parsed.source_kind, 'dsh-session');
   assert.equal(parsed.usage_events, 2);
@@ -52,7 +59,7 @@ test('parseSession reads concatenated zstd frames', () => {
   const cut = text.indexOf('\n') + 1;
   const frames = [text.slice(0, cut), text.slice(cut)].map(part => zlib.zstdCompressSync(Buffer.from(part, 'utf8')));
   fs.writeFileSync(file, Buffer.concat(frames));
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   assert.equal(parsed.session_id, 'sess-test-1');
   assert.equal(parsed.usage_events, 2);
   assert.equal(parsed.usage.total, 360);
@@ -64,7 +71,7 @@ test('parseSession falls back to the session directory and skips corrupt lines',
   fs.mkdirSync(sessionDir);
   const file = path.join(sessionDir, 'session.v4.jsonl');
   fs.writeFileSync(file, 'not-json\n' + JSON.stringify({ type: 'assistant/message', data: { usage: { inputTokens: 1, outputTokens: 2, totalTokens: 3 } } }) + '\n', 'utf8');
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   assert.equal(parsed.session_id, '11111111-2222-3333-4444-555555555555');
   assert.equal(parsed.usage_events, 1);
   assert.equal(parsed.usage.total, 3);

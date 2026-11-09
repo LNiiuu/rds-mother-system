@@ -15,6 +15,13 @@ const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const ledger = require('../../src/ledger');
+// M3 / B3：会话解析已从 ledger.js 移到 adapters/dsh-session-source.js。
+// 测试仍按「给一个文件路径、拿一个会话记录」的方式调用，这里做一层薄封装。
+const dsh = require('../../src/adapters/dsh-session-source');
+const dshSource = dsh.createDshSessionSource();
+const parseSession = (file) => dsh.parseSessionFile(file, dshSource);
+const zstdFrames = dsh.zstdFrames;
+
 const fixtures = require('../fixtures/ledger/make-session');
 
 function tempDir(t) {
@@ -25,7 +32,7 @@ function tempDir(t) {
 
 /** 独立解码：逐帧解压、逐行累加。刻意不复用 ledger 的累加逻辑，避免「用实现验证实现」。 */
 function rawTotals(file) {
-  const frames = ledger.zstdFrames(fs.readFileSync(file));
+  const frames = zstdFrames(fs.readFileSync(file));
   const acc = { usageEvents: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 };
   for (const frame of frames) {
     const text = zlib.zstdDecompressSync(frame).toString('utf8');
@@ -51,7 +58,7 @@ test('A1 多帧 zstd 会话可解析，且与独立逐帧解码一致', (t) => {
   const dir = tempDir(t);
   const { file, expected } = fixtures.writeSession(dir, { frames: 3 });
 
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   const raw = rawTotals(file);
 
   assert.equal(parsed.usage_events, expected.usageEvents);
@@ -81,7 +88,7 @@ test('A1 多帧 zstd 会话可解析，且与独立逐帧解码一致', (t) => {
 test('A1 账本与 fixture 总量对账通过，超出 1% 时明确拒绝', (t) => {
   const dir = tempDir(t);
   const { file, expected } = fixtures.writeSession(dir);
-  const built = ledger.buildLedger({ sessions: [ledger.parseSession(file)] });
+  const built = ledger.buildLedger({ sessions: [parseSession(file)] });
 
   assert.equal(built.totals.total, expected.total);
 
@@ -102,7 +109,7 @@ test('A1 只有会话头、没有 usage 事件时不产出虚假用量', (t) => 
   const events = [{ type: 'session', version: 4, id: 'fixture-empty-0001', createdAt: '2026-01-01T00:00:00.000Z' }];
   const { file } = fixtures.writeSession(dir, { events, frames: 1 });
 
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   assert.equal(parsed.usage_events, 0);
   assert.deepEqual(parsed.usage, { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 });
   assert.equal(parsed.session_id, 'fixture-empty-0001');
@@ -124,7 +131,7 @@ test('A1 损坏行被跳过，但不影响同一文件里合法行的统计', (t
     '\n'
   ]);
 
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   assert.equal(parsed.usage_events, 1, '坏行必须被跳过，合法行必须保留');
   assert.equal(parsed.usage.total, 150);
   assert.equal(parsed.session_id, 'fixture-corrupt-0001');
@@ -133,14 +140,14 @@ test('A1 损坏行被跳过，但不影响同一文件里合法行的统计', (t
 test('A1 会话文件不存在时抛出错误，而不是静默跳过', (t) => {
   const dir = tempDir(t);
   const missing = path.join(dir, 'not-there.v4.jsonl.zstd');
-  assert.throws(() => ledger.parseSession(missing), /ENOENT/);
+  assert.throws(() => parseSession(missing), /ENOENT/);
 });
 
 test('A1 同一 fixture 多次解析结果稳定', (t) => {
   const dir = tempDir(t);
   const { file } = fixtures.writeSession(dir);
-  const first = ledger.parseSession(file);
-  const second = ledger.parseSession(file);
+  const first = parseSession(file);
+  const second = parseSession(file);
   assert.deepEqual(
     { id: first.session_id, n: first.usage_events, u: first.usage },
     { id: second.session_id, n: second.usage_events, u: second.usage }
@@ -150,7 +157,7 @@ test('A1 同一 fixture 多次解析结果稳定', (t) => {
 test('A1 重复 session_id 会被记为警告，不静默合并', (t) => {
   const dir = tempDir(t);
   const { file } = fixtures.writeSession(dir);
-  const parsed = ledger.parseSession(file);
+  const parsed = parseSession(file);
   const built = ledger.buildLedger({ sessions: [parsed, parsed] });
   assert.ok(
     built.warnings.some(w => w.includes('duplicate session_id')),

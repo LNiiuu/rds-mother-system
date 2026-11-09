@@ -13,12 +13,17 @@ const zlib = require('node:zlib');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const ledger = require('../../src/ledger');
+const dsh = require('../../src/adapters/dsh-session-source');
+const dshSource = dsh.createDshSessionSource();
+const parseSession = (file) => dsh.parseSessionFile(file, dshSource);
+const zstdFrames = dsh.zstdFrames;
+
 
 const SESSION = process.env.RDS_IT_DSH_SESSION || '';
 const EXPECTED_TOTAL = process.env.RDS_IT_DSH_EXPECTED_TOTAL || '';
 
 function rawTotals(file) {
-  const frames = ledger.zstdFrames(fs.readFileSync(file));
+  const frames = zstdFrames(fs.readFileSync(file));
   const acc = { usageEvents: 0, total: 0, cacheWrite: 0 };
   for (const frame of frames) {
     const text = zlib.zstdDecompressSync(frame).toString('utf8');
@@ -46,7 +51,7 @@ if (!SESSION) {
   });
 } else {
   test('EXTERNAL 真实会话解析结果与独立逐帧解码一致', () => {
-    const parsed = ledger.parseSession(SESSION);
+    const parsed = parseSession(SESSION);
     const raw = rawTotals(SESSION);
     assert.equal(parsed.usage_events, raw.usageEvents);
     assert.equal(parsed.usage.total, raw.total);
@@ -58,7 +63,7 @@ if (!SESSION) {
       assert.ok(true, '未提供 RDS_IT_DSH_EXPECTED_TOTAL，跳过对账断言');
       return;
     }
-    const built = ledger.buildLedger({ sessions: [ledger.parseSession(SESSION)] });
+    const built = ledger.buildLedger({ sessions: [parseSession(SESSION)] });
     const rec = ledger.reconcile(built, Number(EXPECTED_TOTAL));
     assert.equal(rec.matched, 1, 'diff_ratio=' + rec.diff_ratio);
     assert.ok(rec.diff_ratio <= 0.01);
