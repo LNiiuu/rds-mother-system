@@ -329,6 +329,25 @@ tests > 0 && fail === 0 && skipped === 0 && pass+fail+skipped+todo+cancelled ===
 
 **判断 CI 是否真跑过**：看 `g1` job 的耗时。跳过会在 1 秒内结束；真跑约 27 秒。
 
+### 6.4 本地跑 G1 与结构自检
+
+两者都是 Windows 脚本，且都需要 `git` 在 PATH 里：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/git-review/run.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/self/run.ps1
+```
+
+**`git` 不在 PATH 时**（常见于只在 Git Bash 里装过 git 的机器）会报「git 未找到」。两种解法：
+
+```powershell
+$env:RDS_GIT = "C:\Program Files\Git\cmd\git.exe"    # 只对当前会话生效
+```
+
+或在 `tooling/toolchain.local.json` 里写 `{ "git": "<git 路径>" }`。后者是本地文件，已被 `.gitignore` 排除，不会进仓库。
+
+G1 的六个夹具里，F2–F4 的预期裁决就是 `FAIL`、F5 是 `BLOCKED`、F6 是 `PARTIAL`——**夹具 PASS 的意思是「工具给出了预期裁决」，不是「一切正常」**。
+
 ### 6.4 本地复现 CI
 
 ```bash

@@ -162,6 +162,16 @@ Required 测试验证的是**引擎行为**：存储与治理、鉴权与越界�
 | `run:` 块里写中文 | Windows 上语法错误：GitHub 把 `run` 块写成 UTF-8 无 BOM，Windows 的旧 shell 按 ANSI 解析，中文会吃掉引号 | 步骤正文只用 ASCII |
 | npm 全局目录布局不同 | Linux 是 `<prefix>/lib/node_modules`，Windows 是 `<prefix>/node_modules` | `ci-smoke.sh` 用双候选 + `find` 兜底 |
 | 本地绿、CI 红 | 平台差异 | 本地绿不算数；以 CI 为准 |
+| G1 在本地跑不起来 | 报「git 未找到」——`git` 不在 PATH | 设 `RDS_GIT` 指向 `git.exe`，或写进 `tooling/toolchain.local.json`。CI 的 windows-latest 自带 git，不受影响 |
+
+### 6.4 本地跑两个 Windows 脚本
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/git-review/run.ps1   # G1 六夹具
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/self/run.ps1         # 母体系结构自检
+```
+
+G1 的 F2–F4 预期裁决是 `FAIL`、F5 是 `BLOCKED`、F6 是 `PARTIAL`：夹具 PASS 指「工具给出了预期裁决」，不是「一切正常」。整行 `RESULT: PASS` 才是通过。
 
 ---
 
