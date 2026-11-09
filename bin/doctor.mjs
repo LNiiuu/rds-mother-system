@@ -228,14 +228,22 @@ export function collect() {
   //
   // 此前的盲区：core/**/*.md 会随包分发（package.json.files 含 "core/"），
   // 却不参与任何路径检查 —— CODE_EXT 不含 .md，paths:docs 只扫 docs/ 与 mars/docs/。
-  const ASSET_DOCS = [
-    'README.md', 'CHANGELOG.md',
-    'docs/install.md', 'docs/README.md', 'docs/quickstart.md',
-    'docs/PROJECT-MAP.md', 'docs/testing.md', 'docs/versioning.md'
-  ];
-  const assetDocs = ASSET_DOCS
+  // 活跃文档 = 仓库门面（README / CHANGELOG）+ docs/ 根下的正式文档 + core/**/*.md。
+  // docs/ 根用目录扫描而不是硬编码清单：新增一份正式文档不必再改这里。
+  // 排除 M1-0-*.md —— 它们是 2026-11-01 的阶段验收报告，属历史证据。
+  const ASSET_DOCS_FIXED = ['README.md', 'CHANGELOG.md'];
+  let docsRootMd = [];
+  try {
+    docsRootMd = fs.readdirSync(path.join(ROOT, 'docs'))
+      .filter((n) => n.endsWith('.md') && !/^M1-0-/.test(n))
+      .map((n) => path.join(ROOT, 'docs', n));
+  } catch {
+    /* docs/ 不存在时跳过 */
+  }
+  const assetDocs = ASSET_DOCS_FIXED
     .map((f) => path.join(ROOT, f))
     .filter((f) => fs.existsSync(f))
+    .concat(docsRootMd)
     .concat(walkMarkdown(path.join(ROOT, 'core')));
   const assetHits = scanPaths(assetDocs, pats);
   add(

@@ -92,7 +92,8 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 |---|---|
 | 先跑起来 | [docs/quickstart.md](docs/quickstart.md) —— 10 分钟最小闭环，每步带预期输出 |
 | 完整安装与配置 | [docs/install.md](docs/install.md) —— 唯一权威安装文档 |
-| 出问题了 | [docs/install.md](docs/install.md) §12「故障排查」 —— 按现象查 |
+| 出问题了 | [docs/maintainer-guide.md](docs/maintainer-guide.md) §2 按症状查 / §3 错误码表 |
+| 要发版、要备份、要交接 | [docs/maintainer-guide.md](docs/maintainer-guide.md) §4–§9 |
 | 改代码 | [docs/PROJECT-MAP.md](docs/PROJECT-MAP.md) → [docs/testing.md](docs/testing.md) |
 | 核对它可不可信 | [docs/checks/README.md](docs/checks/README.md) —— 全部验收证据索引 |
 

@@ -12,8 +12,8 @@
 
 1. [docs/quickstart.md](quickstart.md) —— 10 分钟跑通最小闭环，每一步都给出预期输出
 2. [docs/install.md](install.md) —— 安装、配置、初始化、MCP 接入、升级卸载（**唯一权威安装文档**）
-3. 装不上或报错 → [docs/install.md](install.md) §12「故障排查」（一张按现象查的表），或 [quickstart.md](quickstart.md) §9「卡住了」
-4. `rds doctor` —— 装完先跑这一条，它会把 Node 版本、FTS5、zstd、目录可写、版本一致性、路径卫生一次报清
+3. 出问题了 → [docs/maintainer-guide.md](maintainer-guide.md) §2「按症状查」与 §3「72 个错误码表」，或 [install.md](install.md) §12「故障排查」
+4. `rds doctor` —— 装完先跑这一条，它会把 Node 版本、FTS5、zstd、目录可写、版本一致性、三类路径卫生、身份与数据库一次报清
 
 不需要读 `core/`、`mars/docs/`、`docs/checks/` 中的任何内容。
 
@@ -68,6 +68,7 @@
 | [README.md](../README.md) | 定位、5 步跑通、文档地图、能力状态表 | 第一次接触 |
 | [docs/quickstart.md](quickstart.md) | 10 分钟最小闭环：建库→建身份→写入→审批→检索→编译，每步带预期输出 | 要立刻跑起来 |
 | [docs/install.md](install.md) | 唯一权威安装文档：前置条件、安装、配置、初始化、最小闭环、新项目接入、MCP 接入、升级卸载、故障排查 | 要装、要用 |
+| [docs/maintainer-guide.md](maintainer-guide.md) | 维护者指南：按症状查、72 个错误码表、备份与恢复、版本与兼容、发布流程、回滚、什么时候该停手 | 出问题、要发版、要交接 |
 | [docs/testing.md](testing.md) | 三类测试、门禁判据、fixture 约定、覆盖范围声明 | 要改测试 |
 | [docs/versioning.md](versioning.md) | 三个版本命名空间、五条规则、Node 版本承诺 | 要发版、要改 Schema |
 | [docs/PROJECT-MAP.md](PROJECT-MAP.md) | RDS/MARS 关系、目录职责、分层规则、数据流、改动影响面 | 要改代码 |
@@ -161,6 +162,7 @@ MARS 的历史设计与评审记录，共 40 份。索引见 [mars/docs/README.m
 | `README.md` | 它是什么、不是什么、5 步跑通、文档地图、当前能力与诚实状态 |
 | `docs/quickstart.md` | 10 分钟从零到「一条记忆被批准并编译进上下文包」，每步都有预期输出 |
 | `docs/install.md` | 从零到能写入第一条记忆的完整步骤，以及装不上时怎么办 |
+| `docs/maintainer-guide.md` | 出了错先查这里；备份、发版、回滚、跑测试的标准动作 |
 | `docs/testing.md` | 测试分三类，门禁只认四个计数，skip 等于失败 |
 | `docs/versioning.md` | 产品版本、数据格式版本、数据库结构版本是三个独立维度 |
 | `docs/PROJECT-MAP.md` | RDS 是流程资产，MARS 是引擎；五端口隔离宿主；改哪里会牵动哪里 |
