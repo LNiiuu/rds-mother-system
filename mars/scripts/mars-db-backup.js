@@ -11,6 +11,21 @@ const { DatabaseSync } = require('node:sqlite');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
+const KNOWN = new Set(['--db', '--out-dir', '--verify']);
+// M4 / B3：未知 flag 必须报错。此前 `--out X` 会被静默忽略并写进默认目录，
+// 调用方以为备份到了 X，实际落在 var/backups —— 而清理"多余文件"时很容易误删。
+for (let i = 0; i < args.length; i += 1) {
+  const a = args[i];
+  if (!KNOWN.has(a)) {
+    console.error('ERROR 未知参数 ' + a + '（支持: --db FILE / --out-dir DIR / --verify FILE）');
+    process.exit(2);
+  }
+  if (!args[i + 1] || args[i + 1].startsWith('--')) {
+    console.error('ERROR 参数 ' + a + ' 缺少取值');
+    process.exit(2);
+  }
+  i += 1;
+}
 function arg(name, fallback) {
   const i = args.indexOf('--' + name);
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;

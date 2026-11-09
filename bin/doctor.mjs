@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const { resolvePaths } = require(path.join(ROOT, 'mars', 'src', 'composition.js'));
+// 注意：这里**不**在模块顶层 require 组合根或 db.js —— 它们会把 node:sqlite 一起拉进来，
+// 而 doctor 恰恰要在 node:sqlite 不可用时给出诊断。所需模块在用到的地方按需引入。
 
 // node:sqlite 在 22.x 会打印 ExperimentalWarning，诊断输出里不该出现这条噪音。
 const originalEmit = process.emit;
@@ -192,12 +193,45 @@ export function collect() {
   // 8) 数据库
   // M3 / B2：路径由组合根的 resolvePaths 统一解析（与 rds put / MCP 走同一套优先级），
   // 不再在这里单独读 MARS_DB —— 否则 doctor 报的库和实际写入的库可能不是同一个。
+  // M4 / B3：这里真的把库打开（只读），而不是只看文件是否存在。
+  //           "文件在"与"库能读"是两件事；损坏的库只有打开才知道。
+  const { resolvePaths } = require(path.join(ROOT, 'mars', 'src', 'paths.js'));
+  const { SCHEMA_VERSION } = require(path.join(ROOT, 'mars', 'src', 'db', 'schema.js'));
   const dbPath = resolvePaths({ env: process.env }).db;
-  if (fs.existsSync(dbPath)) {
-    const size = fs.statSync(dbPath).size;
-    add('database', 'info', `${dbPath}（${size} B）`);
-  } else {
+
+  if (!fs.existsSync(dbPath)) {
     add('database', 'info', `未初始化：${dbPath}（rds init 创建）`);
+  } else {
+    const size = fs.statSync(dbPath).size;
+    let handle = null;
+    try {
+      const { DatabaseSync } = require('node:sqlite');
+      handle = new DatabaseSync(dbPath, { readOnly: true });
+      const row = handle.prepare("SELECT value FROM meta WHERE key = 'schema_version'").get();
+      const got = Number(row && row.value);
+      const quick = handle.prepare('PRAGMA quick_check').get();
+      const integrity = quick && (quick.quick_check || Object.values(quick)[0]);
+
+      if (Number.isFinite(got) && got > SCHEMA_VERSION) {
+        add('database', 'fail',
+          `结构版本 ${got} 高于当前代码支持的 ${SCHEMA_VERSION}（${dbPath}）；请升级 rds，勿用旧版本打开`);
+      } else if (Number.isFinite(got) && got < SCHEMA_VERSION) {
+        add('database', 'warn',
+          `结构版本 ${got} < ${SCHEMA_VERSION}（${size} B）；下次打开会自动增量迁移，建议先备份`);
+      } else if (integrity && String(integrity).toLowerCase() !== 'ok') {
+        add('database', 'fail', `完整性检查未通过（${integrity}）；请从备份恢复：${dbPath}`);
+      } else {
+        add('database', 'ok', `${dbPath}（${size} B，schema ${Number.isFinite(got) ? got : '?'}）`);
+      }
+    } catch (err) {
+      const msg = String((err && err.message) || err);
+      const hint = /not a database|malformed|corrupt/i.test(msg)
+        ? '不是有效的 SQLite 数据库或已损坏；从备份恢复（node mars/scripts/mars-db-backup.js）'
+        : '检查文件权限与磁盘状态';
+      add('database', 'fail', `无法打开 ${dbPath}：${msg}。${hint}`);
+    } finally {
+      try { if (handle) handle.close(); } catch (err) { /* ignore */ }
+    }
   }
 
   return { root: ROOT, nodeVersion: process.versions.node, checks };

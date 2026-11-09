@@ -1,6 +1,9 @@
 {
   "note": "M3 期间允许的对外增项。每加一条必须写清批次与理由；只允许新增，不允许修改或删除既有项。",
-  "errorCodes": [],
+  "errorCodes": [
+    "DB_OPEN_FAILED",
+    "DB_SCHEMA_NEWER"
+  ],
   "packFiles": [
     "mars/src/adapters/cli-identity.js",
     "mars/src/adapters/db-audit-sink.js",

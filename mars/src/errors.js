@@ -73,6 +73,10 @@ const PUBLIC_CODES = new Set([
   'ZSTD_UNSUPPORTED',
   'DSH_SESSION_CORRUPT',
 
+  // 数据库生命周期（新增 M4 / B3）
+  'DB_OPEN_FAILED',
+  'DB_SCHEMA_NEWER',
+
   // 宿主注册表（新增 B4）
   'HOST_REGISTRY_NOT_FOUND',
   'HOST_REGISTRY_INVALID',
