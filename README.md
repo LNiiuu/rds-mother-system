@@ -26,16 +26,24 @@ git clone https://github.com/LNiiuu/rds-mother-system.git && cd rds-mother-syste
 npm install -g .                                  # 1. 安装（Node >= 22.15）
 rds doctor                                        # 2. 自检：Node / sqlite+FTS5 / 版本 / 路径卫生
 
-export MARS_DB=./mars-data/mars.db                 # 3. 指定数据位置（Windows: $env:MARS_DB="...\mars.db"）
-export MARS_PRINCIPALS=./mars-data/principals.json
+mkdir -p ./mars-data
+export MARS_DB="$PWD/mars-data/mars.db"            # 3. 数据放到仓库外，升级才不会被覆盖
+export MARS_PRINCIPALS="$PWD/mars-data/principals.json"
 rds init                                          #    建库
-rds init-dev --principal dev-r0 --projects demo --roles R0   # 4. 生成身份（token 只显示一次）
-export MARS_TOKEN=<DEV_TOKEN>
+
+rds init-dev --principal dev-r0 --projects demo --roles R0   # 4. 生成身份
+#    上一步会打印一行 DEV_TOKEN=xxxx，复制 xxxx 后：
+export MARS_TOKEN="把上一步打印的 DEV_TOKEN 原样粘贴到这里"
+
 rds put --project demo --type L3 \
   --content "示例决策" --source docs/d.md --version v1        # 5. 写入一条 proposed 记忆
+rds list --project demo --status proposed          #    应能看到刚写入的 memory_id
 ```
 
-完整链路（含检索、上下文包、审批、MCP 接入、卸载、故障排查）见 **[docs/install.md](docs/install.md)**。
+> **Windows PowerShell 对应写法**：`$env:MARS_DB="$PWD\mars-data\mars.db"`、`$env:MARS_TOKEN="..."`。
+> 不要写成 `export MARS_TOKEN=<DEV_TOKEN>` —— `<` 在 bash 里是重定向符，会报语法错误。
+
+完整链路（含检索、上下文包、审批、MCP 接入、升级卸载、故障排查）见 **[docs/install.md](docs/install.md)**。
 
 ## 两种用法
 
@@ -64,13 +72,31 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `core/policies` | 权限、任务管理、验收、MCP、下载、Git 远程、交接、冲突 |
 | `core/protocols` | 任务卡、证据协议（E1–E4 分级） |
 | `core/roles` | 8 席角色卡（4 常设 + 4 轮换）与变量化模板 |
-| `core/workflows` | WF1 需求交付、WF2 多方向研究、WF3 缺陷修复、WF4 方案评审 |
+| `core/workflows` | WF1 需求交付、WF2 多方向研究、WF3 缺陷修复、WF4 方案评审、WF5 Git 审查 |
 | `core/templates` | `project.yaml`、交接单、验收单、测试报告、缺陷单 |
 | `stacks/` | 技术栈适配（weapp、native-bin） |
 | `mars/src` | MARS 引擎：存储、鉴权、检索、上下文编译、账本、MCP 服务 |
-| `tooling/` | 工具清单、探针、备份/恢复、同步守卫 |
+| `mars/docs` | MARS 的设计与历史评审记录（索引见 `mars/docs/README.md`） |
+| `tooling/` | 门禁与检查（测试门禁、分层、基线、打包、配置、smoke）、工具清单、探针、备份/恢复 |
+| `docs/` | 文档。**入口是 [`docs/README.md`](docs/README.md)**：正式文档 / 架构设计 / 验收证据 / 历史材料 四类分开索引 |
 | `rea/` | REA 能力基线与六套分析工作流（文档层） |
 | `tests/self` | 母体系结构自检（PowerShell） |
+
+完整的「改哪里会牵动哪里」见 **[docs/PROJECT-MAP.md](docs/PROJECT-MAP.md)**。
+
+## 文档地图
+
+`docs/` 里同时放着四类东西（正式文档、架构设计、验收证据、历史材料），混读会得出错误结论，所以先看分类：
+
+| 你想做什么 | 读哪份 |
+|---|---|
+| 先跑起来 | [docs/install.md](docs/install.md) §7「跑通最小闭环」 |
+| 完整安装与配置 | [docs/install.md](docs/install.md) —— 唯一权威安装文档 |
+| 出问题了 | [docs/install.md](docs/install.md) §12「故障排查」 —— 按现象查 |
+| 改代码 | [docs/PROJECT-MAP.md](docs/PROJECT-MAP.md) → [docs/testing.md](docs/testing.md) |
+| 核对它可不可信 | [docs/checks/README.md](docs/checks/README.md) —— 全部验收证据索引 |
+
+完整索引、状态图例、以及「哪些文档已知失效」在 **[docs/README.md](docs/README.md)**。
 
 ## 当前状态（诚实表）
 
@@ -79,11 +105,15 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2） | E1 |
-| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42583081805](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583081805) @ `d7cba45` | E1 |
+| 测试 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2，`b89cbb2`） | E1 |
+| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42583509413](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583509413) @ `b89cbb2`（6 个 job 全 success） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
-| `render-role` 等投递命令 | **未实现**（路线图 M4） | — |
+| CLI 子命令帮助 | `rds --help` / `rds help` / `rds ledger --help` 可用；其余子命令的 `--help` 在 M5 补齐 | E1 |
+| `render-role` 角色包渲染 | **未纳入仓库与发行包**。工作区存在未入库的 PowerShell 实现（`tooling/agent-runtime/`），不随包分发 | — |
+| `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。身份需用 `rds init-dev` 生成，升级为覆盖安装 | — |
+
+未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。
 
 测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径。
 `npm test` 走门禁 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0`；
