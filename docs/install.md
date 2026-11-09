@@ -2,6 +2,8 @@
 
 > 本文是**唯一权威安装文档**。README 只给定位与最短路径；凡涉及"怎么装、装完怎么验"，以本文为准。
 > 适用基线：`VERSION` 0.1.0 = `package.json` 0.1.0。文档若与代码冲突，以 `rds doctor` 与测试的实际输出为准。
+>
+> **发行包只带本文与 `README.md`**。本文中指向 `docs/testing.md`、`docs/versioning.md`、`docs/checks/` 的链接在发行包内不可点——它们在源码仓库里。只想快速跑通的人看 `docs/quickstart.md`（同样在仓库内）。
 
 ---
 
@@ -63,7 +65,7 @@ rds doctor
 rds doctor
 ```
 
-典型输出（从发行包安装、未初始化数据时）：
+典型输出（从发行包安装、未初始化数据时，实测 2026-11-09 / Windows / Node 22.22.2）：
 
 ```
 RDS doctor  root=<安装目录>
@@ -71,21 +73,22 @@ RDS doctor  root=<安装目录>
   node         ok    v22.22.2（要求 >=22.15.0；22.5 起有 node:sqlite，22.15 起才有 zlib zstd）
   node:sqlite  ok    模块可用，FTS5 虚拟表可用
   zlib:zstd    ok    zstdCompressSync / zstdDecompressSync 可用（rds ledger 依赖）
-  node:sqlite  ok    模块可用，FTS5 虚拟表可用
   git          ok    git version 2.55.0.windows.3
   writable     ok    <安装目录>
   version      ok    0.1.0（VERSION 与 package.json 一致）
-  paths:code   ok    已扫描 41 个代码/配置文件，无本机绝对路径
+  paths:code   ok    已扫描 62 个代码/配置文件，无本机绝对路径
   paths:docs   ok    历史文档无本机绝对路径
-  identity     info  未创建
-  database     info  未初始化
+  identity     info  未创建（rds init-dev 生成；不要把生成的 token 写入版本库）
+  database     info  未初始化：<安装目录>/mars/var/mars.db（rds init 创建）
 
-status: ok  (fail=0 warn=0 checks=9)
+status: ok  (fail=0 warn=0 checks=10)
 ```
 
+- 共 **10** 项检查。`paths:code` 的文件数随安装形态变化：发行包 **62**，源码树 **138**（源码树含测试与工具脚本）。
 - 有 `fail` 时退出码为 `1`，可直接用于 CI 门禁；只有 `warn` 时退出码为 `0`。
 - `rds doctor --json` 输出机器可读结果。
 - `identity` 一项只报告文件**是否存在**，从不读取内容。
+- 从源码树运行时，`paths:docs` 可能为 `warn`（11 个历史证据文档含作者机器路径）。这是**预期**，不是安装问题，详见 §11。
 
 ---
 
@@ -172,21 +175,64 @@ rds compile --project demo --task T-001 --role R0 --budget 4000 --out ./packet.j
 ERROR SELF_REVIEW_DENIED
 ```
 
-这是**故意**的——写入与审批必须由不同主体完成。要体验完整流程，追加一个审批身份：
+这是**故意**的——写入与审批必须由不同主体完成。
+
+**为什么需要手工加身份**：`rds init-dev` 每次都会**整个覆盖** `principals.json`，它没有「追加一个身份」的选项；`rds principal add` 尚未实现（见 §11）。所以第二个身份要手工追加。
+
+**第一步：追加一个 R4 审批身份，并把新 token 存到单独文件**
+
+Linux / macOS：
 
 ```bash
-node -e "const fs=require('fs'),c=require('crypto');const p=process.env.MARS_PRINCIPALS;const cfg=JSON.parse(fs.readFileSync(p,'utf8'));const t=c.randomBytes(24).toString('hex');cfg.principals.push({token_sha256:c.createHash('sha256').update(t).digest('hex'),principal_id:'dev-r4',project_ids:['demo'],roles:['R4'],note:'local approver'});fs.writeFileSync(p,JSON.stringify(cfg,null,2));require('fs').writeFileSync(p+'.r4token',t);console.log('R4 token 已写入 '+p+'.r4token')"
+node -e '
+const fs = require("fs"), c = require("crypto");
+const p = process.env.MARS_PRINCIPALS;
+const cfg = JSON.parse(fs.readFileSync(p, "utf8"));
+const t = c.randomBytes(24).toString("hex");
+cfg.principals.push({
+  token_sha256: c.createHash("sha256").update(t).digest("hex"),
+  principal_id: "dev-r4",
+  project_ids: ["demo"],
+  roles: ["R4"],
+  note: "local approver"
+});
+fs.writeFileSync(p, JSON.stringify(cfg, null, 2));
+fs.writeFileSync(p + ".r4token", t);
+console.log("R4 token 已写入 " + p + ".r4token");
+'
 ```
+
+Windows PowerShell（等价，避免引号转义问题）：
+
+```powershell
+node -e "const fs=require('fs'),c=require('crypto');const p=process.env.MARS_PRINCIPALS;const cfg=JSON.parse(fs.readFileSync(p,'utf8'));const t=c.randomBytes(24).toString('hex');cfg.principals.push({token_sha256:c.createHash('sha256').update(t).digest('hex'),principal_id:'dev-r4',project_ids:['demo'],roles:['R4'],note:'local approver'});fs.writeFileSync(p,JSON.stringify(cfg,null,2));fs.writeFileSync(p+'.r4token',t);console.log('R4 token 已写入 '+p+'.r4token')"
+```
+
+> 脚本只追加一条记录，不会清空已有身份。但请先备份 `principals.json`——它不可从 token 反推重建。
+
+**第二步：用 R4 身份审批，再用 R0 身份检索**
 
 ```bash
-rds review --token (cat $MARS_PRINCIPALS.r4token) \
-  --project demo --memory <memory_id> --decision approved
+# 先拿到 memory_id（proposed 状态的那条）
+rds list --project demo --status proposed
 
-rds search --project demo --query "sqlite"     # 现在能查到
+# 把 token 读进变量再传参。不要写成 --token (cat ...)：括号是子 shell，不会作为参数值
+R4_TOKEN=$(cat "$MARS_PRINCIPALS.r4token")
+rds review --token "$R4_TOKEN" --project demo --memory <上一步看到的 memory_id> --decision approved
+
+# 换回 R0 身份检索，现在能查到
+rds search --project demo --query "sqlite"
 ```
 
-> `--decision` 取**状态名**：`approved` / `rejected`。传动词 `approve` 会得到 `DECISION_INVALID`。
-> 目前没有 `rds principal add` 子命令，所以上一步是一段脚本；一等公民命令属于后续版本（路线图 M5）。
+PowerShell：
+
+```powershell
+$r4 = Get-Content "$env:MARS_PRINCIPALS.r4token" -Raw
+rds review --token $r4.Trim() --project demo --memory <memory_id> --decision approved
+```
+
+> `--decision` 取**状态名**：`approved` / `rejected` / `deprecated` / `superseded`。传动词 `approve` 会得到 `DECISION_INVALID`。
+> 审批成功后，`proposed` 那条记录的 `status` 变为 `approved`，才会出现在 `rds search` 与 `rds compile` 的结果里。
 
 ---
 
@@ -250,9 +296,9 @@ git pull && npm install -g .
 npm uninstall -g rds-mother-system
 ```
 
-数据不会被卸载：`D:\rds-data\`（或你 `MARS_DB` 指定的位置）需要手动删除。
+数据不会被卸载：`$MARS_DB` 指向的库文件（默认 `<安装目录>/mars/var/mars.db`）需要手动删除。
 
-> `rds upgrade` / `rds uninstall` 尚未实现（路线图 M5）。当前升级 = 覆盖安装 + 自行备份数据库。
+> `rds upgrade` / `rds uninstall` **尚未实现**，本轮也不计划实现。当前升级 = 覆盖安装 + 自行备份数据库。不提供空壳命令：`rds upgrade` 会明确报「未知命令」。
 
 备份（Windows 脚本，需 Git）：
 
@@ -266,18 +312,22 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2）。M3 起新增分层检查与行为基线；M4 起新增契约、脚本、数据库、版本、配置、诊断六类测试 | 测试已完全去环境化：不再依赖作者会话、本机 DSH 或绝对路径 |
-| Linux / Ubuntu | 上一轮（M2.1）四组 CI 实测通过；**M3 的改动尚未在任何 CI 上运行** | 本机无 Linux 环境，跨平台结论仍为静态可移植性 |
-| M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置改为启动快照：改 `role-routing.json` 后需重启 MCP |
+| 测试状态 | **173 项全通过，fail=0，skipped=0**（2026-11-09，Windows × Node 22.22.2，`b89cbb2`）。M3 起含分层检查与行为基线；M4 起含契约、脚本、数据库、版本、配置、诊断六类测试 | 测试已完全去环境化：不依赖作者会话、本机 DSH 或绝对路径 |
+| Linux / Ubuntu | **由 CI 实测通过**（Node 22 / 24 各一格），最近一次 `run 42583509413` @ `b89cbb2` | 跨平台结论有 E1 证据，不再是静态推断 |
+| macOS | **未实机验证** | 代码层无 Windows 专有依赖（`powershell.exe` 只出现在测试与脚本中），但未跑过即不承诺 |
+| M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置是**启动快照**：改 `role-routing.json` 后需重启 MCP 才生效 |
 | `rds ledger` | 只读动作：**不会创建数据库**；库已存在时才写审计 | 审计主体记为哨兵 `'local'`，不是已认证 principal |
 | 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
-| `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录 7 处仅告警 | 历史记录（`mars/docs`）属 M5 文档清理范围，不参与门禁 |
-| 版本号 | `VERSION` = `package.json` = `serverInfo.version` = 0.1.0（M4 起 `serverInfo` 派生自产品版本） | 规则见 `docs/versioning.md`；`SCHEMA_VERSION` 与账本格式版本是独立维度 |
-| macOS | 未实机验证 | 不作承诺 |
-| `rds principal` | 无此子命令 | 审批身份需按 §7 的脚本追加 |
-| 发布渠道 | 未发布到 npm | 用本地路径安装 |
+| `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录多处仅告警 | 历史记录（`mars/docs`、`docs/checks`、`docs/history`）属证据，不改写 |
+| `doctor` 的 `paths:docs` | 源码树触发 `warn`（11 个历史证据文档含作者机器路径）；发行包为 `ok` | 预期行为，不是安装缺陷。历史证据只归档标注，不替换正文 |
+| 版本号 | `VERSION` = `package.json` = `serverInfo.version` = 0.1.0 | 规则见 [docs/versioning.md](versioning.md)；`SCHEMA_VERSION` 与账本格式版本是独立维度 |
+| `rds principal add/revoke/list` | **未实现** | 第二个身份需按 §7 的脚本追加；这是有意不做空壳命令 |
+| `rds upgrade` / `rds uninstall` / `rds backup` | **未实现** | 升级 = `git pull && npm install -g .`；备份用 `tooling/backup.ps1`（源码树）或手工拷库 |
+| `render-role` 角色包渲染 | **未纳入仓库与发行包**。工作区存在未入库的 PowerShell 实现 | 干净克隆与发行包中都不存在，不要按文档去找 |
+| 发布渠道 | 未发布到 npm registry | 用本地路径安装（§3） |
 | `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用；`--raw` 查看未加工输出 | 想跑测试请用源码树 |
-| CI | **全部绿**（Windows/Ubuntu × Node 22/24 四组 + 结构自检 + G1）。G1 六个夹具已真实执行（步骤耗时 12s，非跳过） | 详见 `docs/checks/productization/G1-adoption-report.md` |
+| CI | **全部绿**：Windows/Ubuntu × Node 22/24 四组 + structure self-check + g1，共 6 个 job。G1 六个夹具真实执行（耗时 27s，非跳过） | 详见 [docs/checks/productization/M4-ci-validation-report.md](checks/productization/M4-ci-validation-report.md) |
+| Node 22.15 精确边界 | `engines` 声明 `>=22.15.0`；CI 跑 22.x / 24.x 的**最新补丁版**，未固定 22.15.0 实测 | 22.15 的依据是 zstd 回移植的文档事实 |
 
 ---
 

@@ -90,13 +90,16 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 
 | 你想做什么 | 读哪份 |
 |---|---|
-| 先跑起来 | [docs/install.md](docs/install.md) §7「跑通最小闭环」 |
+| 先跑起来 | [docs/quickstart.md](docs/quickstart.md) —— 10 分钟最小闭环，每步带预期输出 |
 | 完整安装与配置 | [docs/install.md](docs/install.md) —— 唯一权威安装文档 |
 | 出问题了 | [docs/install.md](docs/install.md) §12「故障排查」 —— 按现象查 |
 | 改代码 | [docs/PROJECT-MAP.md](docs/PROJECT-MAP.md) → [docs/testing.md](docs/testing.md) |
 | 核对它可不可信 | [docs/checks/README.md](docs/checks/README.md) —— 全部验收证据索引 |
 
 完整索引、状态图例、以及「哪些文档已知失效」在 **[docs/README.md](docs/README.md)**。
+
+> **发行包只带 `README.md` 与 `docs/install.md`**。上表中的其他文档在源码仓库里（`git clone` 后可见）。
+> 只装了包、没 clone 仓库时，用 `npm view` 拿不到它们——请按需 clone 或直接看 GitHub。
 
 ## 当前状态（诚实表）
 
