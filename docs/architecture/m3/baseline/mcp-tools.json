@@ -1,0 +1,71 @@
+[
+  {
+    "name": "memory_get",
+    "required": [
+      "project_id",
+      "memory_id"
+    ],
+    "properties": [
+      "memory_id",
+      "project_id"
+    ],
+    "additionalProperties": true
+  },
+  {
+    "name": "memory_list",
+    "required": [
+      "project_id"
+    ],
+    "properties": [
+      "limit",
+      "project_id",
+      "status",
+      "type"
+    ],
+    "additionalProperties": true
+  },
+  {
+    "name": "memory_stats",
+    "required": [
+      "project_id"
+    ],
+    "properties": [
+      "project_id"
+    ],
+    "additionalProperties": true
+  },
+  {
+    "name": "memory_propose",
+    "required": [
+      "project_id",
+      "memory_type",
+      "content",
+      "source_ref",
+      "source_version"
+    ],
+    "properties": [
+      "confidence",
+      "content",
+      "expires_at",
+      "memory_type",
+      "project_id",
+      "role_scope",
+      "source_ref",
+      "source_version",
+      "visibility"
+    ],
+    "additionalProperties": true
+  },
+  {
+    "name": "context_compile",
+    "required": [
+      "project_id"
+    ],
+    "properties": [
+      "budget",
+      "project_id",
+      "task"
+    ],
+    "additionalProperties": true
+  }
+]

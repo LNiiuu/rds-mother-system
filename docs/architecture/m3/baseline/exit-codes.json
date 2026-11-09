@@ -1,0 +1,12 @@
+{
+  "help: no args": 0,
+  "help: --help": 0,
+  "version": 0,
+  "doctor": 0,
+  "init": 0,
+  "put: no token": 3,
+  "ledger: session missing": 2,
+  "mcp: without --enable": 5,
+  "unknown command": 2,
+  "compile: no token": 3
+}

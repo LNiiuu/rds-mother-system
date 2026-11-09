@@ -1,0 +1,7 @@
+{
+  "mars/contracts/context-packet.schema.json": "d4f75ae3dd686b79fe48c58292f5b75c4c2aa31584504e1958ee8d594cf65c79",
+  "mars/contracts/ledger.schema.json": "53899c9b058425a07a44e6d3f0871a8ac02711a669ac291739f0974bf051e6af",
+  "mars/contracts/manifest.schema.json": "163553544d0fecb7b8a071a125f841264802b62ec93ddd135ad980126fc13291",
+  "mars/contracts/memory.schema.json": "f8db0eaa4772007662d9c9be4852d983f5771f3b2b61abeb40eada03f7e5290a",
+  "mars/contracts/role-routing.schema.json": "696ab446c3c7c6bf57c061e994ee12775a5afff2aabc5f95e8b23584918c49c8"
+}

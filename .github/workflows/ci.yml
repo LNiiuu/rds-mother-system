@@ -45,6 +45,10 @@ jobs:
         shell: bash
         run: npm run config
 
+      - name: 分层检查（端口零依赖 / 域无宿主耦合 / 无循环依赖）
+        shell: bash
+        run: npm run layers
+
       - name: Required 测试门禁
         shell: bash
         run: npm test

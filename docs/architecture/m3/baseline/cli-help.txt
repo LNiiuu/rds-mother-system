@@ -1,0 +1,25 @@
+RDS —— 研发流程资产 + 本地记忆引擎（MARS）
+
+用法: rds <命令> [选项]
+
+内建命令
+  version                 打印 VERSION
+  doctor [--json]         环境诊断（Node / node:sqlite+FTS5 / Git / 目录可写 / 版本一致性 / 路径卫生）
+  validate [--file <p>]   校验 project.yaml（默认取当前目录）
+  test                    运行 mars/tests（仅源码仓库可用）
+
+MARS 记忆引擎（转交 mars/src/cli.js）
+  init                    初始化数据库
+  init-dev                生成开发身份（token 只显示一次）
+  put | get | list        写入 / 读取 / 列出记忆
+  search                  检索（只返回 approved）
+  review                  审批（需 R4 类角色，不能自审）
+  compile                 编译上下文包
+  fragment | alias | stats | audit | ledger | mcp | project | share
+
+示例
+  rds init --db ./mars-data/mars.db
+  rds doctor
+  rds search --token $env:MARS_TOKEN --project demo --query "SQLite"
+
+文档: docs/install.md
