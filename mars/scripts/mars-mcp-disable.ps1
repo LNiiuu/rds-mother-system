@@ -1,7 +1,10 @@
-# MARS MCP disable script (Phase 2 / G1).
-# Removes DSH MCP registry entries whose name starts with "mars-", after backing up registry.json.
-# Dry-run by default; pass -Yes to write. Does not touch mars DB or source files.
-[CmdletBinding(SupportsShouldProcess = $true)]
+﻿# MARS MCP disable script (Phase 2 / G1).
+# M3 / B4: this script now only delegates. The logic lives in mars/scripts/mars-mcp-disable.js.
+# The old version rewrote the host registry with ConvertFrom-Json / ConvertTo-Json
+# (no structure check, no atomic write). The new one backs up first, validates the
+# entries array, preserves unknown top-level fields, writes tmp+rename, reads back.
+#
+# Dry-run by default; pass -Yes to write. Does not touch the mars database or sources.
 param(
   [string]$Registry = (Join-Path $env:USERPROFILE '.dsh\skill-mcp-manager\registry.json'),
   [string]$BackupDir = '',
@@ -9,40 +12,19 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
-if (-not $BackupDir) { $BackupDir = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'mars\var\mcp') }
-
-if (-not (Test-Path -LiteralPath $Registry)) { Write-Error "registry not found: $Registry"; exit 2 }
-
-$raw = Get-Content -LiteralPath $Registry -Raw -Encoding UTF8
-$doc = $raw | ConvertFrom-Json
-if (-not ($doc.PSObject.Properties.Name -contains 'entries')) { Write-Error 'registry has no entries array'; exit 2 }
-
-$all = @($doc.entries)
-$keep = @($all | Where-Object { -not ([string]$_.name).StartsWith('mars-') })
-$removed = $all.Count - $keep.Count
-Write-Output ("registry entries: {0}; mars entries: {1}; will remove: {2}" -f $all.Count, ($all.Count - $keep.Count), $removed)
-if ($removed -eq 0) { Write-Output 'no mars-* entries; nothing to do'; exit 0 }
-
-if (-not $Yes) {
-  Write-Output 'WHATIF: no write. Re-run with -Yes (registry.json is backed up first).'
-  Write-Output ('backup target: {0}\registry-backup-{1}.json' -f $BackupDir, (Get-Date -Format 'yyyyMMdd-HHmmss'))
-  exit 0
+$node = $env:RDS_NODE_BIN
+if (-not $node) {
+  $cmd = Get-Command node -ErrorAction SilentlyContinue
+  if ($cmd) { $node = $cmd.Source }
 }
+if (-not $node) { Write-Error 'node not found: add Node 22.5+ to PATH or set RDS_NODE_BIN'; exit 2 }
 
-if (-not $PSCmdlet.ShouldProcess($Registry, "remove $removed mars-* entries")) {
-  Write-Output 'ABORTED (ShouldProcess returned false); registry unchanged.'
-  exit 0
-}
+$impl = Join-Path $PSScriptRoot 'mars-mcp-disable.js'
+if (-not (Test-Path -LiteralPath $impl)) { Write-Error ('missing implementation: ' + $impl); exit 2 }
 
-if (-not (Test-Path -LiteralPath $BackupDir)) { New-Item -ItemType Directory -Path $BackupDir | Out-Null }
-$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$backup = Join-Path $BackupDir ("registry-backup-$stamp.json")
-Copy-Item -LiteralPath $Registry -Destination $backup -Force
-Write-Output "backup written: $backup"
+$cliArgs = @($impl, '--registry', $Registry)
+if ($BackupDir) { $cliArgs += @('--backup-dir', $BackupDir) }
+if ($Yes) { $cliArgs += '--yes' }
 
-$doc.entries = $keep
-$json = $doc | ConvertTo-Json -Depth 12
-Set-Content -LiteralPath $Registry -Value $json -Encoding UTF8
-Write-Output "removed $removed mars-* entries from $Registry"
-Write-Output 'NOTE: a running DSH session must reload/restart before the tool catalog refreshes.'
-exit 0
+& $node @cliArgs
+exit $LASTEXITCODE
