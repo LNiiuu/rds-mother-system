@@ -150,3 +150,49 @@ test('B5 ledger --help 输出用法并退出 0（此前会报缺少 --session）
   assert.match(r.stdout, /--session/);
   assert.match(r.stdout, /--source/);
 });
+
+// --- MCP 启动降级（回滚演练在干净克隆里发现的问题）------------------------
+// 此前 principals.json 不存在时 MCP 直接退出，客户端只看到进程消失 + 一行 ENOENT。
+// 与 docs/install.md §9「token 缺失不阻止启动」不一致；现改为降级启动 + 明确告警。
+
+const MCP = path.join(REPO, 'mars', 'src', 'mcp-stdio.js');
+
+function handshake(requests, extraEnv = {}) {
+  const env = Object.assign({}, process.env, extraEnv);
+  delete env.MARS_TOKEN;
+  delete env.MARS_TOKEN_FILE;
+  Object.assign(env, extraEnv);
+  const input = requests.map((r) => JSON.stringify(r)).join('\n') + '\n';
+  return spawnSync(process.execPath, [MCP], { input, encoding: 'utf8', timeout: 60000, env });
+}
+
+test('B6 MCP 在 principals.json 缺失时降级启动，而不是退出', () => {
+  withDir((dir) => {
+    const r = handshake(
+      [{ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', clientInfo: { name: 'diag', version: '0' } } }],
+      { MARS_PRINCIPALS: path.join(dir, 'missing.json'), MARS_DB: path.join(dir, 'mars.db') }
+    );
+    assert.equal(r.status, 0, r.stderr);
+    const msg = JSON.parse(r.stdout.split('\n').filter(Boolean)[0]);
+    assert.equal(msg.result.serverInfo.name, 'mars');
+    assert.match(r.stderr, /WARN principals 不可用/);
+    assert.match(r.stderr, /rds init-dev/, '应告诉用户怎么生成身份');
+  });
+});
+
+test('B6 MCP 在 principals.json 缺失时每次调用返回 AUTH_DENIED', () => {
+  withDir((dir) => {
+    const r = handshake([
+      { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', clientInfo: { name: 'diag', version: '0' } } },
+      { jsonrpc: '2.0', method: 'notifications/initialized' },
+      { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'memory_stats', arguments: { project_id: 'demo' } } }
+    ], { MARS_PRINCIPALS: path.join(dir, 'missing.json'), MARS_DB: path.join(dir, 'mars.db') });
+
+    assert.equal(r.status, 0, r.stderr);
+    const lines = r.stdout.split('\n').filter(Boolean).map((l) => JSON.parse(l));
+    const call = lines.find((m) => m.id === 2);
+    const payload = JSON.parse(call.result.content[0].text);
+    assert.equal(payload.ok, false);
+    assert.match(String(payload.code), /AUTH_DENIED|TOKEN_MISSING/);
+  });
+});

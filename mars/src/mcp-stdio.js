@@ -199,8 +199,16 @@ function createGateway({ dbPath, principalsPath, routingPath, allowedRoots, toke
   try {
     principals = loadPrincipals(path.resolve(principalsPath));
   } catch (err) {
-    try { db.close(); } catch (closeErr) { /* ignore */ }
-    throw err;
+    // M4 / B6（回滚演练在干净克隆里发现）：没有 principals.json 时此前直接退出，
+    // 客户端只看到进程消失 + 一行 `[mars] ENOENT`。
+    // 与 docs/install.md §9「token 缺失不阻止启动」保持一致：**降级启动**，
+    // 每次工具调用返回 AUTH_DENIED，并在 stderr 说明缺的是什么、怎么生成。
+    principals = { version: '0.1.0', principals: [] };
+    process.stderr.write(
+      '[mars] WARN principals 不可用：' + (err && err.message ? err.message : String(err)) + '\n'
+      + '[mars] WARN 本次启动将以空身份表运行，所有工具调用返回 AUTH_DENIED；'
+      + '先运行 `rds init-dev` 生成身份后重启。\n'
+    );
   }
 
   function boundIdentity() {

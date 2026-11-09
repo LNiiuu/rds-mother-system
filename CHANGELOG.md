@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## Unreleased — M4 可维护性
+
+目标：让下一阶段的开发更容易定位问题、更容易安全修改。不加功能、不加依赖、不改 Schema。
+
+新增
+- `mars/src/version.js`：产品版本的单一读取点；`serverInfo.version` 不再硬编码
+- `docs/versioning.md`：三个版本命名空间（产品 / 数据格式 / 数据库结构）与五条规则
+- `tooling/baseline-capture.mjs` 支持「登记过的契约变更」（`approved-additions.json.contractChanges`）
+- 六类新测试：契约一致性、脚本可解析、数据库生命周期、版本一致性、配置一致性、故障诊断矩阵
+- 文档：`M4-*.md` 报告 8 份（审计 / 契约 / 脚本 / 数据库 / 版本 / 观测 / 测试 / 最终验收）
+
+变更（对外可见）
+- **`rds ledger` 输出按契约校验**：不符合 `ledger.schema.json#/properties/sessions/items` 时
+  `LEDGER_CONTRACT_INVALID` + exit 4。契约此前在 `mars/src` 零引用，等于没有约束
+- **`ledger.schema.json` 的 `source` / `source_kind` 由 `const: dsh-session` 放宽为 `pattern`**，
+  与已支持多数据源的 `session-registry` 一致（H-05 关闭）
+- **`serverInfo.version` 由 `0.2.0` 改为 `0.1.0`**（派生自产品版本）。仓库内无依赖方
+- **`engines.node` 由 `>=22.5.0` 改为 `>=22.15.0`**：zstd 到 22.15 才进 v22 分支，
+  22.5–22.14 上 `rds ledger` 会失败
+- **打开更新版本的数据库会被拒绝**（`DB_SCHEMA_NEWER`），不再把 `schema_version` 静默写回旧值
+- **数据库打开失败给出可操作错误**（`DB_OPEN_FAILED`），CLI 不再打印 Node 栈
+- **审计写入失败不再完全静默**：计数 + 每连接一次 stderr 提示
+- **CLI 顶层异常出口覆盖全部子命令**；栈只在 `--debug` 时输出
+- **未知命令先于身份检查**：`rds typo` 报「未知命令」而不是「认证失败」
+- **`rds ledger --help`**、`mars-issue-mcp-identity.js --help` 可用
+- **`mars/scripts/mars-db-backup.js` 与身份签发脚本拒绝未知参数**（此前静默忽略并写默认位置）
+- **`mars-issue-mcp-identity.js` 不再在 principals.json 损坏时重置为空表**（此前会静默抹掉所有身份）
+
+删除
+- `mars/scripts/seed-phase2.js`：语法损坏（中文曾被按 GBK 解码，含不可逆 `?`）、无调用方、
+  直写默认库。替代路径：`rds init-dev` → `rds put` → `rds review`
+
+不变
+- 任何 SQL / DDL / `SCHEMA_VERSION` / 数据迁移；CLI 参数与 JSON 形状；MCP 工具面；
+  五个端口边界；零第三方依赖
+
+测试
+- 128 → **173** 项，`fail=0`、`skipped=0`；分层 0 违规；7 面行为基线零漂移（仅登记增项）
+- 回滚演练：逐批 revert → 验证 → revert-revert → 验证（结果见 `M4-rollback-report.md`）
+
 ## Unreleased — M3 宿主适配层
 
 目标：把宿主相关的实现收进适配器，域逻辑不再直接依赖 DSH、文件系统布局与进程环境。

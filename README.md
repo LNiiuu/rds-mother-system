@@ -4,7 +4,7 @@
 
 - **版本**：见 `VERSION`（当前 0.1.0）
 - **许可**：MIT（见 `LICENSE`）
-- **安装**：`npm install -g .`（Node >= 22.5，无第三方依赖）→ 详见 **[docs/install.md](docs/install.md)**
+- **安装**：`npm install -g .`（Node >= 22.15，无第三方依赖）→ 详见 **[docs/install.md](docs/install.md)**
 - **范围**：只含通用资产；不含任何具体项目的业务代码、数据与需求
 
 ## 它是什么 / 不是什么
@@ -23,7 +23,7 @@
 ```bash
 git clone https://github.com/LNiiuu/rds-mother-system.git && cd rds-mother-system
 
-npm install -g .                                  # 1. 安装（Node >= 22.5）
+npm install -g .                                  # 1. 安装（Node >= 22.15）
 rds doctor                                        # 2. 自检：Node / sqlite+FTS5 / 版本 / 路径卫生
 
 export MARS_DB=./mars-data/mars.db                 # 3. 指定数据位置（Windows: $env:MARS_DB="...\mars.db"）
@@ -79,8 +79,8 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **128 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2） | E1 |
-| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42479193137](https://github.com/LNiiuu/rds-mother-system/actions/runs/42479193137) @ `afd423a` | E1 |
+| 测试 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2） | E1 |
+| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42575344428](https://github.com/LNiiuu/rds-mother-system/actions/runs/42575344428) @ `9a6b4a8`（M4 的 run 见 `docs/checks/productization/M4-ci-validation-report.md`） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
 | `render-role` 等投递命令 | **未实现**（路线图 M4） | — |

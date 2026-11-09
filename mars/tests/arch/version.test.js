@@ -37,7 +37,22 @@ test('B4 MCP initialize 的 serverInfo.version 等于产品版本（端到端握
     ''
   ].join('\n');
 
-  const r = spawnSync(process.execPath, [script], { input, encoding: 'utf8', timeout: 30000 });
+  // 自建临时身份与库：绝不依赖仓库内的 mars/config/principals.json
+  // （那是本机运行产物，干净检出里不存在 —— 早期版本因此在本机绿、在克隆里红）。
+  const os = require('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'm4-version-'));
+  const principals = path.join(dir, 'principals.json');
+  fs.writeFileSync(principals, JSON.stringify({ version: '0.1.0', principals: [] }));
+  const env = Object.assign({}, process.env, {
+    MARS_PRINCIPALS: principals,
+    MARS_DB: path.join(dir, 'mars.db'),
+    MARS_ROUTING: path.join(REPO, 'mars', 'config', 'role-routing.json')
+  });
+  delete env.MARS_TOKEN;
+  delete env.MARS_TOKEN_FILE;
+
+  const r = spawnSync(process.execPath, [script], { input, encoding: 'utf8', timeout: 30000, env });
+  fs.rmSync(dir, { recursive: true, force: true });
   assert.equal(r.status, 0, r.stderr);
   const first = r.stdout.split('\n').filter(Boolean)[0];
   const msg = JSON.parse(first);

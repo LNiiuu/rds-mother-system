@@ -9,7 +9,7 @@
 
 | 项 | 要求 | 说明 |
 |---|---|---|
-| Node.js | **>= 22.5.0** | 数据库层使用内置模块 `node:sqlite`，该模块自 22.5 起提供。22.22.x 与 24.x 已实测通过 |
+| Node.js | **>= 22.15.0** | `node:sqlite` 自 22.5 起提供；`zlib` 的 zstd（`rds ledger` 解析会话必需）到 22.15 才进 v22 分支。22.22.x 与 24.x 已实测通过 |
 | npm | 随 Node 附带 | 只用于安装本包；运行时不依赖任何第三方库 |
 | Git | 可选 | 仅 `tooling/sync.ps1`、`tooling/backup.ps1` 等运维脚本需要；MARS 本体不需要 |
 | PowerShell | 仅 Windows 需要 5.1+ | 只用于 `.ps1` 脚本；`rds` 命令本身在两个平台等价 |
@@ -68,7 +68,9 @@ rds doctor
 ```
 RDS doctor  root=<安装目录>
 
-  node         ok    v22.22.2（要求 >=22.5.0）
+  node         ok    v22.22.2（要求 >=22.15.0；22.5 起有 node:sqlite，22.15 起才有 zlib zstd）
+  node:sqlite  ok    模块可用，FTS5 虚拟表可用
+  zlib:zstd    ok    zstdCompressSync / zstdDecompressSync 可用（rds ledger 依赖）
   node:sqlite  ok    模块可用，FTS5 虚拟表可用
   git          ok    git version 2.55.0.windows.3
   writable     ok    <安装目录>
@@ -264,13 +266,13 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | **128 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2）。M3 起新增分层检查与行为基线 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
+| 测试状态 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2）。M3 起新增分层检查与行为基线；M4 起新增契约、脚本、数据库、版本、配置、诊断六类测试 | 测试已完全去环境化：不再依赖作者会话、本机 DSH 或绝对路径 |
 | Linux / Ubuntu | 上一轮（M2.1）四组 CI 实测通过；**M3 的改动尚未在任何 CI 上运行** | 本机无 Linux 环境，跨平台结论仍为静态可移植性 |
 | M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置改为启动快照：改 `role-routing.json` 后需重启 MCP |
 | `rds ledger` | 只读动作：**不会创建数据库**；库已存在时才写审计 | 审计主体记为哨兵 `'local'`，不是已认证 principal |
 | 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
 | `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录 7 处仅告警 | 历史记录（`mars/docs`）属 M5 文档清理范围，不参与门禁 |
-| 版本号 | `VERSION` = `package.json` = 0.1.0，但 MCP `serverInfo.version` 为 0.2.0 | 属 M5；未在本轮强行统一，因为尚未确认两者是否同一版本体系 |
+| 版本号 | `VERSION` = `package.json` = `serverInfo.version` = 0.1.0（M4 起 `serverInfo` 派生自产品版本） | 规则见 `docs/versioning.md`；`SCHEMA_VERSION` 与账本格式版本是独立维度 |
 | macOS | 未实机验证 | 不作承诺 |
 | `rds principal` | 无此子命令 | 审批身份需按 §7 的脚本追加 |
 | 发布渠道 | 未发布到 npm | 用本地路径安装 |
@@ -283,13 +285,21 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 现象 | 原因 | 处理 |
 |---|---|---|
-| `ERROR Node.js 版本过低` | Node < 22.5 | 用 nvm/fnm 切到 >= 22.5 |
+| `ERROR Node.js 版本过低` | Node < 22.15 | 用 nvm/fnm 切到 >= 22.15（低于此版本 `rds ledger` 不可用） |
 | `Cannot find module 'node:sqlite'` | 绕过 `rds` 直接跑 `node mars/src/cli.js`，或在旧 Node 上运行 | 用 `rds <命令>`；或升级 Node |
 | `principals 文件不存在` | 未设 `MARS_PRINCIPALS`，又没传 `--principals` | 按 §5 设置，或每次传 `--principals` |
 | `AUTH_DENIED` / `TOKEN_MISSING_OR_TOO_SHORT` | token 缺失/错误；该身份无权访问该项目 | 检查 `MARS_TOKEN`、`principals.json` 里的 `project_ids` 与 `roles` |
 | `SELF_REVIEW_DENIED` | 写入者与审批者是同一身份 | 按 §7 增加第二个身份 |
 | `DECISION_INVALID` | `--decision` 传了动词 | 用 `approved` / `rejected` |
 | `Unknown stack` | `stack` 无对应 `stacks/<name>/stack.yaml` | `ls stacks/` 查看可用栈 |
+| `DB_OPEN_FAILED` | 库文件不是 SQLite、已损坏，或目录不可写 | `rds doctor` 确认；从备份恢复（`node mars/scripts/mars-db-backup.js --verify <file>`） |
+| `DB_SCHEMA_NEWER` | 这个库被更新版本的 rds 写过（`schema_version` 高于当前代码） | 升级 rds；**不要**用旧版本打开 —— 旧代码不会改它，但也不会正确理解它 |
+| `LEDGER_CONTRACT_INVALID` | `rds ledger` 输出不符合契约 | 说明解析器与契约不一致，属 bug；用 `--debug` 拿栈并报告 |
+| `SOURCE_UNSUPPORTED` / `未知数据源` | `--source` 写错，或该来源未注册 | 省略 `--source` 让程序嗅探；报错信息里会列出已注册来源 |
+| `HOST_REGISTRY_INVALID` / `HOST_REGISTRY_READONLY` | 目标注册表不是合法 JSON / 无写权限 | 先备份；修正格式或换可写位置（`--registry`） |
+| `ASSET_MISSING` | 发行包缺少 `mars/contracts/*.json` 或 `role-routing.json` | 重装；或确认 `RDS_HOME` 指向的根目录完整 |
+| `ROUTING_UNAVAILABLE` | routing 配置缺失、非法或 `roles` 为空 | 对照 `mars/config/role-routing.json` 修复；改完需重启 MCP |
+| 想看栈 | 默认只输出一行 `ERROR <CODE> <说明>` | 加 `--debug`：`rds put ... --debug` |
 | Windows 控制台中文乱码（管道场景） | 控制台代码页 936 与 UTF-8 输出不一致 | `chcp 65001`，或 `[Console]::OutputEncoding=[Text.Encoding]::UTF8` |
 | `EPERM` 安装失败 | 全局目录权限 | 用 `npm i -g . --prefix <可写目录>` 或 `npm link` |
 
@@ -306,5 +316,5 @@ rds init                                   # 输出包含 stats，无异常
 rds put ... && rds list --status proposed   # 能写、能查
 ```
 
-`npm test` 的双平台绿灯是**质量门槛**，不是安装门槛。当前源码树为 88 项全通过（fail=0 / skipped=0），
+`npm test` 的双平台绿灯是**质量门槛**，不是安装门槛。当前源码树为 173 项全通过（fail=0 / skipped=0），
 门禁细节见 [docs/testing.md](testing.md)。
