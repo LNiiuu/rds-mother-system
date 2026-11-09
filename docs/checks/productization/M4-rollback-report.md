@@ -62,10 +62,17 @@ not ok 77 - B4 MCP initialize 的 serverInfo.version 等于产品版本（端到
 
 ---
 
-## 4. B6 演练（提交后补记）
+## 4. B6 演练（提交后执行）
 
-B6 提交后在同样方式下演练：`revert B6` → 确认回到 `m4-b5` 的 `171/170/1`（即 B6 修复前的已知状态），
-`revert-revert` → 回到 `173/173/0/0`。结果见 §5。
+同样方式：`checkout m4-b6` → `git revert m4-b6` → `git revert HEAD`。
+
+| 状态 | 结果 |
+|---|---|
+| `m4-b6` 自身 | `GATE PASS tests=173 pass=173 fail=0 skipped=0` |
+| revert B6 后 | `GATE FAIL tests=171 pass=170 fail=1`（正是 m4-b5 的已知失败，符合预期） |
+| revert-revert 后 | `GATE PASS tests=173 pass=173 fail=0 skipped=0` |
+
+两次 revert 均无冲突。这同时验证了 B6 的修复确实是"从 171 恢复到 173"的唯一原因。
 
 ---
 

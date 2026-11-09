@@ -3,7 +3,7 @@
 **日期**：2026-11-09
 **起点**：`9c5e4ab`（M3 终点 + CI 回填）
 **终点**：见 `git log`（B0–B6 七个提交）
-**判定**：**READY WITH WARNINGS**（唯一未完成项是四组 CI 尚未运行，见 §2 M4-11）
+**判定**：**READY FOR COMMIT**（15 项验收全部 PASS；CI 四组矩阵真实通过）
 
 ---
 
@@ -19,27 +19,34 @@
 | M4-06 | 版本体系有明确规则 | **PASS** | `docs/versioning.md`（三个命名空间 + 五条规则）；`serverInfo.version` 派生自产品版本并被真实握手测试钉住 |
 | M4-07 | 关键故障可定位 | **PASS** | 故障矩阵 8 项 + 2 项，每项都有错误码、可行动提示、非栈输出（12 例测试） |
 | M4-08 | Required 全绿 | **PASS** | `GATE PASS tests=173 pass=173 fail=0 skipped=0` |
-| M4-09 | G1 真实执行并通过 | **PASS（本地）** / **NOT RUN（CI）** | 本地 G1 六夹具 PASS；CI 中的 g1 job 需推送后才跑 |
+| M4-09 | G1 真实执行并通过 | **PASS** | 本地六夹具 PASS；CI 的 g1 job success，耗时 27s（跳过会在 1s 内结束） |
 | M4-10 | 分层 0 违规 | **PASS** | `LAYERS PASS problems=0 warnings=2`（2 条为永久边界声明） |
-| M4-11 | 四组 CI 真实通过 | **NOT RUN** | M4 尚未提交推送。本地只覆盖 Windows × Node 22.22.2 |
+| M4-11 | 四组 CI 真实通过 | **PASS** | run [42583081805](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583081805) @ `d7cba45`：Win/Ubuntu × Node 22/24 四组 + structure self-check + g1 共 6 job 全 success |
 | M4-12 | 每批有真实回滚演练 | **PASS（含 1 项条件）** | `M4-rollback-report.md`：B0–B3 clean revert 前后全绿；B4/B5 暴露"测试依赖本机产物"，已在 B6 修复 |
 | M4-13 | 发行包安装与 smoke 全通过 | **PASS** | `PACK PASS`（108 文件，禁止项 0 命中）+ `SMOKE PASS`（安装→doctor→init→写入→审批→检索→编译） |
 | M4-14 | 文档与实际实现一致 | **PASS** | README / install / testing / versioning / CHANGELOG 全部同步；本次修的失真项见 §3 |
 | M4-15 | 原有工作完整保护 | **PASS** | 开工前后 `git status` 均为 51 项；77→0 项未受影响（见 §4） |
 
-**14 PASS + 1 NOT RUN。**
+**15 PASS + 0 NOT RUN。**
 
 ---
 
-## 2. 唯一未完成项：四组 CI
+## 2. 四组 CI（已补齐）
 
-`M4-11` 标记 **NOT RUN**，不是 PASS。
+`M4-11` 已从 **NOT RUN** 转为 **PASS**。
 
-原因：CI 由 `push` 触发，而本轮在写验收时尚未推送。不允许把"本地跑过"写成"CI 通过"，
-也不允许把未运行的矩阵写成通过。
+Run：[42583081805](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583081805) @ `d7cba45`
 
-**补救**：推送后回填 `M4-ci-validation-report.md` §5，并据实更新本节。
-若 CI 出现失败，修复后重新推送，直到四组全绿或确认外部阻塞。
+| Job | 结论 | 耗时 |
+|---|---|---|
+| required (windows / node 22) | success | 89s |
+| required (windows / node 24) | success | 57s |
+| required (ubuntu / node 22) | success | 14s |
+| required (ubuntu / node 24) | success | 10s |
+| structure self-check | success | 18s |
+| g1 | success | 27s |
+
+首轮即全绿，无失败需修。逐行日志因 403 不可读，判据与 M3 相同（见 `M4-ci-validation-report.md` §5）。
 
 ---
 
@@ -99,7 +106,6 @@
 
 | 项 | 等级 | 说明 | 归属 |
 |---|---|---|---|
-| 四组 CI 未运行 | **S2** | 唯一未完成的验收项 | 本轮推送后 |
 | `m4-b4` / `m4-b5` 在干净克隆里各有 1 例失败 | S3 | 测试依赖本机 `principals.json`；已在 B6 修，历史 tag 不改写 | 已记录，不改历史 |
 | 多语句事务未覆盖 | S3 | 现有代码无显式事务 | M5+ |
 | 并发写未实测 | S3 | 只验证 `busy_timeout>0` | M5+ |
@@ -113,10 +119,11 @@
 
 ## 8. 判定
 
-**READY WITH WARNINGS**
+**READY FOR COMMIT**
 
-- 14 项验收 PASS，唯一未完成的是四组 CI（未推送，无法运行）；
-- 代码层没有已知缺陷挡住提交：门禁全绿、分层 0 违规、7 面行为基线零漂移、回滚可干净 revert；
-- 警告项集中在"未验证"而非"已知坏"：CI 矩阵、macOS、并发写、事务边界。
-
-补齐 CI 并回填报告后，可转为 **READY FOR COMMIT**。
+- 15 项验收全部 PASS（含四组 CI 真实通过）；
+- 门禁：`GATE PASS 173/173/0/0`；分层 `problems=0 warnings=2`（2 条为永久边界声明）；
+  7 面行为基线零漂移；发行包 `PACK PASS + SMOKE PASS`；
+- 回滚：B0–B3 clean revert 前后全绿；B4/B5 暴露的"测试依赖本机产物 + MCP 缺身份即退出"
+  已在 B6 修复并加回归测试（B6 演练：173 → 171/170/1 → 173）；
+- 警告项集中在"未验证"而非"已知坏"：macOS、并发写、多语句事务、精确 22.15 边界。

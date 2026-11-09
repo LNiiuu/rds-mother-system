@@ -1,6 +1,6 @@
 # M4 CI 实证报告
 
-**状态**：**NOT RUN**（写本文时 M4 尚未提交推送；写完后再推送触发，结果回填于文末 §5）
+**状态**：**PASS**（四组矩阵 + structure self-check + g1 共 6 个 job 全 success）
 
 ---
 
@@ -59,15 +59,29 @@ M4 未改 workflow 文件；新增的六类测试自动被 `mars/tests/**/*.test
 
 ## 5. 真实运行结果
 
-**待回填**：M4 推送后由 run 结果填入（含 run 链接、commit SHA、六个 job 的结论与耗时）。
+Run：[42583081805](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583081805) @ commit `d7cba45`
+结论：**6/6 job success，首轮即全绿，未出现需要修复的失败。**
 
 | Job | 结论 | 耗时 |
 |---|---|---|
-| required (windows / node 22) | 待填 | — |
-| required (windows / node 24) | 待填 | — |
-| required (ubuntu / node 22) | 待填 | — |
-| required (ubuntu / node 24) | 待填 | — |
-| structure self-check | 待填 | — |
-| g1 | 待填 | — |
+| required (windows-latest / node 22.x) | **success** | 89s |
+| required (windows-latest / node 24.x) | **success** | 57s |
+| required (ubuntu-latest / node 22.x) | **success** | 14s |
+| required (ubuntu-latest / node 24.x) | **success** | 10s |
+| structure self-check (windows-latest) | **success** | 18s |
+| g1 (windows-latest) | **success** | 27s |
 
-> 在回填之前，**本文件不构成"CI 通过"的证据**。
+required job 的 7 个步骤在两平台全部 success（环境信息 → doctor → 配置校验 → 分层检查 →
+Required 门禁 → 门禁反向验证 → 发行包端到端）。M4 新增的 45 例测试已包含在门禁内。
+
+`g1` 的「G1 六个夹具」步骤 success，耗时 27s —— 跳过会在 1s 内结束，因此是真实执行。
+
+**与上一次（M3）对比**：Windows required 从 48s/53s 增至 89s/57s，增量来自新增的
+子进程测试（CLI 故障矩阵 12 例、身份脚本 4 例、备份脚本 2 例、MCP 握手 2 例）。
+Ubuntu 仍为 10–14s。
+
+### 证据强度的边界（同 M3 口径）
+
+`/actions/jobs/{id}/logs` 需 admin 权限，匿名访问 403，因此**未逐行读取日志**。
+判据为：job/step 结论 success + 步骤无 `if` 跳过 + 门禁强制 `tests>0 && fail=0 && skipped=0`
++ smoke 脚本 `set -euo pipefail` 且无早退分支。
