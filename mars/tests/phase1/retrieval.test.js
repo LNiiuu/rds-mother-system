@@ -10,7 +10,7 @@ function make(env, id, content, type = 'L2', extra = {}) {
   const created = store.propose(env.db, env.principal(id), Object.assign({
     project_id: 'p1', role_id: env.principal(id).roles[0], content, memory_type: type,
     source_ref: 'docs/phase1-retrieval.md', source_version: 'v1'
-  }, extra), { allowedRoots: [env.dir] });
+  }, extra), { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   store.review(env.db, env.principal('R4'), 'R4', 'p1', created.memory_id, 'approved', 'ok');
   return created.memory_id;
 }
@@ -51,7 +51,7 @@ test('proposed memories of another principal are not retrievable', () => {
   const created = store.propose(env.db, env.principal('R2'), {
     project_id: 'p1', role_id: 'R2', memory_type: 'L2', content: 'pending-retrieval-marker',
     source_ref: 'docs/pending.md', source_version: 'v1'
-  }, { allowedRoots: [env.dir] });
+  }, { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   const rows = retrieve(env.db, env.principal('R3'), 'R3', env.routing, { project_id: 'p1', query: 'pending-retrieval-marker' });
   assert.ok(!rows.some(row => row.memory_id === created.memory_id));
 });

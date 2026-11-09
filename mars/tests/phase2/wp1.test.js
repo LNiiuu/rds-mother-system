@@ -13,8 +13,10 @@ const store = require('../../src/store');
 const { retrieve } = require('../../src/retrieval');
 const { loadRouting } = require('../../src/authz');
 const { createGateway } = require('../../src/mcp-stdio');
+const { testAssets } = require('../helpers/assets');
 
 const ROOT = path.resolve(__dirname, '..', '..');
+const assets = testAssets();
 const ROUTING = path.join(ROOT, 'config', 'role-routing.json');
 // 被测脚本是普通 Node 脚本，用当前 Node 运行即可；不再依赖 DSH.exe。
 // 需要指定其他运行时（例如 Electron 内置 Node）时用 RDS_NODE_BIN 覆盖。
@@ -25,23 +27,25 @@ function principal(id, roles) { return { principal_id: id, roles, project_ids: [
 
 test('N-03: propose is fail-closed without an explicit routing object', () => {
   const db = openDb(':memory:');
+  const routing = loadRouting(ROUTING);
   const r2 = principal('mcp-R2', ['R2']);
+
+  // M3 / B2 起更严格：域内不再读 MARS_ROUTING（配置是组合根的启动快照），
+  // 因此「没传 routing」一律 ROUTING_UNAVAILABLE，不再依赖进程环境碰巧指向哪里。
   assert.throws(
-    () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L3', content: 'x', source_ref: 'docs/a.md', source_version: 'v1' }),
+    () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'x', source_ref: 'docs/a.md', source_version: 'v1' }, { assets }),
+    /ROUTING_UNAVAILABLE/
+  );
+
+  // 注入 routing 后角色门禁仍然生效：R2 不能提 L3
+  assert.throws(
+    () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L3', content: 'x', source_ref: 'docs/a.md', source_version: 'v1' }, { routing, assets }),
     /ROLE_TYPE_DENIED/
   );
-  const ok = store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'y', source_ref: 'docs/a.md', source_version: 'v1' });
+
+  // 合法组合应当成功
+  const ok = store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'y', source_ref: 'docs/a.md', source_version: 'v1' }, { routing, assets });
   assert.equal(ok.status, 'proposed');
-  const prev = process.env.MARS_ROUTING;
-  process.env.MARS_ROUTING = path.join(TMP(), 'missing.json');
-  try {
-    assert.throws(
-      () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'z', source_ref: 'docs/a.md', source_version: 'v1' }),
-      /ROUTING_UNAVAILABLE/
-    );
-  } finally {
-    if (prev === undefined) delete process.env.MARS_ROUTING; else process.env.MARS_ROUTING = prev;
-  }
 });
 
 test('N-08: stats counts all visible rows without the list pagination clamp', () => {
@@ -51,12 +55,12 @@ test('N-08: stats counts all visible rows without the list pagination clamp', ()
   const r0 = principal('mcp-R0', ['R0']);
   const routing = loadRouting(ROUTING);
   for (let i = 0; i < 205; i += 1) {
-    store.propose(db, r0, { project_id: 'rds-m1', memory_type: 'L2', content: 'bulk-' + i, source_ref: 'docs/bulk.md', source_version: 'v1' }, { routing });
+    store.propose(db, r0, { project_id: 'rds-m1', memory_type: 'L2', content: 'bulk-' + i, source_ref: 'docs/bulk.md', source_version: 'v1' }, { routing, assets });
   }
   const token = 'wp1-token-0123456789abcdef';
   const principalsPath = path.join(dir, 'principals.json');
   fs.writeFileSync(principalsPath, JSON.stringify({ principals: [{ principal_id: 'mcp-R0', roles: ['R0'], project_ids: ['rds-m1'], token_sha256: sha256(token) }] }));
-  const gw = createGateway({ dbPath, principalsPath, routingPath: ROUTING, token, role: 'R0' });
+  const gw = createGateway({ dbPath, principalsPath, routingPath: ROUTING, token, role: 'R0', assets });
   try {
     const res = gw.handleMessage({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'memory_stats', arguments: { project_id: 'rds-m1' } } });
     const data = JSON.parse(res.result.content[0].text).data;
@@ -74,7 +78,7 @@ test('expired memories leave compiled context but remain readable by approvers',
   const past = new Date(Date.now() - 3600 * 1000).toISOString();
   const p = store.propose(db, r3, {
     project_id: 'rds-m1', memory_type: 'L2', content: 'short-lived fact', source_ref: 'docs/t.md', source_version: 'v1', expires_at: past
-  }, { routing });
+  }, { routing, assets });
   store.review(db, r0, 'R0', 'rds-m1', p.memory_id, 'approved');
   const found = retrieve(db, r0, 'R0', routing, { project_id: 'rds-m1', query: 'short-lived' });
   assert.equal(found.some((r) => r.memory_id === p.memory_id), false);

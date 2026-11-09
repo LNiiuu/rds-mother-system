@@ -9,6 +9,9 @@ const store = require('../src/store');
 const sharing = require('../src/sharing');
 const { retrieve } = require('../src/retrieval');
 const { loadRouting } = require('../src/authz');
+const { createRuntime } = require('../src/composition');
+// M3 / B1：契约由组合根解析，脚本只传能力对象。
+const RUNTIME_ASSETS = createRuntime({}).assets;
 const { sha256 } = require('../src/util');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -32,7 +35,7 @@ sharing.registerProject(db, bR0, 'R0', { project_id: B, display_name: 'Synthetic
 const fact = store.propose(db, aR2, {
   project_id: A, memory_type: 'L2', content: 'alpha fact available for explicit sharing',
   source_ref: 'docs/a.md', source_version: 'v1'
-}, { routing: ROUTING });
+}, { routing: ROUTING, assets: RUNTIME_ASSETS });
 store.review(db, aR0, 'R0', A, fact.memory_id, 'approved');
 
 const before = retrieve(db, bR2, 'R2', ROUTING, { project_id: B, query: 'alpha' });

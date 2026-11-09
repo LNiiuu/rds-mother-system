@@ -10,7 +10,8 @@ const store = require('../../src/store');
 test('A6 manifest entries trace source, version, role and task', () => {
   const env = setup('mars-p1-man-');
   const manifest = buildManifest(env.db, {
-    project_id: 'p1', task_id: 'T-P1-MAN', role_id: 'R3', token_budget: 1000, tokens_estimated: 42
+    project_id: 'p1', task_id: 'T-P1-MAN', role_id: 'R3', token_budget: 1000, tokens_estimated: 42,
+    assets: env.assets
   }, [
     { id: 'sec_task', kind: 'task', title: 'task', content: 'task card body', source_refs: ['task-card:T-P1-MAN'], token_estimate: 5 },
     { id: 'sec_facts', kind: 'facts', title: 'facts', content: 'fact one', source_refs: ['docs/f1.md'], source_version: 'v1', token_estimate: 3 },
@@ -33,7 +34,8 @@ test('A6 manifest entries trace source, version, role and task', () => {
 test('A3 identical content reuses one fragment while keeping both entries', () => {
   const env = setup('mars-p1-man-');
   const manifest = buildManifest(env.db, {
-    project_id: 'p1', task_id: 'T-P1-DEDUP', role_id: 'R3', token_budget: 1000, tokens_estimated: 10
+    project_id: 'p1', task_id: 'T-P1-DEDUP', role_id: 'R3', token_budget: 1000, tokens_estimated: 10,
+    assets: env.assets
   }, [
     { id: 'sec_a', kind: 'facts', content: 'same card text', source_refs: ['docs/a.md'], source_version: 'v1' },
     { id: 'sec_b', kind: 'facts', content: 'same card text', source_refs: ['docs/b.md'], source_version: 'v1' },
@@ -51,7 +53,8 @@ test('A3 identical content reuses one fragment while keeping both entries', () =
 test('A3/A7 restoreFragment returns the original text for R3 and denies R2', () => {
   const env = setup('mars-p1-man-');
   const manifest = buildManifest(env.db, {
-    project_id: 'p1', task_id: 'T-P1-RESTORE', role_id: 'R3', token_budget: 1000, tokens_estimated: 10
+    project_id: 'p1', task_id: 'T-P1-RESTORE', role_id: 'R3', token_budget: 1000, tokens_estimated: 10,
+    assets: env.assets
   }, [{ id: 'sec_facts', kind: 'facts', content: 'restorable original text', source_refs: ['docs/r.md'], source_version: 'v1' }]);
   const fragmentId = manifest.entries[0].fragment_id;
   const restored = restoreFragment(env.db, env.principal('R3'), 'R3', 'p1', fragmentId, env.routing);
@@ -66,10 +69,10 @@ test('compiled packet links to a persisted manifest with section sources', () =>
   const created = store.propose(env.db, env.principal('R3'), {
     project_id: 'p1', role_id: 'R3', memory_type: 'L2', content: 'manifest compile fact',
     source_ref: 'docs/mc.md', source_version: 'v1'
-  }, { allowedRoots: [env.dir] });
+  }, { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   store.review(env.db, env.principal('R4'), 'R4', 'p1', created.memory_id, 'approved', 'ok');
   const result = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-MC', role_id: 'R3', task: { id: 'T-P1-MC', objective: 'manifest' },
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-MC', role_id: 'R3', task: { id: 'T-P1-MC', objective: 'manifest' },
     evidence: [{ ref: 'docs/mc.md', kind: 'file' }]
   });
   assert.equal(result.packet.manifest_id, result.manifest.manifest_id);
@@ -86,10 +89,10 @@ test('A7 role profiles produce different packets for R2 and R3', () => {
   const created = store.propose(env.db, env.principal('R3'), {
     project_id: 'p1', role_id: 'R3', memory_type: 'L3', content: 'role specific decision',
     source_ref: 'docs/role-l3.md', source_version: 'v1'
-  }, { allowedRoots: [env.dir] });
+  }, { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   store.review(env.db, env.principal('R4'), 'R4', 'p1', created.memory_id, 'approved', 'ok');
   const compile = id => compileContext(env.db, env.principal(id), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-ROLE', role_id: id, task: { id: 'T-P1-ROLE' }
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-ROLE', role_id: id, task: { id: 'T-P1-ROLE' }
   });
   const r2 = compile('R2');
   const r3 = compile('R3');
@@ -100,11 +103,11 @@ test('A7 role profiles produce different packets for R2 and R3', () => {
   assert.ok(!r2Decisions, 'R2 role profile excludes L3');
   assert.ok(r2.packet.missing.some(item => item.kind === 'decisions' && item.blocking === true));
   const r1 = compileContext(env.db, env.principal('R1'), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-ROLE', role_id: 'R1', task: { id: 'T-P1-ROLE' },
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-ROLE', role_id: 'R1', task: { id: 'T-P1-ROLE' },
     evidence: [{ ref: 'docs/role-l3.md', kind: 'file' }]
   });
   const r4 = compileContext(env.db, env.principal('R4'), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-ROLE', role_id: 'R4', task: { id: 'T-P1-ROLE' },
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-ROLE', role_id: 'R4', task: { id: 'T-P1-ROLE' },
     evidence: [{ ref: 'docs/role-l3.md', kind: 'file' }]
   });
   assert.notEqual(r1.packet.role_profile, r4.packet.role_profile);

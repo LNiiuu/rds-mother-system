@@ -11,9 +11,11 @@ const { openDb } = require('../../src/db');
 const store = require('../../src/store');
 const { createGateway, validateToolArgs } = require('../../src/mcp-stdio');
 const { loadRouting } = require('../../src/authz');
+const { testAssets } = require('../helpers/assets');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const ROUTING = path.join(ROOT, 'config', 'role-routing.json');
+const assets = testAssets();
 
 function tmpDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'mars-phase2-')); }
 
@@ -33,10 +35,10 @@ test('propose enforces role allowed_types (R2 cannot propose L3)', () => {
   const routing = loadRouting(ROUTING);
   const r2 = { principal_id: 'mcp-R2', roles: ['R2'], project_ids: ['rds-m1'] };
   assert.throws(
-    () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L3', content: 'x', source_ref: 'docs/a.md', source_version: 'v1' }, { routing }),
+    () => store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L3', content: 'x', source_ref: 'docs/a.md', source_version: 'v1' }, { routing, assets }),
     /ROLE_TYPE_DENIED/
   );
-  const ok = store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'y', source_ref: 'docs/a.md', source_version: 'v1' }, { routing });
+  const ok = store.propose(db, r2, { project_id: 'rds-m1', memory_type: 'L2', content: 'y', source_ref: 'docs/a.md', source_version: 'v1' }, { routing, assets });
   assert.equal(ok.status, 'proposed');
 });
 
@@ -45,13 +47,13 @@ test('review enforces state transitions and audits no-op attempts', () => {
   const routing = loadRouting(ROUTING);
   const proposer = { principal_id: 'mcp-R2', roles: ['R2'], project_ids: ['rds-m1'] };
   const approver = { principal_id: 'mcp-R0', roles: ['R0'], project_ids: ['rds-m1'] };
-  const a = store.propose(db, proposer, { project_id: 'rds-m1', memory_type: 'L2', content: 'alpha', source_ref: 'docs/a.md', source_version: 'v1' }, { routing });
+  const a = store.propose(db, proposer, { project_id: 'rds-m1', memory_type: 'L2', content: 'alpha', source_ref: 'docs/a.md', source_version: 'v1' }, { routing, assets });
   const approved = store.review(db, approver, 'R0', 'rds-m1', a.memory_id, 'approved', 'ok');
   assert.equal(approved.status, 'approved');
   assert.throws(() => store.review(db, approver, 'R0', 'rds-m1', a.memory_id, 'approved'), /STATE_UNCHANGED/);
   const sup = store.review(db, approver, 'R0', 'rds-m1', a.memory_id, 'superseded', 'v2');
   assert.equal(sup.status, 'superseded');
-  const b = store.propose(db, proposer, { project_id: 'rds-m1', memory_type: 'L2', content: 'beta', source_ref: 'docs/b.md', source_version: 'v1' }, { routing });
+  const b = store.propose(db, proposer, { project_id: 'rds-m1', memory_type: 'L2', content: 'beta', source_ref: 'docs/b.md', source_version: 'v1' }, { routing, assets });
   assert.throws(() => store.review(db, approver, 'R0', 'rds-m1', b.memory_id, 'superseded'), /INVALID_TRANSITION/);
   const rejected = store.review(db, approver, 'R0', 'rds-m1', b.memory_id, 'rejected', 'no');
   assert.equal(rejected.status, 'rejected');
@@ -59,7 +61,7 @@ test('review enforces state transitions and audits no-op attempts', () => {
 
 test('gateway returns PROJECT_DENIED and INVALID_ARGUMENT without store access', () => {
   const dir = tmpDir();
-  const token = 'phase2-test-token-0123456789abcdef';
+  const token = 'phase2-test-token-fixture-alpha';
   const principalsPath = path.join(dir, 'principals.json');
   fs.writeFileSync(principalsPath, JSON.stringify({
     principals: [{ principal_id: 'mcp-R0', roles: ['R0'], project_ids: ['rds-m1'], token_sha256: sha256(token) }]
@@ -69,7 +71,8 @@ test('gateway returns PROJECT_DENIED and INVALID_ARGUMENT without store access',
     principalsPath,
     routingPath: ROUTING,
     token,
-    role: 'R0'
+    role: 'R0',
+    assets
   });
   try {
     const call = (args) => {
@@ -88,7 +91,7 @@ test('gateway returns PROJECT_DENIED and INVALID_ARGUMENT without store access',
 
 test('gateway startup fails closed when routing config is missing', () => {
   const dir = tmpDir();
-  const token = 'phase2-routing-token-0123456789ab';
+  const token = 'phase2-routing-token-fixture-beta';
   const principalsPath = path.join(dir, 'principals.json');
   fs.writeFileSync(principalsPath, JSON.stringify({
     principals: [{ principal_id: 'mcp-R0', roles: ['R0'], project_ids: ['rds-m1'], token_sha256: sha256(token) }]
@@ -99,7 +102,8 @@ test('gateway startup fails closed when routing config is missing', () => {
       principalsPath,
       routingPath: path.join(dir, 'missing-routing.json'),
       token,
-      role: 'R0'
+      role: 'R0',
+      assets
     }), /ROUTING_UNAVAILABLE/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -115,7 +119,7 @@ test('memory_stats only counts memories visible to the caller (F-09)', () => {
   const r2 = { principal_id: 'mcp-R2', roles: ['R2'], project_ids: ['rds-m1'] };
   const r3 = { principal_id: 'mcp-R3', roles: ['R3'], project_ids: ['rds-m1'] };
   const add = (principal, input) => {
-    const m = store.propose(db, principal, Object.assign({ project_id: 'rds-m1', source_ref: 'docs/s.md', source_version: 'v1' }, input), { routing });
+    const m = store.propose(db, principal, Object.assign({ project_id: 'rds-m1', source_ref: 'docs/s.md', source_version: 'v1' }, input), { routing, assets });
     return m;
   };
   const visible = add(r3, { memory_type: 'L2', content: 'visible project fact', visibility: 'project' });
@@ -125,7 +129,7 @@ test('memory_stats only counts memories visible to the caller (F-09)', () => {
   add(r3, { memory_type: 'L2', content: 'r3 pending proposal', visibility: 'project' }); // proposed, not R2's
   db.close();
 
-  const token = 'phase2-stats-token-0123456789ab';
+  const token = 'phase2-stats-token-fixture-gamma';
   const principalsPath = path.join(dir, 'principals.json');
   fs.writeFileSync(principalsPath, JSON.stringify({
     principals: [
@@ -133,7 +137,7 @@ test('memory_stats only counts memories visible to the caller (F-09)', () => {
       { principal_id: 'mcp-R2', roles: ['R2'], project_ids: ['rds-m1'], token_sha256: sha256(token) }
     ]
   }));
-  const gw = createGateway({ dbPath, principalsPath, routingPath: ROUTING, token, role: 'R2' });
+  const gw = createGateway({ dbPath, principalsPath, routingPath: ROUTING, token, role: 'R2', assets });
   try {
     const res = gw.handleMessage({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'memory_stats', arguments: { project_id: 'rds-m1' } } });
     const out = JSON.parse(res.result.content[0].text);

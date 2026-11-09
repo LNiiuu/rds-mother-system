@@ -10,6 +10,8 @@ const { openDb } = require('../src/db');
 const store = require('../src/store');
 const { compileContext } = require('../src/compiler');
 const { loadRouting } = require('../src/authz');
+const { createRuntime } = require('../src/composition');
+const RUNTIME_ASSETS = createRuntime({}).assets;
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'experiments', 'p4');
@@ -59,7 +61,7 @@ for (const item of corpusAll) {
     visibility: item.visibility,
     role_scope: item.role_scope,
     confidence: 0.9
-  }, { routing: ROUTING });
+  }, { routing: ROUTING, assets: RUNTIME_ASSETS });
   if (item.status === 'approved') {
     store.review(db, approver, 'R0', project, proposed.memory_id, 'approved');
   }
@@ -70,6 +72,7 @@ const index = [];
 for (const task of fixtures.tasks) {
   const marker = 'P4-RUN:' + task.task_id + ':';
   const compiled = compileContext(db, principal('p4-' + task.role, [task.role], [project]), ROUTING, {
+    assets: RUNTIME_ASSETS,
     project_id: project,
     role_id: task.role,
     budget: 800,

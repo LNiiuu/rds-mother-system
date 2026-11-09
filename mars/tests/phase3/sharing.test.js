@@ -5,6 +5,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { openDb } = require('../../src/db');
 const store = require('../../src/store');
+const { testAssets } = require('../helpers/assets');
+const ROUTING_ASSETS = testAssets();
 const sharing = require('../../src/sharing');
 const { retrieve } = require('../../src/retrieval');
 const { loadRouting } = require('../../src/authz');
@@ -26,11 +28,11 @@ function seed(db) {
   const bR0 = principal('agent-b-R0', ['R0'], [B]);
   const projA = sharing.registerProject(db, aR0, 'R0', { project_id: A, display_name: 'Synthetic A' });
   const projB = sharing.registerProject(db, bR0, 'R0', { project_id: B, display_name: 'Synthetic B' });
-  const fact = store.propose(db, aR2, { project_id: A, memory_type: 'L2', content: 'alpha fact inside project A', source_ref: 'docs/a.md', source_version: 'v1' }, { routing: ROUTING });
-  const decision = store.propose(db, aR1, { project_id: A, memory_type: 'L3', content: 'decision: choose SQLite for A', source_ref: 'docs/a-decision.md', source_version: 'v1' }, { routing: ROUTING });
+  const fact = store.propose(db, aR2, { project_id: A, memory_type: 'L2', content: 'alpha fact inside project A', source_ref: 'docs/a.md', source_version: 'v1' }, { routing: ROUTING, assets: ROUTING_ASSETS });
+  const decision = store.propose(db, aR1, { project_id: A, memory_type: 'L3', content: 'decision: choose SQLite for A', source_ref: 'docs/a-decision.md', source_version: 'v1' }, { routing: ROUTING, assets: ROUTING_ASSETS });
   store.review(db, aR0, 'R0', A, fact.memory_id, 'approved');
   store.review(db, aR0, 'R0', A, decision.memory_id, 'approved');
-  const bFact = store.propose(db, bR2, { project_id: B, memory_type: 'L2', content: 'beta fact inside project B', source_ref: 'docs/b.md', source_version: 'v1' }, { routing: ROUTING });
+  const bFact = store.propose(db, bR2, { project_id: B, memory_type: 'L2', content: 'beta fact inside project B', source_ref: 'docs/b.md', source_version: 'v1' }, { routing: ROUTING, assets: ROUTING_ASSETS });
   store.review(db, bR0, 'R0', B, bFact.memory_id, 'approved');
   return { aR0, aR1, aR2, bR0, bR2, fact, decision, bFact, projA, projB };
 }

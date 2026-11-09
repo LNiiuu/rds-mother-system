@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { createServer } = require('../../src/mcp');
 const { sha256 } = require('../../src/util');
+const { testAssets } = require('../helpers/assets');
 
 const TOKEN = 'test-token-0123456789abcdef';
 const OTHER_TOKEN = 'other-token-0123456789abcdef';
@@ -27,7 +28,7 @@ function setup() {
       roles: ['R2']
     }]
   }), 'utf8');
-  const server = createServer({ dbPath: path.join(dir, 'mars.db'), principalsPath });
+  const server = createServer({ dbPath: path.join(dir, 'mars.db'), principalsPath, assets: testAssets() });
   return { dir, server };
 }
 

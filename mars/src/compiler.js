@@ -1,6 +1,4 @@
 'use strict';
-const fs = require('node:fs');
-const path = require('node:path');
 const { nowIso, newId, estimateTokens, clampInt } = require('./util');
 const { validate } = require('./validate');
 const { audit } = require('./db');
@@ -9,9 +7,16 @@ const { applyBudget } = require('./budget');
 const DEFAULT_PROTECTIONS = ['task', 'decisions', 'evidence', 'prohibitions'];
 const { buildManifest } = require('./manifest');
 const { authorize, roleProfile } = require('./authz');
+const { AppError } = require('./errors');
 
-const ROOT = path.resolve(__dirname, '..');
-const PACKET_SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', 'context-packet.schema.json'), 'utf8'));
+// M3 / B1：packet schema 由调用方注入（params.assets），模块不再在加载期读盘。
+function resolvePacketSchema(params) {
+  const assets = params && params.assets;
+  if (!assets || typeof assets.contract !== 'function') {
+    throw new AppError('ASSET_MISSING', 'context-packet schema 未注入（调用方需传 params.assets）');
+  }
+  return assets.contract('context-packet').value;
+}
 
 function sectionFromMemories(kind, title, records) {
   const lines = records.map(r => `- [${r.memory_id}] (${r.memory_type}, ${r.source_project ? r.source_project + ':' : ''}${r.source_ref}@${r.source_version}) ${r.content}`);
@@ -98,7 +103,8 @@ function compileContext(db, principal, routing, params) {
   const manifest = buildManifest(db, {
     project_id, task_id: task.id || params.task_id || 'UNKNOWN', role_id,
     run_id: params.run_id, session_id: params.session_id,
-    token_budget: budget, tokens_estimated: tokens
+    token_budget: budget, tokens_estimated: tokens,
+    assets: params.assets
   }, budgeted.sections.map(s => ({
     ...s,
     visibility: s.visibility || 'project',
@@ -124,7 +130,7 @@ function compileContext(db, principal, routing, params) {
     prohibited: prohibitions,
     evidence_refs: evidence.map(e => Object.assign({ ref: e.ref, kind: e.kind || 'file' }, e.note ? { note: e.note } : {}))
   };
-  const result = validate(packet, PACKET_SCHEMA);
+  const result = validate(packet, resolvePacketSchema(params));
   if (!result.valid) {
     const head = result.errors.slice(0, 3).map(e => `${e.path}: ${e.message}`).join('; ');
     throw new Error('PACKET_SCHEMA_INVALID ' + head);
@@ -137,4 +143,4 @@ function compileContext(db, principal, routing, params) {
   return { packet, manifest, budget: budgeted };
 }
 
-module.exports = { compileContext, PACKET_SCHEMA };
+module.exports = { compileContext, resolvePacketSchema };

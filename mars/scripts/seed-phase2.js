@@ -6,6 +6,8 @@ const path = require('node:path');
 const { openDb } = require('../src/db');
 const { loadPrincipals, loadRouting } = require('../src/authz');
 const store = require('../src/store');
+const { createRuntime } = require('../src/composition');
+const RUNTIME_ASSETS = createRuntime({}).assets;
 
 const ROOT = path.resolve(__dirname, '..');
 const db = openDb(path.join(ROOT, 'var', 'mars.db'));
@@ -43,7 +45,7 @@ for (const s of seeds) {
     confidence: 0.9,
     visibility: s.visibility,
     role_scope: s.role_scope || []
-  }, { allowedRoots, routing });
+  }, { allowedRoots, routing, assets: RUNTIME_ASSETS });
   let status = proposal.status;
   if (s.approve !== false && proposal.status === 'proposed') {
     const reviewer = s.role === 'R4' ? byId('mcp-R0') : byId('mcp-R4');

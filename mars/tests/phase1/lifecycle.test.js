@@ -12,12 +12,12 @@ function propose(env, id, extra = {}) {
   return store.propose(env.db, env.principal(id), Object.assign({
     project_id: 'p1', role_id: env.principal(id).roles[0],
     source_ref: 'docs/phase1-lifecycle.md', source_version: 'v1'
-  }, extra), { allowedRoots: [env.dir] });
+  }, extra), { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
 }
 
 function compile(env, id, query) {
   return compileContext(env.db, env.principal(id), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-TEST', role_id: env.principal(id).roles[0],
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-TEST', role_id: env.principal(id).roles[0],
     query, task: { id: 'T-P1-TEST', objective: 'phase1 lifecycle', acceptance: ['A5'] },
     evidence: [{ ref: 'docs/phase1-lifecycle.md', kind: 'file' }]
   });

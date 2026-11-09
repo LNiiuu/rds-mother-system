@@ -1,25 +1,26 @@
 'use strict';
-const fs = require('node:fs');
-const path = require('node:path');
 const { sha256, nowIso, newId, guardSourceRef } = require('./util');
 const { validate } = require('./validate');
 const { audit } = require('./db');
-const { isApprover, loadRouting } = require('./authz');
+const { isApprover } = require('./authz');
+const { AppError } = require('./errors');
 
-const ROOT = path.resolve(__dirname, '..');
-const MEMORY_SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', 'memory.schema.json'), 'utf8'));
-const DEFAULT_ROUTING = path.join(ROOT, 'config', 'role-routing.json');
+// M3 / B1：memory schema 不再在模块加载期读盘，改由调用方通过 options.assets 注入。
+// 缺注入时给出带码的错误，而不是让调用栈里出现一个 ENOENT。
+function resolveMemorySchema(options) {
+  const assets = options && options.assets;
+  if (!assets || typeof assets.contract !== 'function') {
+    throw new AppError('ASSET_MISSING', 'memory schema 未注入（调用方需传 options.assets）');
+  }
+  return assets.contract('memory').value;
+}
 
-// Fail-closed routing resolution: an explicit routing object wins, otherwise the
-// trusted on-disk configuration is loaded. If neither is available the call is
-// rejected instead of silently skipping the role/type gate (N-03).
+// Fail-closed routing resolution（M3 / B2 起更严格）：
+// 只接受调用方注入的 routing 对象。域内不再读 MARS_ROUTING、也不再兜底读仓库文件 —
+// 配置是组合根在启动时解析好的快照。缺注入就明确失败，绝不静默回退（N-03）。
 function resolveRouting(routing) {
   if (routing && routing.roles) return routing;
-  try {
-    return loadRouting(process.env.MARS_ROUTING || DEFAULT_ROUTING);
-  } catch (err) {
-    throw new Error('ROUTING_UNAVAILABLE');
-  }
+  throw new AppError('ROUTING_UNAVAILABLE', 'routing 未注入：由组合根解析后传入（域内不读环境变量）');
 }
 
 function toRecord(row) {
@@ -47,8 +48,9 @@ function toRecord(row) {
   };
 }
 
-function assertValid(record) {
-  const result = validate(record, MEMORY_SCHEMA);
+function assertValid(record, schema) {
+  if (!schema) throw new AppError('ASSET_MISSING', 'memory schema 未注入');
+  const result = validate(record, schema);
   if (!result.valid) {
     const head = result.errors.slice(0, 3).map(e => `${e.path}: ${e.message}`).join('; ');
     throw new Error('MEMORY_SCHEMA_INVALID ' + head);
@@ -103,7 +105,7 @@ function propose(db, principal, input, options = {}) {
     updated_at: ts,
     expires_at: expiresAt
   };
-  assertValid(record);
+  assertValid(record, resolveMemorySchema(options));
   const existing = db.prepare(
     'SELECT * FROM memories WHERE project_id = ? AND content_hash = ? AND source_ref = ? AND source_version = ?'
   ).get(project_id, content_hash, source.normalized, String(input.source_version));
@@ -210,4 +212,4 @@ function addAlias(db, principal, role_id, project_id, term, alias, memory_id) {
   audit(db, { principal_id: principal.principal_id, project_id, role_id, action: 'memory.alias', target: `${term}=>${alias}`, result: 'ok' });
 }
 
-module.exports = { propose, get, list, review, addAlias, toRecord, canRead, assertValid, MEMORY_SCHEMA };
+module.exports = { propose, get, list, review, addAlias, toRecord, canRead, assertValid, resolveMemorySchema };

@@ -21,7 +21,7 @@ test('P1: restoreFragment rejects role not held by principal', () => {
   const env = setup('mars-p1-rem-');
   seed(env);
   const packet = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000, query: 'alpha'
+    assets: env.assets, project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000, query: 'alpha'
   });
   const fragmentId = packet.manifest.fragments.find(f => f.content_type === 'decision').fragment_id;
   // R2 token holder cannot claim R3 (evidence_direct) role.
@@ -40,7 +40,7 @@ test('P2: query does not leak other memory types when type is requested', () => 
   assert.ok(rows.every(r => r.memory_type === 'L3'), 'only L3 rows expected, got ' + rows.map(r => r.memory_type).join(','));
 
   const packet = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000, query: 'alpha'
+    assets: env.assets, project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000, query: 'alpha'
   });
   const decisions = packet.packet.sections.find(s => s.kind === 'decisions');
   assert.ok(decisions && !decisions.content.includes('alpha 事实'), 'decisions section must not contain L2 facts');
@@ -51,7 +51,7 @@ test('P3: manifest entry status reflects source status', () => {
   const env = setup('mars-p1-rem-');
   const { decision } = seed(env);
   const packet = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000
+    assets: env.assets, project_id: 'p1', role_id: 'R3', task_id: 'T-REM', budget: 4000
   });
   const entry = packet.manifest.entries.find(e => e.content_type === 'decision');
   assert.equal(entry.status, 'approved');
@@ -78,13 +78,13 @@ test('G1: role-scoped memory is excluded from other roles packets (even approver
   });
   approve(env, 'R3', scoped.memory_id, 'R4');
   const r0 = compileContext(env.db, env.principal('R0'), env.routing, {
-    project_id: 'p1', role_id: 'R0', task_id: 'T-SCOPE', budget: 4000, query: 'scope'
+    assets: env.assets, project_id: 'p1', role_id: 'R0', task_id: 'T-SCOPE', budget: 4000, query: 'scope'
   });
   const r0Knowledge = r0.packet.sections.find(s => s.kind === 'knowledge');
   const r0Text = r0Knowledge ? r0Knowledge.content : '';
   assert.ok(!r0Text.includes('仅 R3 可见'), 'R0 packet must not contain R3-scoped memory, got: ' + r0Text);
   const r3 = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', role_id: 'R3', task_id: 'T-SCOPE', budget: 4000, query: 'scope'
+    assets: env.assets, project_id: 'p1', role_id: 'R3', task_id: 'T-SCOPE', budget: 4000, query: 'scope'
   });
   const r3Knowledge = r3.packet.sections.find(s => s.kind === 'knowledge');
   assert.ok(r3Knowledge && r3Knowledge.content.includes('仅 R3 可见'), 'R3 packet must contain R3-scoped memory');

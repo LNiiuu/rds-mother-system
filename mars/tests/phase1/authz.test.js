@@ -11,7 +11,7 @@ function build(env, id, input) {
   return store.propose(env.db, env.principal(id), Object.assign({
     project_id: 'p1', role_id: env.principal(id).roles[0],
     source_ref: 'docs/phase1-authz.md', source_version: 'v1'
-  }, input), { allowedRoots: [env.dir] });
+  }, input), { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
 }
 
 test('A4 unknown and short tokens are denied without detail', () => {
@@ -29,7 +29,7 @@ test('A4 cross-project reads are denied', () => {
   const r0 = env.principal('R0');
   const created = store.propose(env.db, r0, {
     project_id: 'p2', role_id: 'R0', content: 'p2 secret', source_ref: 'docs/p2.md', source_version: 'v1'
-  }, { allowedRoots: [env.dir] });
+  }, { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   const r2 = env.principal('R2');
   assert.throws(() => store.get(env.db, r2, 'R2', 'p2', created.memory_id), /PROJECT_DENIED/);
   const check = authorize(r2, { project_id: 'p2', role_id: 'R2', action: 'memory.get', routing: env.routing });

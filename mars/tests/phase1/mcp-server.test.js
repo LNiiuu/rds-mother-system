@@ -7,11 +7,12 @@ const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { setup, TOKENS } = require('./helpers');
+const { testAssets } = require('../helpers/assets');
 const { createServer } = require('../../src/mcp');
 
 test('MCP denies missing/unknown identity and cross-project requests', () => {
   const env = setup('mars-p1-mcp-', { R2: { project_ids: ['p1'] } });
-  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json') });
+  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json'), assets: testAssets() });
   try {
     assert.equal(server.handle({ method: 'memory.list', params: { project_id: 'p1' } }).code, 'AUTH_DENIED');
     assert.equal(server.handle({ token: 'short', method: 'memory.list', params: { project_id: 'p1' } }).code, 'AUTH_DENIED');
@@ -26,7 +27,7 @@ test('MCP denies missing/unknown identity and cross-project requests', () => {
 
 test('MCP propose writes proposed only and errors never leak paths or stacks', () => {
   const env = setup('mars-p1-mcp-');
-  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json'), allowedRoots: [env.dir] });
+  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json'), allowedRoots: [env.dir], assets: testAssets() });
   try {
     const created = server.handle({
       token: TOKENS.R2, method: 'memory.propose',
@@ -52,7 +53,7 @@ test('MCP propose writes proposed only and errors never leak paths or stacks', (
 
 test('MCP context.compile is authorized and returns a packet', () => {
   const env = setup('mars-p1-mcp-');
-  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json') });
+  const server = createServer({ dbPath: env.dbPath, principalsPath: env.principalsPath, routingPath: path.join(__dirname, '..', '..', 'config', 'role-routing.json'), assets: testAssets() });
   try {
     const compiled = server.handle({
       token: TOKENS.R3, method: 'context.compile',

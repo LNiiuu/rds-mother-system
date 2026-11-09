@@ -1,16 +1,23 @@
 'use strict';
-const fs = require('node:fs');
-const path = require('node:path');
 const { sha256, nowIso, newId, stableJson } = require('./util');
 const { validate } = require('./validate');
 const { audit } = require('./db');
+const { AppError } = require('./errors');
 
-const ROOT = path.resolve(__dirname, '..');
 const TYPE_MAP = { facts: 'fact', decisions: 'decision', prohibitions: 'prohibition', task: 'task', state: 'state', knowledge: 'knowledge', evidence: 'evidence', reference: 'reference' };
-const MANIFEST_SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', 'manifest.schema.json'), 'utf8'));
 
-function assertManifest(manifest) {
-  const result = validate(manifest, MANIFEST_SCHEMA);
+// M3 / B1：manifest schema 由调用方注入（meta.assets），模块不再在加载期读盘。
+function resolveManifestSchema(meta) {
+  const assets = meta && meta.assets;
+  if (!assets || typeof assets.contract !== 'function') {
+    throw new AppError('ASSET_MISSING', 'manifest schema 未注入（调用方需传 meta.assets）');
+  }
+  return assets.contract('manifest').value;
+}
+
+function assertManifest(manifest, schema) {
+  if (!schema) throw new AppError('ASSET_MISSING', 'manifest schema 未注入');
+  const result = validate(manifest, schema);
   if (!result.valid) {
     const head = result.errors.slice(0, 3).map(e => `${e.path}: ${e.message}`).join('; ');
     throw new Error('MANIFEST_SCHEMA_INVALID ' + head);
@@ -74,7 +81,7 @@ function buildManifest(db, meta, sections) {
   };
   // 可选字段为空时移除，保持 additionalProperties=false 兼容
   for (const key of ['run_id', 'session_id']) if (manifest[key] === undefined) delete manifest[key];
-  assertManifest(manifest);
+  assertManifest(manifest, resolveManifestSchema(meta));
   db.prepare(`INSERT INTO manifests (manifest_id, project_id, task_id, role_id, run_id, session_id, created_at, token_budget, tokens_estimated, entries_json, fragments_json)
               VALUES (?,?,?,?,?,?,?,?,?,?,?)`).run(
     manifest.manifest_id, manifest.project_id, manifest.task_id, manifest.role_id,
@@ -111,4 +118,4 @@ function manifestByFragment(db, fragment_id) {
   return rows.filter(r => r.entries_json.includes(fragment_id)).map(r => r.manifest_id);
 }
 
-module.exports = { buildManifest, restoreFragment, manifestByFragment, assertManifest, MANIFEST_SCHEMA };
+module.exports = { buildManifest, restoreFragment, manifestByFragment, assertManifest, resolveManifestSchema };

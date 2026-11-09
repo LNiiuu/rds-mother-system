@@ -10,6 +10,8 @@ const { openDb } = require('../src/db');
 const { compileContext } = require('../src/compiler');
 const { retrieve } = require('../src/retrieval');
 const authz = require('../src/authz');
+const { createRuntime } = require('../src/composition');
+const RUNTIME_ASSETS = createRuntime({}).assets;
 
 const ROOT = path.resolve(__dirname, '..');
 const src = path.join(ROOT, 'var', 'mars.db');
@@ -49,6 +51,7 @@ for (let i = 0; i < N; i += 1) {
   const forbidden = forbiddenFor(role);
   const t0 = process.hrtime.bigint();
   const out = compileContext(db, byId[pid], routing, {
+    assets: RUNTIME_ASSETS,
     project_id: 'rds-m1', role_id: role, budget: 800,
     task_id: `WP5-STRESS-${i}`, task: { task_id: `WP5-STRESS-${i}`, title: 'stress compile' }
   });

@@ -38,10 +38,10 @@ test('compiled packet exposes an [ESTIMATE] label and trims oversized facts', ()
   const huge = store.propose(env.db, env.principal('R3'), {
     project_id: 'p1', role_id: 'R3', memory_type: 'L2', content: 'C'.repeat(6000),
     source_ref: 'docs/huge.md', source_version: 'v1'
-  }, { allowedRoots: [env.dir] });
+  }, { allowedRoots: [env.dir], routing: env.routing, assets: env.assets });
   store.review(env.db, env.principal('R4'), 'R4', 'p1', huge.memory_id, 'approved', 'ok');
   const result = compileContext(env.db, env.principal('R3'), env.routing, {
-    project_id: 'p1', task_id: 'T-P1-BUDGET', role_id: 'R3', budget: 256,
+    assets: env.assets,project_id: 'p1', task_id: 'T-P1-BUDGET', role_id: 'R3', budget: 256,
     task: { id: 'T-P1-BUDGET', objective: 'budget' },
     evidence: [{ ref: 'docs/huge.md', kind: 'file' }]
   });

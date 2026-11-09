@@ -7,6 +7,7 @@ const path = require('node:path');
 const { sha256 } = require('../../src/util');
 const { openDb } = require('../../src/db');
 const { loadPrincipals, loadRouting } = require('../../src/authz');
+const { testAssets } = require('../helpers/assets');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const ROUTING_PATH = path.join(ROOT, 'config', 'role-routing.json');
@@ -57,17 +58,18 @@ function setup(prefix = 'mars-p1-', overrides = {}) {
   const db = openDb(dbPath);
   const principals = loadPrincipals(principalsPath);
   const routing = loadRouting(ROUTING_PATH);
+  const assets = testAssets();
   const principal = id => {
     const auth = principals.principals.find(p => p.principal_id === 'pid-' + id.toLowerCase());
     if (!auth) throw new Error('missing fixture principal ' + id);
     return auth;
   };
-  return { dir, db, dbPath, principalsPath, principals, routing, principal, token: id => TOKENS[id] };
+  return { dir, db, dbPath, principalsPath, principals, routing, assets, principal, token: id => TOKENS[id] };
 }
 
 function propose(env, id, input, options) {
   const store = require('../../src/store');
-  return store.propose(env.db, env.principal(id), Object.assign({ project_id: 'p1', role_id: ROLES[id][0] }, input), options);
+  return store.propose(env.db, env.principal(id), Object.assign({ project_id: 'p1', role_id: ROLES[id][0] }, input), Object.assign({ assets: env.assets, routing: env.routing }, options));
 }
 
 function approve(env, creatorId, memoryId, reviewerId = 'R4', decision = 'approved') {
