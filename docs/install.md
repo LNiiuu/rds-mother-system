@@ -76,7 +76,7 @@ RDS doctor  root=<安装目录>
   git          ok    git version 2.55.0.windows.3
   writable     ok    <安装目录>
   version      ok    0.1.0（VERSION 与 package.json 一致）
-  paths:code   ok    已扫描 62 个代码/配置文件，无本机绝对路径
+  paths:code   ok    已扫描 63 个代码/配置文件，无本机绝对路径
   paths:docs   ok    历史文档无本机绝对路径
   identity     info  未创建（rds init-dev 生成；不要把生成的 token 写入版本库）
   database     info  未初始化：<安装目录>/mars/var/mars.db（rds init 创建）
@@ -84,7 +84,7 @@ RDS doctor  root=<安装目录>
 status: ok  (fail=0 warn=0 checks=10)
 ```
 
-- 共 **10** 项检查。`paths:code` 的文件数随安装形态变化：发行包 **62**，源码树 **138**（源码树含测试与工具脚本）。
+- 共 **10** 项检查。`paths:code` 的文件数随安装形态与版本变化：发行包约 **63**，源码树约 **140**（含测试与工具脚本）。数字只作对照，不是契约。
 - 有 `fail` 时退出码为 `1`，可直接用于 CI 门禁；只有 `warn` 时退出码为 `0`。
 - `rds doctor --json` 输出机器可读结果。
 - `identity` 一项只报告文件**是否存在**，从不读取内容。

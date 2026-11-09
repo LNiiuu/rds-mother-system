@@ -13,12 +13,15 @@ const sharing = require('./sharing');
 const { sha256, writeJsonAtomic } = require('./util');
 const { createRuntime } = require('./composition');
 const { validate } = require('./validate');
+const { USAGE, render: renderHelp } = require('./cli-help');
 
 
 function parseArgs(argv) {
   const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
+    // M5 / B3：-h 与 --help 等价。此前只有 --help 被识别，-h 会掉进位置参数。
+    if (a === '-h') { out.help = true; continue; }
     if (a.startsWith('--')) {
       const key = a.slice(2);
       const next = argv[i + 1];
@@ -78,12 +81,6 @@ function loadAuth(runtime) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const cmd = args._[0];
-  if (!cmd || cmd === 'help') {
-    console.log('用法: rds <init|init-dev|put|get|list|search|review|alias|compile|fragment|stats|audit|ledger|mcp|project|share> [选项]');
-    console.log('（rds 为统一入口；也可直接运行 node mars/src/cli.js）');
-    process.exit(0);
-  }
   // M4 / B5：顶层异常出口覆盖**所有**子命令。
   // 此前 try 从第 176 行才开始，init / init-dev / ledger 等路径上的异常
   // 会以「Node 栈 + 安装绝对路径」的形式直接甩给用户。
@@ -103,6 +100,30 @@ const KNOWN_COMMANDS = new Set([
 
 function run(args) {
   const cmd = args._[0];
+
+  // M5 / B3：帮助必须先于一切副作用与身份检查，否则同一个 flag 在不同命令上
+  // 会变成三件不同的事。修复前的实测行为：
+  //   rds init --help       → 创建数据库并输出 stats
+  //   rds init-dev --help   → 生成身份并**整个覆盖** principals.json
+  //   rds put --help        → ERROR 认证失败：TOKEN_MISSING（exit 3）
+  //   rds mcp --help        → ERROR MCP 网关默认禁用（exit 5）
+  // 现在统一：打印用法、退出码 0、不碰任何文件。
+  if (!cmd) { console.log(USAGE); return; }
+  if (cmd === 'help') {
+    // rds help --help 应当是「help 命令自己的说明」；rds help 才是顶层用法。
+    if (args.help) { console.log(renderHelp('help')); return; }
+    const topic = args._[1];
+    if (!topic) { console.log(USAGE); return; }
+    const text = renderHelp(String(topic));
+    if (text) { console.log(text); return; }
+    die('未知命令: ' + topic + '（rds --help 查看命令）', 2);
+  }
+  if (args.help) {
+    const text = renderHelp(cmd);
+    if (text) { console.log(text); return; }
+    die('未知命令: ' + cmd + '（rds --help 查看命令）', 2);
+  }
+
   // 组合根：路径、契约、配置快照与身份来源的唯一出处。
   // fail-fast —— 发行包缺 contracts 或路由配置非法时，在这里就失败，而不是等某次 put。
   // M4 / B5：先认命令，再谈身份。
@@ -158,16 +179,7 @@ function run(args) {
 
   if (cmd === 'ledger') {
     const ledger = require('./ledger');
-    if (args.help) {
-      console.log('用法: rds ledger --session <文件> [--source <kind>] [--out <目录>] [--project <id>]');
-      console.log('');
-      console.log('  --session  会话文件（.jsonl 或 .jsonl.zstd）');
-      console.log('  --source   数据源 kind；省略时按内容嗅探。已注册来源见 rds ledger 报错信息');
-      console.log('  --out      写出 ledger.json / ledger.csv 到该目录；省略则打印到 stdout');
-      console.log('');
-      console.log('只读：不会创建数据库；库已存在时写一条 audit（principal 记为 local）。');
-      return;
-    }
+    // --help 已在 run() 开头统一处理（M5 / B3），此处不再重复一份文本。
     if (!args.session) die('ledger 需要 --session <文件>（--help 查看用法）', 2);
     const sessionFile = path.resolve(String(args.session));
     // 先检查文件，再做任何有副作用的事（B3 之前是先建库、后报「文件不存在」）。
@@ -400,4 +412,4 @@ function run(args) {
 }
 
 if (require.main === module) main();
-module.exports = { parseArgs };
+module.exports = { parseArgs, KNOWN_COMMANDS };

@@ -46,11 +46,21 @@ foreach ($j in $json) {
 }
 Check 'manifest count >= 8' ($json.Count -ge 8) "count=$($json.Count)"
 
-$forbidden = @('rwgl','星日晓','miniprogram/pages','计划qpp')
+$forbidden = @('rwgl','星日晓','xingrixiao','m1-dev','miniprogram/pages','计划qpp')
 # 历史记录目录：这些是已提交的验收/审查证据，必然提到当初的项目名。
 # 改写它们等于篡改证据，因此单独计数、不参与门禁。
 $historyPrefixes = @('mars/docs/','docs/checks/','docs/history/','docs/analysis/','docs/runs/','docs/acceptance/')
-$all = Get-ChildItem -Recurse -File -LiteralPath $Root | Where-Object { $_.Extension -in @('.md','.yaml','.yml','.json','.ps1','') -and $_.FullName -notlike '*\tests\self\*' }
+# 不参与扫描：版本库元数据、依赖目录、运行时产物、本地身份文件。
+# 本地身份文件（principals.json / *.r4token）属运行配置，含项目 ID 与 token 哈希，
+# 不在仓库内，也不该被当作「活跃资产」检查。
+$skipFileNames = @('principals.json','toolchain.local.json')
+$all = Get-ChildItem -Recurse -File -LiteralPath $Root | Where-Object {
+  $_.Extension -in @('.md','.yaml','.yml','.json','.ps1','') -and
+  $_.FullName -notlike '*\tests\self\*' -and
+  $_.FullName -notmatch '[\\/](\.git|node_modules|var|dist|coverage)[\\/]' -and
+  $skipFileNames -notcontains $_.Name -and
+  $_.Name -notlike '*.r4token'
+}
 $hits = @()
 $historyHits = @()
 foreach ($f in $all) {

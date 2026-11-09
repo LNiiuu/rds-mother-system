@@ -140,7 +140,7 @@
 - 9 个 PowerShell 脚本的默认根：`D:\M1` → 按脚本位置推导，`RDS_HOME` 可覆盖（**参数默认值在 PS 5.1 下于调用方作用域求值，故改为脚本体内归一化**）
 - 3 处 `D:\Tools\Git\bin\git.exe` → `Get-Command git` 探测
 - `project.yaml` 与 `new-project.ps1`：本机路径改为 `<PROJECT_NAME>` / `<PROJECT_ROOT>` / `<STACK>` 占位符，生成后自动校验
-- `mars/src/cli.js`：移除默认项目名 `xingrixiao,m1-dev`；usage 改为 `rds`
+- `mars/src/cli.js`：移除默认项目名（此前硬编码了两个具体项目 ID，使 `--project` 在省略时静默指向某个项目）；usage 改为 `rds`
 - `mars/src/db.js`：`node:sqlite` 引入失败时给出可读的 Node 版本提示，而非模块缺失栈
 - `mars/scripts/phase4-usage.js`：个人会话路径改为 `RDS_SESSIONS_ROOT` + 家目录推导
 - `README.md`：重写为"定位三边界 + 5 步跑通 + 两种用法 + 诚实状态表"

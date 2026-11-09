@@ -292,10 +292,27 @@ function check() {
   const problems = [];
   const notes = [];
 
-  // 1. 文本严格相等
+  // 1. 文本严格相等。
+  // M5 / B3：帮助文本此前只能靠覆盖基线文件来「通过」，等于把一次对外可见的
+  // 变更静默抹掉。现在允许**显式登记**（approved.helpText = {sha256, batch, reason}），
+  // 与 contractChanges 同一套思路：改了要留痕，不能靠重采基线绕过。
   const helpBase = readBaseline('cli-help.txt');
-  if (helpBase === null) problems.push('缺少基线 cli-help.txt');
-  else if (helpBase !== cur['cli-help.txt']) problems.push('cli-help.txt 与基线不一致（子命令或 flag 拼写发生变化）');
+  const helpCur = cur['cli-help.txt'];
+  const helpApproved = approved.helpText || null;
+  const helpSha = sha256(Buffer.from(helpCur, 'utf8'));
+  if (helpBase === null) {
+    problems.push('缺少基线 cli-help.txt');
+  } else if (helpBase !== helpCur) {
+    if (helpApproved && helpApproved.sha256 === helpSha) {
+      notes.push(`cli-help.txt 已按登记变更（batch=${helpApproved.batch || '?'}）`);
+    } else if (helpApproved && helpApproved.sha256 !== helpSha) {
+      problems.push('cli-help.txt 与基线不一致，且登记里的 sha256 已过期（又改了一次没重新登记）');
+    } else {
+      problems.push('cli-help.txt 与基线不一致（子命令或 flag 拼写发生变化）');
+    }
+  } else if (helpApproved && helpApproved.sha256 !== helpSha) {
+    notes.push('cli-help.txt 已与基线一致，approved-additions.helpText 可删除');
+  }
 
   // 2/6/7. JSON 严格相等（契约单独处理：允许经登记的变更，见 diffContracts）
   for (const name of ['cli-json-keys.json', 'exit-codes.json', 'mcp-tools.json']) {

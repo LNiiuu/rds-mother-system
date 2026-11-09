@@ -4,16 +4,16 @@
     {
       "token_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "principal_id": "dev-r0",
-      "project_ids": ["xingrixiao", "m1-dev"],
+      "project_ids": ["demo", "example"],
       "roles": ["R0"],
-      "note": "示例占位：请勿使用该 token；实际部署由 R7 生成随机 token，仅存 SHA-256"
+      "note": "示例占位：请勿使用该 token。实际部署用 rds init-dev 生成随机 token，文件里只存 SHA-256"
     },
     {
       "token_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
       "principal_id": "dev-r2",
-      "project_ids": ["xingrixiao"],
+      "project_ids": ["demo"],
       "roles": ["R2"],
-      "note": "示例占位"
+      "note": "示例占位：R2 实现者身份。审批需要 R4 或 R0，且不能与写入者是同一 principal"
     }
   ]
 }

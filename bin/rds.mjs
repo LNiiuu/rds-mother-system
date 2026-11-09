@@ -13,38 +13,15 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// M5 / B3：用法文本的唯一真相在 mars/src/cli-help.js。
+// 此前这里一份、cli.js 里一份，已经分叉（简版漏了 orchestrate）。
+import cliHelp from '../mars/src/cli-help.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const CLI = path.join(ROOT, 'mars', 'src', 'cli.js');
 const MIN_NODE = [22, 5, 0];
-
-const USAGE = `RDS —— 研发流程资产 + 本地记忆引擎（MARS）
-
-用法: rds <命令> [选项]
-
-内建命令
-  version                 打印 VERSION
-  doctor [--json]         环境诊断（Node / node:sqlite+FTS5 / Git / 目录可写 / 版本一致性 / 路径卫生）
-  validate [--file <p>]   校验 project.yaml（默认取当前目录）
-  test                    运行 mars/tests（仅源码仓库可用）
-
-MARS 记忆引擎（转交 mars/src/cli.js）
-  init                    初始化数据库
-  init-dev                生成开发身份（token 只显示一次）
-  put | get | list        写入 / 读取 / 列出记忆
-  search                  检索（只返回 approved）
-  review                  审批（需 R4 类角色，不能自审）
-  compile                 编译上下文包
-  fragment | alias | stats | audit | ledger | mcp | project | share
-
-示例
-  rds init --db ./mars-data/mars.db
-  rds doctor
-  rds search --token $env:MARS_TOKEN --project demo --query "SQLite"
-
-文档: docs/install.md
-`;
+const USAGE = cliHelp.USAGE;
 
 function fail(message, code = 2) {
   console.error('ERROR ' + message);
@@ -88,13 +65,34 @@ const argv = process.argv.slice(2);
 const cmd = argv[0];
 
 // ---------- 2. 内建命令 ----------
-if (!cmd || cmd === 'help' || cmd === '--help' || cmd === '-h') {
+if (!cmd || cmd === '--help' || cmd === '-h') {
   console.log(USAGE);
   process.exit(0);
 }
 
+// rds help            -> 顶层用法（在此处理，避免多起一个进程）
+// rds help <命令>     -> 转交 cli.js 打印该命令的详细说明（文本在 cli-help.js）
+if (cmd === 'help' && argv.length === 1) {
+  console.log(USAGE);
+  process.exit(0);
+}
+
+// M5 / B3：内建命令也要认 --help / -h。
+// 此前 `rds version --help` 直接打印版本号、`rds doctor --help` 真的去跑体检，
+// 用户想要说明却触发了动作。
+const WANTS_HELP = argv.includes('--help') || argv.includes('-h');
+
 if (cmd === 'version' || cmd === '--version' || cmd === '-v') {
+  if (WANTS_HELP) {
+    console.log(cliHelp.render('version'));
+    process.exit(0);
+  }
   console.log(readVersion());
+  process.exit(0);
+}
+
+if ((cmd === 'doctor' || cmd === 'validate' || cmd === 'test') && WANTS_HELP) {
+  console.log(cliHelp.render(cmd));
   process.exit(0);
 }
 

@@ -112,7 +112,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42583509413](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583509413) @ `b89cbb2`（6 个 job 全 success） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
-| CLI 子命令帮助 | `rds --help` / `rds help` / `rds ledger --help` 可用；其余子命令的 `--help` 在 M5 补齐 | E1 |
+| CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |
 | `render-role` 角色包渲染 | **未纳入仓库与发行包**。工作区存在未入库的 PowerShell 实现（`tooling/agent-runtime/`），不随包分发 | — |
 | `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。身份需用 `rds init-dev` 生成，升级为覆盖安装 | — |
 

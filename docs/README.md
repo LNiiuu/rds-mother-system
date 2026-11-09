@@ -139,7 +139,6 @@ MARS 的历史设计与评审记录，共 40 份。索引见 [mars/docs/README.m
 | `docs/architecture/m3/migration-plan.md` | 通篇为「将要做」 | 已执行完毕，B0–B5 各有 tag | `git tag -l 'm3-*'` |
 | `mars/docs/architecture.md` | 模块清单只有 10 个域文件 | 现有 22 个域文件 + 5 端口 + 8 适配器 | [docs/PROJECT-MAP.md](PROJECT-MAP.md) |
 | `mars/docs/interfaces.md` §3 | 授权动作含 `ledger.read` | 该动作已在 M3 移除，改为 `ledger.parse` | [CHANGELOG.md](../CHANGELOG.md) M3 段 |
-| `mars/README.md` | `--project xingrixiao`、`D:\M1\…`、「80 用例」 | 应为 `demo`、参数化路径、173 用例 | [README.md](../README.md) |
 | `docs/checks/GITHUB.md` | 「状态：未接入」 | 已推送，CI 已运行 6 个 job | [M2.1 CI 报告](checks/productization/M2.1-ci-validation-report.md) |
 | `docs/checks/productization/remaining-issues.md` | M1/M2 时的 10 项遗留 | 6 项已关闭，4 项仍在 | [docs/checks/README.md](checks/README.md) §2 |
 
