@@ -73,7 +73,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `core/protocols` | 任务卡、证据协议（E1–E4 分级） |
 | `core/roles` | 8 席角色卡（4 常设 + 4 轮换）与变量化模板 |
 | `core/workflows` | WF1 需求交付、WF2 多方向研究、WF3 缺陷修复、WF4 方案评审、WF5 Git 审查 |
-| `core/templates` | `project.yaml`、交接单、验收单、测试报告、缺陷单 |
+| `core/templates` | `project.yaml`、交接单、验收单、测试报告、缺陷单、角色执行包模板（`role-packet.md` / `run-record.json`） |
 | `stacks/` | 技术栈适配（weapp、native-bin） |
 | `mars/src` | MARS 引擎：存储、鉴权、检索、上下文编译、账本、MCP 服务 |
 | `mars/docs` | MARS 的设计与历史评审记录（索引见 `mars/docs/README.md`） |
@@ -114,7 +114,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
 | CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |
-| `render-role` 角色包渲染 | **未纳入仓库与发行包**。工作区存在未入库的 PowerShell 实现（`tooling/agent-runtime/`），不随包分发 | — |
+| `render-role` 角色包渲染 | **模板已入库，渲染器未入库**。`core/templates/role-packet.md` 与 `run-record.json` 定义执行包格式并随包分发；生成它的 `rds-render-role.ps1` 只存在于本地工作区，不随包分发 | — |
 | `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。身份需用 `rds init-dev` 生成，升级为覆盖安装 | — |
 
 未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。

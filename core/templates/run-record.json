@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "{{RUN_ID}}",
+  "taskId": "{{TASK_ID}}",
+  "projectId": "{{PROJECT_ID}}",
+  "roleId": "{{ROLE_ID}}",
+  "roleName": "{{ROLE_NAME}}",
+  "mode": "{{MODE}}",
+  "parentSessionId": "{{PARENT_SESSION_ID}}",
+  "childSessionId": "{{CHILD_SESSION_ID}}",
+  "generatedAt": "{{GENERATED_AT}}",
+  "startedAt": null,
+  "endedAt": null,
+  "status": "pending",
+  "evidence": [],
+  "review": {
+    "verdict": null,
+    "notes": ""
+  },
+  "packet": {
+    "path": "{{PACKET_PATH}}",
+    "sha256": "{{PACKET_SHA256}}"
+  },
+  "generator": {
+    "tool": "rds-render-role.ps1",
+    "version": "1.0.0"
+  },
+  "notes": ""
+}
