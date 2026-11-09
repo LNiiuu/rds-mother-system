@@ -23,7 +23,8 @@
     "mars/src/ports/host-registry.js",
     "mars/src/ports/identity-provider.js",
     "mars/src/ports/session-source.js",
-    "mars/src/session-registry.js"
+    "mars/src/session-registry.js",
+    "mars/src/version.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -44,7 +45,8 @@
     "mars/src/ports/host-registry.js": "B4：HostRegistry 端口契约",
     "mars/src/db/ratelimit.js": "B5：固定窗口限流，从 db.js 拆出（SQL 未改）",
     "mars/src/db/schema.js": "B5：建表与增量迁移，从 db.js 拆出（DDL 逐字节一致）",
-    "mars/src/db/stats.js": "B5：统计查询，从 db.js 拆出"
+    "mars/src/db/stats.js": "B5：统计查询，从 db.js 拆出",
+    "mars/src/version.js": "M4 / B4：产品版本的单一读取点（serverInfo.version 不再硬编码 0.2.0）"
   },
   "contractChanges": [
     {

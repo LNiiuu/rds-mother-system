@@ -20,7 +20,9 @@ const store = require('./store');
 
 const ROOT = path.resolve(__dirname, '..');
 const SERVER_NAME = 'mars';
-const SERVER_VERSION = '0.2.0';
+// M4 / B4：serverInfo.version 报告**产品版本**，与 VERSION / package.json 同源。
+// 此前这里是硬编码的 '0.2.0'，与 0.1.0 长期不一致 —— 一个没人维护的数字。
+const { PRODUCT_VERSION: SERVER_VERSION } = require('./version');
 const PROTOCOL_VERSION = '2024-11-05';
 const MAX_LINE_BYTES = 256 * 1024;
 const MAX_CALLS_PER_MINUTE = 120;

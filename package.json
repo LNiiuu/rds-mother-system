@@ -8,7 +8,7 @@
     "url": "git+https://github.com/LNiiuu/rds-mother-system.git"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=22.15.0"
   },
   "bin": {
     "rds": "bin/rds.mjs"

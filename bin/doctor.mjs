@@ -97,11 +97,15 @@ export function collect() {
   // 1) Node 版本
   const v = process.versions.node;
   const [maj, min] = v.split('.').map((n) => parseInt(n, 10));
-  const okNode = maj > 22 || (maj === 22 && min >= 5);
+  // M4 / B4：门槛从 22.5 提到 22.15 —— node:sqlite 在 22.5 就有，但 zstd 系列
+  // （zstdDecompressSync，ledger 解析会话必需）到 22.15 才进 v22 分支。
+  // 只按 sqlite 声明会让 22.5–22.14 的用户装得上、跑不了 ledger。
+  const okNode = maj > 22 || (maj === 22 && min >= 15);
   add(
     'node',
     okNode ? 'ok' : 'fail',
-    `v${v}（要求 >=22.5.0）` + (process.versions.electron ? '；运行在 Electron 内，非标准 Node' : '')
+    `v${v}（要求 >=22.15.0；22.5 起有 node:sqlite，22.15 起才有 zlib zstd）`
+      + (process.versions.electron ? '；运行在 Electron 内，非标准 Node' : '')
   );
 
   // 2) node:sqlite + FTS5
@@ -113,6 +117,18 @@ export function collect() {
     add('node:sqlite', 'ok', '模块可用，FTS5 虚拟表可用');
   } catch (err) {
     add('node:sqlite', 'fail', err.message);
+  }
+
+  // 2b) zlib zstd：rds ledger 解析 zstd 会话必需。缺失时 ledger 会报 ZSTD_UNSUPPORTED，
+  //      但那要等到用户跑命令才发现；这里提前说清楚。
+  try {
+    const zlib = require('node:zlib');
+    const ok = typeof zlib.zstdDecompressSync === 'function' && typeof zlib.zstdCompressSync === 'function';
+    add('zlib:zstd', ok ? 'ok' : 'fail',
+      ok ? 'zstdCompressSync / zstdDecompressSync 可用（rds ledger 依赖）'
+         : `当前 Node 缺少 zlib zstd（${process.version}）；rds ledger 不可用，请升级到 >=22.15.0`);
+  } catch (err) {
+    add('zlib:zstd', 'fail', err.message);
   }
 
   // 3) Git（可选依赖）

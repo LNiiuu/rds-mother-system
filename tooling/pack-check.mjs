@@ -25,6 +25,7 @@ const REQUIRED = [
   'mars/src/db/ratelimit.js',
   'mars/src/db/stats.js',
   'mars/src/errors.js',
+  'mars/src/version.js',
   'mars/src/composition.js',
   'mars/src/ports/asset-resolver.js',
   'mars/src/ports/identity-provider.js',
