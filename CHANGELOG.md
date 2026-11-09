@@ -1,5 +1,58 @@
 # CHANGELOG
 
+## Unreleased — M5 可发现性
+
+目标：让一个没参与过 M1–M4 的人，仅凭仓库里的正式文档就能理解、安装、启动、使用、排查和维护。
+不加功能、不改 Schema、不改 JSON 输出形状。
+
+新增
+- `docs/README.md`：唯一文档入口。三条阅读路径（装起来用 / 改它 / 核对可信度）、
+  四类文档定义、状态图例（CURRENT/DESIGN/EVIDENCE/HISTORICAL/LOCAL）、已知失效清单
+- `docs/PROJECT-MAP.md`：RDS 与 MARS 的关系、目录职责、MARS 五层结构、
+  L1–L7 分层规则、一条记忆的生命周期、改动影响面矩阵、6 条红线
+- `docs/quickstart.md`：10 分钟最小闭环，每步带预期输出
+- `docs/maintainer-guide.md`：按症状查、72 个错误码全表、备份与恢复、
+  版本与兼容、发布九步、回滚、什么时候该停手
+- `docs/checks/README.md`、`docs/architecture/README.md`、`mars/docs/README.md`：三份索引
+- `mars/src/cli-help.js`：22 个命令的帮助文本单一真相（此前 bin 与 cli 各一份且已分叉）
+- `tooling/docs-check.mjs`：Markdown 相对链接检查，进 verify 与 CI
+- `docs/checks/productization/M5-*.md`：8 份验收证据
+
+变更（对外可见）
+- **`--help` 先于一切副作用**。修复前：`rds init-dev --help` 会生成身份并**整个覆盖**
+  `principals.json`；`rds init --help` 会建库；其余 15 个命令报「认证失败」；
+  `rds mcp --help` 返回「网关默认禁用」。现在统一：打印用法、退出 0、不碰文件
+- **22 个命令全部有 `--help` / `-h`**（此前 1/19）
+- **`rds help <命令>` 与 `rds <命令> --help` 输出逐字节相同**
+- **`rds doctor` 从 10 项检查增到 11 项**：新增 `paths:assets`（活跃文档，`fail` 级）；
+  `paths:docs` 改为也扫 `.md`（此前只扫 json 与脚本）
+- **顶层帮助文本更新**：补 `orchestrate`、`project`/`share` 子命令说明、`help` 命令；
+  变更登记在 `approved-additions.helpText`
+- **发行包文件数 108 → 109**：新增 `mars/src/cli-help.js`（已登记）
+- **`core/templates/role-packet.md` 与 `run-record.json` 入库**：此前未跟踪但随包分发，
+  导致「同一提交在两种工作区里打出的包不同」
+- **`npm run verify` 增加一步** `docs:check`
+
+删除 / 修正
+- `mars/README.md` 全文重写：此前示例用具体项目 ID 与作者机器路径，测试数写「80 用例」
+- `mars/config/principals.example.json` 的 `project_ids` 改为 `demo` / `example`
+  （该文件随发行包分发）
+- `core/bootstrap/bootstrap.md`、`core/policies/download.md` 去掉硬编码的机器路径
+- `tests/self/run.ps1` 的关键词表补上拼音形式，并排除 `.git`/`node_modules`/`var`
+  与本地身份文件——此前拼音名从未被捕获
+- `docs/install.md` 修掉 6 处失真（doctor 样例重复行、`checks=9`、41 个文件、
+  「M3 尚未跑过 CI」、`--token (cat ...)` 无效语法、`render-role` 表述）
+
+不变
+- 任何 SQL / DDL / `SCHEMA_VERSION` / 数据迁移；CLI 参数名与语义；JSON 输出形状；
+  MCP 工具面；五个端口边界；零第三方依赖；`ledger.json` 的 path 语义（仍为绝对路径）
+
+测试
+- 173 → **196**（+23：CLI 帮助 12、ledger 路径 4、文档检查 7）；`fail=0`、`skipped=0`
+- 干净克隆同样 196/196（无 `principals.json`、无历史材料）
+- 分层 0 违规；7 面行为基线零漂移（含已登记增项）；文档 180 个 md / 199 个链接全可达
+- CI run `42594239389` @ `72b13d5`：6 个 job 全 success，1 分 23 秒
+
 ## Unreleased — M4 可维护性
 
 目标：让下一阶段的开发更容易定位问题、更容易安全修改。不加功能、不加依赖、不改 Schema。

@@ -109,8 +109,8 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **173 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2，`b89cbb2`） | E1 |
-| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42583509413](https://github.com/LNiiuu/rds-mother-system/actions/runs/42583509413) @ `b89cbb2`（6 个 job 全 success） | E1 |
+| 测试 | **196 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2 与干净克隆，`72b13d5`） | E1 |
+| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42594239389](https://github.com/LNiiuu/rds-mother-system/actions/runs/42594239389) @ `72b13d5`（6 个 job 全 success，1m23s） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
 | CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |
@@ -119,7 +119,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 
 未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。
 
-测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径。
+测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 196/196**。
 `npm test` 走门禁 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0`；
 缺 fixture 或静默 skip 会让门禁失败，而不是显示绿灯。分类与运行方式见 [docs/testing.md](docs/testing.md)。
 

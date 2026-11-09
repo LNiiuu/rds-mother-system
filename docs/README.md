@@ -94,7 +94,7 @@
 
 | 范围 | 位置 |
 |---|---|
-| M5（进行中） | `docs/checks/productization/M5-*.md` |
+| M5 收尾 | [checks/productization/M5-final-acceptance.md](checks/productization/M5-final-acceptance.md)（另有 7 份明细） |
 | M4 封版 | [checks/productization/M4-closure.md](checks/productization/M4-closure.md) |
 | M4 明细 | `docs/checks/productization/M4-*.md`（9 份） |
 | M3 | [checks/productization/M3-2-final-report.md](checks/productization/M3-2-final-report.md) |

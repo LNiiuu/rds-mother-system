@@ -92,16 +92,18 @@
 | [productization/M4-ci-validation-report.md](productization/M4-ci-validation-report.md) | 四组 CI 实证 | run `42583081805` / `42583509413` 全绿 |
 | [productization/M4-architecture-review.md](productization/M4-architecture-review.md) | 架构复核 | 通过 |
 
-### M5：可发现性（2026-11-09，进行中）
+### M5：可发现性（2026-11-09）
 
 | 文档 | 内容 |
 |---|---|
-| [productization/M5-docs-audit.md](productization/M5-docs-audit.md) | B0 只读审计：44 项发现（1 项 S1） |
+| [productization/M5-final-acceptance.md](productization/M5-final-acceptance.md) | **M5 最终验收**：10 项交付物对照、七批次、修掉的 12 类缺陷、未完成事项、技术债、目标达成判定 |
+| [productization/M5-docs-audit.md](productization/M5-docs-audit.md) | B0 只读审计：44 项发现（1 项 S1），每项带 file:line 与承接批次 |
 | [productization/M5-information-architecture.md](productization/M5-information-architecture.md) | B1 信息架构：四类分离、状态图例、为什么用索引而不是移动文件 |
 | [productization/M5-cli-coverage.md](productization/M5-cli-coverage.md) | B3 CLI 帮助覆盖：1/19 → 22/22，修掉 `init-dev --help` 覆盖身份文件的 S1 缺陷 |
 | [productization/M5-path-portability.md](productization/M5-path-portability.md) | B4 路径与可移植性：doctor 补两个扫描盲区、ledger 绝对路径的六方案评估 |
-
-本行以下文档随 M5 各批次产出后回填：干净克隆验证 / 测试报告 / CI 验证 / 最终验收（B6）。
+| [productization/M5-clean-clone.md](productization/M5-clean-clone.md) | B6 干净克隆：342 文件、0 脏状态、196 项全过、照文档 10 步逐步对照 |
+| [productization/M5-test-report.md](productization/M5-test-report.md) | B6 测试：173 → 196，三个新文件的用例逐个说明守什么 |
+| [productization/M5-ci-validation-report.md](productization/M5-ci-validation-report.md) | B6 CI：run 42594239389，6/6 job，1m23s，四条「真跑过」的证据 |
 
 ---
 
