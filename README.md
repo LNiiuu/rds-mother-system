@@ -50,7 +50,7 @@ rds list --project demo --status proposed          #    应能看到刚写入的
 **A. 当模板用**——把 `core/`、`stacks/` 复制进你的项目，用 `project.yaml` 注入项目差异：
 
 ```powershell
-powershell -NoProfile -File core/scripts/new-project.ps1 -Target D:\Projects\my-app -Stack weapp
+powershell -NoProfile -File core/scripts/new-project.ps1 -Target ./my-app -Stack weapp
 ```
 
 生成骨架 + `project.yaml`，并自动用 `rds validate` 校验顶层契约。

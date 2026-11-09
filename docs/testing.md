@@ -89,7 +89,7 @@ tests > 0  &&  fail === 0  &&  skipped === 0  &&  pass + fail + skipped + todo +
 |---|---|---|
 | 硬编码作者会话路径与固定总量 41,597,577 | `phase1/ledger-reconcile.test.js` | 改为合成 fixture；真实会话核对移到 External |
 | 用 `DSH.exe` 当 Node 运行时 | `phase2/wp1.test.js:19` | 改为 `process.execPath`，可用 `RDS_NODE_BIN` 覆盖 |
-| 硬编码 `powershell.exe` 与 `D:\M1` | `phase1/rollback-offline.test.js` | 回滚逻辑下沉到 `mars/scripts/mars-rollback.js`，PS 脚本改为转调 |
+| 硬编码 `powershell.exe` 与作者机器上的仓库绝对路径 | `phase1/rollback-offline.test.js` | 回滚逻辑下沉到 `mars/scripts/mars-rollback.js`，PS 脚本改为转调 |
 | 缺能力就 `t.skip` | `ledger/ledger.test.js`、`phase1/lifecycle.test.js` | 改为 `assert.fail` 并写明原因 |
 
 ---

@@ -55,6 +55,26 @@ function walk(dir, acc, opts = {}) {
   return acc;
 }
 
+/** 只收 Markdown。`walk` 按 CODE_EXT 过滤，.md 不在其中，需要单独一遍。 */
+function walkMarkdown(dir, acc) {
+  acc = acc || [];
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const e of entries) {
+    if (e.isDirectory()) {
+      if (SKIP_DIRS.has(e.name)) continue;
+      walkMarkdown(path.join(dir, e.name), acc);
+    } else if (e.name.toLowerCase().endsWith('.md')) {
+      acc.push(path.join(dir, e.name));
+    }
+  }
+  return acc;
+}
+
 /** 本机绝对路径痕迹。用字符码拼装，避免本文件自己命中自己。 */
 function machinePatterns() {
   const B = String.fromCharCode(92);
@@ -185,15 +205,46 @@ export function collect() {
         codeHits.slice(0, 5).map((h) => `${h.file}:${h.line}`).join('，')
   );
 
-  const docHits = scanPaths(walk(path.join(ROOT, 'docs'), []), pats).concat(
-    scanPaths(walk(path.join(ROOT, 'mars', 'docs'), []), pats)
-  );
+  // 历史证据里的机器路径：md 与代码/配置都要扫。
+  // M5 / B4：此前只扫 CODE_EXT（不含 .md），于是「文档路径卫生」实际上从未检查过 .md。
+  const docFiles = walk(path.join(ROOT, 'docs'), [])
+    .concat(walkMarkdown(path.join(ROOT, 'docs')))
+    .concat(walk(path.join(ROOT, 'mars', 'docs'), []))
+    .concat(walkMarkdown(path.join(ROOT, 'mars', 'docs')));
+  const docHits = scanPaths(docFiles, pats);
   add(
     'paths:docs',
     docHits.length === 0 ? 'ok' : 'warn',
     docHits.length === 0
       ? '历史文档无本机绝对路径'
       : `${docHits.length} 个文档文件命中（历史证据记录，属 M5 文档清理范围）`
+  );
+
+  // 6c) 活跃 Markdown 的路径卫生（M5 / B4）。
+  //
+  // 为什么不并进 paths:docs —— 两者性质不同：
+  //   paths:docs   = 历史证据，含作者机器路径是「真实记录」，改写等于篡改，只告警；
+  //   paths:assets = 会进发行包或作为仓库门面的文档，用户会直接读到，含机器路径即缺陷。
+  //
+  // 此前的盲区：core/**/*.md 会随包分发（package.json.files 含 "core/"），
+  // 却不参与任何路径检查 —— CODE_EXT 不含 .md，paths:docs 只扫 docs/ 与 mars/docs/。
+  const ASSET_DOCS = [
+    'README.md', 'CHANGELOG.md',
+    'docs/install.md', 'docs/README.md', 'docs/quickstart.md',
+    'docs/PROJECT-MAP.md', 'docs/testing.md', 'docs/versioning.md'
+  ];
+  const assetDocs = ASSET_DOCS
+    .map((f) => path.join(ROOT, f))
+    .filter((f) => fs.existsSync(f))
+    .concat(walkMarkdown(path.join(ROOT, 'core')));
+  const assetHits = scanPaths(assetDocs, pats);
+  add(
+    'paths:assets',
+    assetHits.length === 0 ? 'ok' : 'fail',
+    assetHits.length === 0
+      ? `已扫描 ${assetDocs.length} 个活跃文档，无本机绝对路径`
+      : `${assetHits.length} 个文件命中：` +
+        assetHits.slice(0, 5).map((h) => `${h.file}:${h.line}`).join('，')
   );
 
   // 7) 身份文件（只报存在性，绝不读取内容）

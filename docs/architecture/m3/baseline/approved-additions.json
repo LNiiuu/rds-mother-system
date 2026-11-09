@@ -51,9 +51,9 @@
     "mars/src/cli-help.js": "M5 / B3：CLI 帮助文本的唯一真相。此前 bin/rds.mjs 与 cli.js 各写一份且已分叉（简版漏了 orchestrate）"
   },
   "helpText": {
-    "sha256": "18b699cfb49c9dcecf0ddafab052977cb806c735fd73b0b3455cb9204795fad9",
-    "batch": "m5-b3",
-    "reason": "补齐 orchestrate 与 project/share 子命令说明、新增 help 命令与 -h 别名、按显示宽度对齐参数列。子命令与 flag 拼写未删改，只增补说明。基线文件保留 M3 时点的原文，本次变更记录在此"
+    "sha256": "66142b59518484581a8de443d60d91a055e3b05e2e0f63027b7c4198c591d234",
+    "batch": "m5-b3+m5-b4",
+    "reason": "B3：补齐 orchestrate 与 project/share 子命令说明、新增 help 命令与 -h 别名、按显示宽度对齐参数列。B4：doctor 条目去掉写死的检查项数（新增 paths:assets 后从 10 变 11，写死会每次都要改帮助）。两批都只增补说明，未删改任何子命令或 flag 拼写。基线文件保留 M3 时点的原文"
   },
   "contractChanges": [
     {

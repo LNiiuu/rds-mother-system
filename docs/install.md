@@ -70,25 +70,31 @@ rds doctor
 ```
 RDS doctor  root=<安装目录>
 
-  node         ok    v22.22.2（要求 >=22.15.0；22.5 起有 node:sqlite，22.15 起才有 zlib zstd）
-  node:sqlite  ok    模块可用，FTS5 虚拟表可用
-  zlib:zstd    ok    zstdCompressSync / zstdDecompressSync 可用（rds ledger 依赖）
-  git          ok    git version 2.55.0.windows.3
-  writable     ok    <安装目录>
-  version      ok    0.1.0（VERSION 与 package.json 一致）
-  paths:code   ok    已扫描 63 个代码/配置文件，无本机绝对路径
-  paths:docs   ok    历史文档无本机绝对路径
-  identity     info  未创建（rds init-dev 生成；不要把生成的 token 写入版本库）
-  database     info  未初始化：<安装目录>/mars/var/mars.db（rds init 创建）
+  node          ok    v22.22.2（要求 >=22.15.0；22.5 起有 node:sqlite，22.15 起才有 zlib zstd）
+  node:sqlite   ok    模块可用，FTS5 虚拟表可用
+  zlib:zstd     ok    zstdCompressSync / zstdDecompressSync 可用（rds ledger 依赖）
+  git           ok    git version 2.55.0.windows.3
+  writable      ok    <安装目录>
+  version       ok    0.1.0（VERSION 与 package.json 一致）
+  paths:code    ok    已扫描 63 个代码/配置文件，无本机绝对路径
+  paths:docs    ok    历史文档无本机绝对路径
+  paths:assets  ok    已扫描 44 个活跃文档，无本机绝对路径
+  identity      info  未创建（rds init-dev 生成；不要把生成的 token 写入版本库）
+  database      info  未初始化：<安装目录>/mars/var/mars.db（rds init 创建）
 
-status: ok  (fail=0 warn=0 checks=10)
+status: ok  (fail=0 warn=0 checks=11)
 ```
 
-- 共 **10** 项检查。`paths:code` 的文件数随安装形态与版本变化：发行包约 **63**，源码树约 **140**（含测试与工具脚本）。数字只作对照，不是契约。
+- 共 **11** 项检查。三个计数随安装形态与版本变化，只作对照，不是契约：
+  `paths:code` 发行包约 **63**、源码树约 **140**（含测试与工具脚本）；
+  `paths:assets` 发行包约 **44**（进包的 `core/**/*.md` 与正式文档）。
+- 三个 `paths:*` 的区别：
+  - `paths:code` —— 代码与配置，必须为 0，否则 `fail`
+  - `paths:assets` —— **会进发行包或作为仓库门面**的文档（`README.md`、`CHANGELOG.md`、`core/**/*.md`、正式文档），必须为 0，否则 `fail`
+  - `paths:docs` —— **历史证据**（`docs/checks/`、`docs/history/`、`mars/docs/`），源码树里会有几十个命中并给出 `warn`。这是预期：那些是带日期的记录，改写等于篡改证据
 - 有 `fail` 时退出码为 `1`，可直接用于 CI 门禁；只有 `warn` 时退出码为 `0`。
 - `rds doctor --json` 输出机器可读结果。
 - `identity` 一项只报告文件**是否存在**，从不读取内容。
-- 从源码树运行时，`paths:docs` 可能为 `warn`（11 个历史证据文档含作者机器路径）。这是**预期**，不是安装问题，详见 §11。
 
 ---
 
@@ -241,7 +247,7 @@ rds review --token $r4.Trim() --project demo --memory <memory_id> --decision app
 ```powershell
 # Windows（不传 -RdsRoot 时按脚本位置自动推导；也可用 $env:RDS_HOME 覆盖）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\core\scripts\new-project.ps1 `
-  -Target D:\Projects\my-app -Stack weapp
+  -Target ./my-app -Stack weapp
 ```
 
 脚本创建骨架、写入 `project.yaml`，并**自动调用 `rds validate` 校验**；不通过直接报错。
@@ -249,7 +255,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\core\scripts\new-project.p
 手工方式：复制 `core/templates/project.yaml` 到项目根，替换三个占位符 `<PROJECT_NAME>` / `<PROJECT_ROOT>` / `<STACK>`，然后：
 
 ```bash
-rds validate --file D:\Projects\my-app\project.yaml
+rds validate --file ./my-app/project.yaml
 ```
 
 校验范围（明确边界）：只校验**顶层契约**——必填项（`schema`/`name`/`root`/`stack`）、`schema` 必须为 `rds/project/v1`、`stack` 必须有对应 `stacks/<stack>/stack.yaml`、未知顶层键报错、`root` 不允许残留占位符。**不做**嵌套结构的语义校验（本包零第三方依赖，不引入 YAML 解析器）。
@@ -317,9 +323,10 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 | macOS | **未实机验证** | 代码层无 Windows 专有依赖（`powershell.exe` 只出现在测试与脚本中），但未跑过即不承诺 |
 | M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置是**启动快照**：改 `role-routing.json` 后需重启 MCP 才生效 |
 | `rds ledger` | 只读动作：**不会创建数据库**；库已存在时才写审计 | 审计主体记为哨兵 `'local'`，不是已认证 principal |
+| `ledger.json` 的 `sessions[].path` | 一律是**绝对路径**，用途是能直接打开原文件 | 产物不适合提交到版本库或直接分享。需要可移植输出时，`rds ledger --path-style` 尚未实现（方案见 `docs/checks/productization/M5-path-portability.md`） |
 | 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
 | `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录多处仅告警 | 历史记录（`mars/docs`、`docs/checks`、`docs/history`）属证据，不改写 |
-| `doctor` 的 `paths:docs` | 源码树触发 `warn`（11 个历史证据文档含作者机器路径）；发行包为 `ok` | 预期行为，不是安装缺陷。历史证据只归档标注，不替换正文 |
+| `doctor` 的 `paths:docs` | 源码树触发 `warn`（数十个历史证据文件含作者机器路径）；发行包为 `ok` | 预期行为，不是安装缺陷。历史证据只归档标注，不替换正文 |
 | 版本号 | `VERSION` = `package.json` = `serverInfo.version` = 0.1.0 | 规则见 [docs/versioning.md](versioning.md)；`SCHEMA_VERSION` 与账本格式版本是独立维度 |
 | `rds principal add/revoke/list` | **未实现** | 第二个身份需按 §7 的脚本追加；这是有意不做空壳命令 |
 | `rds upgrade` / `rds uninstall` / `rds backup` | **未实现** | 升级 = `git pull && npm install -g .`；备份用 `tooling/backup.ps1`（源码树）或手工拷库 |

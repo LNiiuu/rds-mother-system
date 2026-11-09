@@ -114,7 +114,7 @@
 修复
 - `phase1/ledger-reconcile.test.js`：去掉作者真实会话路径与硬编码总量 `41,597,577`，改为 8 个 fixture 用例；缺文件/坏行/空会话均为硬断言
 - `phase2/wp1.test.js`：不再用 `DSH.exe` 当 Node 运行时，改 `process.execPath`（`RDS_NODE_BIN` 可覆盖）
-- `phase1/rollback-offline.test.js`：不再硬编码 `powershell.exe` 与 `D:\M1`；改为验证 `mars-rollback.js`
+- `phase1/rollback-offline.test.js`：不再硬编码 `powershell.exe` 与作者机器上的仓库绝对路径；改为验证 `mars-rollback.js`
 - `mars/scripts/mars-rollback.ps1`：改为转调 `mars-rollback.js`，避免两份实现分叉
 - 消灭全部静默 `skip`：`ledger.test.js`、`phase1/lifecycle.test.js` 改为 `assert.fail` 并说明原因
 - `package.json`：`test` 走门禁，新增 `test:raw` / `test:external` / `config` / `smoke`
@@ -137,8 +137,8 @@
 - `.gitattributes`：统一 LF，`.ps1` 保持 CRLF
 
 修复
-- 9 个 PowerShell 脚本的默认根：`D:\M1` → 按脚本位置推导，`RDS_HOME` 可覆盖（**参数默认值在 PS 5.1 下于调用方作用域求值，故改为脚本体内归一化**）
-- 3 处 `D:\Tools\Git\bin\git.exe` → `Get-Command git` 探测
+- 9 个 Windows 脚本的默认根：硬编码的机器路径 → 按脚本位置推导，`RDS_HOME` 可覆盖（**参数默认值在 PS 5.1 下于调用方作用域求值，故改为脚本体内归一化**）
+- 3 处硬编码的 git 可执行文件路径 → `Get-Command git` 探测
 - `project.yaml` 与 `new-project.ps1`：本机路径改为 `<PROJECT_NAME>` / `<PROJECT_ROOT>` / `<STACK>` 占位符，生成后自动校验
 - `mars/src/cli.js`：移除默认项目名（此前硬编码了两个具体项目 ID，使 `--project` 在省略时静默指向某个项目）；usage 改为 `rds`
 - `mars/src/db.js`：`node:sqlite` 引入失败时给出可读的 Node 版本提示，而非模块缺失栈

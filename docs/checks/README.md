@@ -99,8 +99,9 @@
 | [productization/M5-docs-audit.md](productization/M5-docs-audit.md) | B0 只读审计：44 项发现（1 项 S1） |
 | [productization/M5-information-architecture.md](productization/M5-information-architecture.md) | B1 信息架构：四类分离、状态图例、为什么用索引而不是移动文件 |
 | [productization/M5-cli-coverage.md](productization/M5-cli-coverage.md) | B3 CLI 帮助覆盖：1/19 → 22/22，修掉 `init-dev --help` 覆盖身份文件的 S1 缺陷 |
+| [productization/M5-path-portability.md](productization/M5-path-portability.md) | B4 路径与可移植性：doctor 补两个扫描盲区、ledger 绝对路径的六方案评估 |
 
-本行以下文档随 M5 各批次产出后回填：路径可移植性报告（B4）、干净克隆验证 / 测试报告 / CI 验证 / 最终验收（B6）。
+本行以下文档随 M5 各批次产出后回填：干净克隆验证 / 测试报告 / CI 验证 / 最终验收（B6）。
 
 ---
 

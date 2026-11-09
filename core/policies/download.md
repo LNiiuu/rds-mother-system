@@ -1,7 +1,7 @@
 # 下载与安装规范
 
 1. 只用官方源（HTTPS）；记录原始 URL、版本、大小、SHA-256。
-2. 下载到隔离目录（默认 `D:\Downloads\rds`），不落业务仓库、不落母体系仓库。
+2. 下载到仓库外的隔离目录（如 `~/rds-downloads`；Windows 用 `%USERPROFILE%\rds-downloads`），不落业务仓库、不落母体系仓库。
 3. 校验通过才安装；Windows 可执行文件额外核对 Authenticode。
 4. 安装/升级需明确授权；一次批准只覆盖当次清单。
 5. 记录：来源、哈希、安装路径、版本、回滚方式。

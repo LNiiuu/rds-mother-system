@@ -28,7 +28,7 @@ const TOPICS = {
 
   doctor: {
     usage: 'rds doctor [--json]',
-    summary: '环境与安装体检。10 项检查：Node 版本、node:sqlite+FTS5、zlib zstd、Git、目录可写、版本一致性、代码路径卫生、文档路径卫生、身份文件存在性、数据库可读性。有 fail 时退出码 1，仅 warn 时退出码 0。',
+    summary: '环境与安装体检。逐项检查 Node 版本、node:sqlite+FTS5、zlib zstd、Git、目录可写、版本一致性、代码路径卫生、历史文档路径、活跃文档路径、身份文件存在性、数据库可读性。有 fail 时退出码 1，仅 warn 时退出码 0。',
     args: [['--json', '输出机器可读 JSON']],
     examples: ['rds doctor', 'rds doctor --json']
   },
@@ -316,8 +316,7 @@ const USAGE = `RDS —— 研发流程资产 + 本地记忆引擎（MARS）
 
 内建命令
   version                 打印 VERSION
-  doctor  [--json]        环境诊断（10 项：Node / sqlite+FTS5 / zstd / Git / 可写 /
-                          版本一致 / 代码路径 / 文档路径 / 身份 / 数据库）
+  doctor  [--json]        环境诊断（逐项体检，明细见 rds help doctor）
   validate [--file <p>]   校验 project.yaml 的顶层契约
   test    [--raw]         运行 Required 测试门禁（仅源码仓库）
 
