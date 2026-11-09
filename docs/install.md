@@ -264,8 +264,10 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | **88 项全通过，fail=0，skipped=0**：本地 Windows × Node 22/24 各跑一遍；CI 上 Windows + Ubuntu × Node 22/24 四组全绿 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
-| Linux / Ubuntu | **已由 CI 实测通过**（Node 22 与 Node 24 各一格，run 42479193137） | 安装路径按 `lib/node_modules` 布局，已在 smoke 中兼容 |
+| 测试状态 | **128 项全通过，fail=0，skipped=0**（本地 Windows × Node 22.22.2）。M3 起新增分层检查与行为基线 | 测试已完全去环境化：不再依赖作者会话、DSH.exe 或本机路径 |
+| Linux / Ubuntu | 上一轮（M2.1）四组 CI 实测通过；**M3 的改动尚未在任何 CI 上运行** | 本机无 Linux 环境，跨平台结论仍为静态可移植性 |
+| M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置改为启动快照：改 `role-routing.json` 后需重启 MCP |
+| `rds ledger` | 只读动作：**不会创建数据库**；库已存在时才写审计 | 审计主体记为哨兵 `'local'`，不是已认证 principal |
 | 测试门禁 | `npm test` 走 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0` | 缺 fixture 或静默 skip 会让门禁变红，而不是显示绿灯 |
 | `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录 7 处仅告警 | 历史记录（`mars/docs`）属 M5 文档清理范围，不参与门禁 |
 | 版本号 | `VERSION` = `package.json` = 0.1.0，但 MCP `serverInfo.version` 为 0.2.0 | 属 M5；未在本轮强行统一，因为尚未确认两者是否同一版本体系 |

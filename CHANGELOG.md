@@ -1,5 +1,42 @@
 # CHANGELOG
 
+## Unreleased — M3 宿主适配层
+
+目标：把宿主相关的实现收进适配器，域逻辑不再直接依赖 DSH、文件系统布局与进程环境。
+
+新增
+- 5 个端口（`mars/src/ports/`）：AssetResolver / IdentityProvider / SessionSource / AuditSink / HostRegistry
+- 8 个适配器（`mars/src/adapters/`）：fs-asset-resolver、cli-identity、token-file-identity、
+  dsh-session-source、db-audit-sink、null-audit-sink、dsh-registry、null-host-registry
+- 组合根 `mars/src/composition.js`（83 行）+ 路径规则 `mars/src/paths.js` + 数据源注册表 `mars/src/session-registry.js`
+- `mars/src/errors.js`：错误码唯一真相，替换 mcp / mcp-stdio 中两份内联白名单
+- `tooling/layering-check.mjs`：分层与循环依赖检查（CI 已接入）
+- `tooling/baseline-capture.mjs` + `docs/architecture/m3/baseline/`：7 个对外面的行为基线
+- `mars/scripts/mars-mcp-disable.js`：注册表移除的 Node 实现（PS 脚本改为转调）
+
+变更（对外可见，逐条说明）
+- **配置改为启动快照**：路径/身份/路由在进程启动时解析一次；修改 `role-routing.json` 后需重启 MCP 才生效
+  （此前的"即时生效"未文档化、无测试覆盖）
+- **域内不再读环境变量**：`store.propose` 不传 `routing` 时稳定返回 `ROUTING_UNAVAILABLE`，
+  不再回退到 `MARS_ROUTING`（fail-closed 更彻底）
+- **ledger 不再创建数据库**：只读动作在没有库时不再顺手建一个空库；审计仅在库已存在时写入
+- **ledger 审计标识**：`principal_id` 由字面量 `'cli'` 改为哨兵 `'local'`，动作名 `ledger.read` → `ledger.parse`
+- **移除 `ledger.read` 授权动作**：它从未被 `authorize()` 校验过，保留会让人误以为受控
+- **错误码修复**：6 个码（`EXPIRES_AT_INVALID`/`INVALID_TRANSITION`/`RATE_LIMITED`/`ROLE_TYPE_DENIED`/
+  `ROUTING_UNAVAILABLE`/`STATE_UNCHANGED`）在旧网关不再退化为 `INTERNAL_ERROR`
+- **`mars-mcp-disable` 写入更安全**：备份 → 结构校验 → 临时文件 + rename → 写后回读；未知顶层字段保留；
+  默认仍是 dry-run
+- **开发脚本**：`phase2-g1-verify.js` 改用当前 Node（不再依赖 DSH.exe）；
+  `phase4-usage.js` 需显式提供 `RDS_SESSIONS_ROOT`（不再猜 `~/.dsh/sessions`）
+
+不变
+- CLI 参数、子命令、JSON 输出形状、退出码；MCP 工具集与契约；`SCHEMA_VERSION=4` 与全部 DDL；
+  数据契约内容（`mars/contracts/*.json` 哈希未变）；发行包安装路径与使用方式
+
+测试
+- 88 → 128 项，`fail=0`、`skipped=0`；分层检查 0 违规、2 条边界代码声明；行为基线 7 面零漂移
+- 回滚演练：128 → revert → 88 → revert-revert → 128
+
 ## Unreleased — M2.1 CI 实证
 
 目标：四组 CI（Windows/Ubuntu × Node 22/24）在 GitHub Actions 上真实跑通。
@@ -87,4 +124,3 @@
 - 自检脚本
 
 说明：本版本是**骨架**，尚无真实项目端到端运行记录；实际能力状态以 `docs/acceptance/` 为准。
-

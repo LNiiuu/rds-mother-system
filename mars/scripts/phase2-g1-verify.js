@@ -6,12 +6,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-// Resolve the node-of-record (DSH's Electron-as-node) without embedding a user-home path
-// or reading DSH_* environment keys: G1 harness must stay offline and machine-portable.
-const LOCAL_APPDATA = process.env['LOCAL' + 'APPDATA'] || '';
-const DSH = process.env['DSH' + '_EXE'] || path.join(LOCAL_APPDATA, 'Programs', 'DSH', 'DSH.exe');
+// M3 / B5：用当前 Node 运行被测服务，不再把 DSH 的 Electron-as-node 当运行时。
+// 需要指定其它运行时（例如 Electron 内置 Node）时用 RDS_NODE_BIN 覆盖 —— 与 wp1.test.js 一致。
+const NODE_BIN = process.env.RDS_NODE_BIN || process.execPath;
 const NODE_ENV = Object.assign({}, process.env, {
-  ELECTRON_RUN_AS_NODE: '1',
   MARS_DB: path.join(ROOT, 'var', 'mars.db'),
   MARS_PRINCIPALS: path.join(ROOT, 'config', 'principals.json'),
   MARS_ROUTING: path.join(ROOT, 'config', 'role-routing.json'),
@@ -22,7 +20,7 @@ function callServer({ role, tokenFile, messages, timeoutMs = 8000 }) {
   return new Promise((resolve) => {
     const env = Object.assign({}, NODE_ENV, { MARS_ROLE: role || '' });
     if (tokenFile) env.MARS_TOKEN_FILE = tokenFile;
-    const child = spawn(DSH, [path.join(ROOT, 'src', 'mcp-stdio.js')], { cwd: ROOT, env, stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn(NODE_BIN, [path.join(ROOT, 'src', 'mcp-stdio.js')], { cwd: ROOT, env, stdio: ['pipe', 'pipe', 'pipe'] });
     const responses = {};
     let buf = '';
     child.stdout.on('data', (d) => {
