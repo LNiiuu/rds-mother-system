@@ -110,7 +110,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
 | 测试 | **196 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2，工作区与干净克隆各跑一遍） | E1 |
-| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42594824632](https://github.com/LNiiuu/rds-mother-system/actions/runs/42594824632)，6 个 job 全 success，1m17s（2026-11-09） | E1 |
+| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42595065685](https://github.com/LNiiuu/rds-mother-system/actions/runs/42595065685)，6 个 job 全 success，1m21s（2026-11-09） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **未验证** | E3 |
 | CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |

@@ -98,9 +98,23 @@ DOCS FAIL  4 处不可达（2 个文件）
 | G1 入库 | — | `a41c650` | — | G1 开始真实执行 |
 | M4 | 42583081805 | `d7cba45` | 6 | 全 success，G1 27s |
 | M4 封版 | 42583509413 | `b89cbb2` | 6 | 全 success |
-| **M5** | **42594239389** | **`72b13d5`** | **6** | **全 success** |
+| **M5 代码** | **42594239389** | **`72b13d5`** | **6** | **全 success，1m23s** |
+| M5 报告回填 | 42594824632 | `9b3c729` | 6 | 全 success，1m17s |
+| M5 最终提交 | 42595065685 | `ef40243` | 6 | 全 success，1m21s |
 
 M5 的 job 数与 M4 相同，新增的 `docs:check` 步骤并入四个 `required` 格，没有新增 job。
+
+### 5.1 一次被取消的 run
+
+`dcd48d9` 的 run 42595020611 显示 `cancelled`（26 秒）。原因不是失败：两次 push 相隔不到 1 分钟，`.github/workflows/ci.yml` 的
+
+```yaml
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+```
+
+让后一次 push 终止了前一次。这是**预期行为**——同一分支只需要验证最新提交。它的内容已被 `ef40243` 的 run 完全覆盖。
 
 ---
 
