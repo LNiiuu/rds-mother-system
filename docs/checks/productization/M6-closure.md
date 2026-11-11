@@ -3,7 +3,7 @@
 **日期**：2026-11-12（+08:00）
 **阶段**：M6 — macOS 兼容性验证
 **起点**：`2343e4d`（M5 封版点）
-**终点**：`b904842`（macOS 验收报告与文档同步）
+**验收基线**：`b904842`（macOS 验收报告与文档同步）
 **判定**：**`COMPLETED`**
 
 > 判定口径由本轮验收要求给定，三档：
@@ -177,7 +177,38 @@ doctor 11 项全 ok、196 项测试全过、发行包打包安装与全链路通
 
 ---
 
-## 7. 复现命令
+## 7. 收尾批次自身
+
+验收基线之后的提交只有一批纯文档（本文件 + 报告回填 + 两处索引同步）。它的 CI 同样真实跑完：
+
+| 项 | 值 |
+|---|---|
+| commit | `0930547930c73f8f91227fc84b890a027373f856` |
+| run | **43054537391**（run number 25） |
+| `status` / `conclusion` | **`completed` / `success`** |
+| 起止（UTC） | 16:03:49Z → 16:04:56Z |
+| 总时长 | **1 分 07 秒** |
+| job | **7 / 7 success** |
+
+| job | 耗时 |
+|---|---|
+| `required (ubuntu-latest / node 22.x)` | 13s |
+| `required (ubuntu-latest / node 24.x)` | 17s |
+| `structure self-check (windows-latest)` | 20s |
+| `macos (macos-latest / node 22.x)` | 21s |
+| `g1 (windows-latest / powershell)` | 34s |
+| `required (windows-latest / node 24.x)` | 54s |
+| `required (windows-latest / node 22.x)` | 65s |
+
+本地同批次的干净克隆：`HEAD=0930547`、351 个跟踪文件、工作区 0 脏、`196/196`、`DOCS PASS`、探针 `5/5 PASS`。
+
+> **自指说明**：本节记录的修订本身又是一次提交，其 CI 不再写入正文——否则每次补记都会产生一个新的待补记提交。
+> 判定口径不变：**验收以验收基线 `b904842` 的 run 43051690255 为准**；
+> 之后每次纯文档批次的 CI 结果在 Actions 页按 commit 查，不改变验收结论。
+
+---
+
+## 8. 复现命令
 
 ```bash
 # 1. 六项复核
