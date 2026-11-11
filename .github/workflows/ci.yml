@@ -117,7 +117,27 @@ jobs:
 
       - name: Required 测试门禁
         shell: bash
-        run: npm test
+        run: |
+          set +e
+          npm test > test-out.txt 2>&1
+          code=$?
+          cat test-out.txt
+          {
+            echo '## test gate'
+            echo ''
+            echo "exit=$code"
+            echo '```'
+            grep -E '^(not ok|# (tests|pass|fail|skipped))|^GATE ' test-out.txt | head -80
+            echo '```'
+            if [ "$code" -ne 0 ]; then
+              echo ''
+              echo '### failure detail'
+              echo '```'
+              grep -n -A 25 '^not ok' test-out.txt | head -120
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
 
       - name: 发行包端到端（打包→检查→安装→全链路）
         shell: bash
