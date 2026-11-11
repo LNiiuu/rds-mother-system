@@ -65,16 +65,20 @@ jobs:
         shell: bash
         run: bash tooling/ci-smoke.sh
 
-  # macOS FTS5 前置探针（macOS 兼容性验证的第一步）。
+  # macOS 实机验证（macOS 兼容性验证的第二步）。
   #
-  # 为什么先做这一步：darwin 构建的 node:sqlite 是否启用 FTS5，静态阅读无法确定，
-  # 而整个引擎的检索压在这一条上。先用一条最短路径验掉：
-  #   - 记录 runner 实际架构、process.arch、Node 精确版本、内置 SQLite 版本
-  #   - 走项目真实路径（mars/src/db.js 的 openDb → initSchema → CREATE VIRTUAL TABLE ... fts5）
-  #   - 测创建、写入、MATCH 查询、memories+fts 联表检索
-  # 失败即红。不提供跳过或降级出口——FTS5 不可用时「兼容」这个结论不成立。
-  macos-probe:
-    name: fts5 probe (macos-latest)
+  # 范围刻意收窄：只跑 Node 22.x 一个版本。目的不是覆盖版本矩阵（Linux/Windows
+  # 已有 22/24 两档），而是证明「darwin 上的 node:sqlite+FTS5、zlib zstd、
+  # 符号链接、BSD 工具链、打包安装链路」可用。
+  #
+  # 第一步是 FTS5 探针：它失败就停，后面的步骤不再掩盖问题。
+  # 探针输出同时写入 $GITHUB_STEP_SUMMARY，并在 Annotations 里留一条 notice，
+  # 这样「哪个 arch / 哪个 Node 版本 / 哪个 SQLite 版本」在页面上直接可读，
+  # 不必下载需要认证的 job 日志。
+  #
+  # 不跑 structure-selfcheck 与 g1：它们依赖 PowerShell。
+  macos:
+    name: macos (macos-latest / node 22.x)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
@@ -83,7 +87,16 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: 环境与 FTS5 前置探针
+      - name: 环境信息
+        shell: bash
+        run: |
+          node --version
+          npm --version
+          uname -a
+          uname -m
+          sw_vers
+
+      - name: FTS5 前置探针
         shell: bash
         run: |
           set +e
@@ -97,6 +110,18 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           exit $code
+
+      - name: 自检（doctor：node:sqlite+FTS5 / zlib zstd / 路径卫生）
+        shell: bash
+        run: node bin/rds.mjs doctor
+
+      - name: Required 测试门禁
+        shell: bash
+        run: npm test
+
+      - name: 发行包端到端（打包→检查→安装→全链路）
+        shell: bash
+        run: bash tooling/ci-smoke.sh
 
   # 母体系结构自检：PowerShell 实现，只在 Windows 跑。
   # 项目名检查已拆分——活跃资产必须为 0，历史记录（mars/docs 等）只告警。

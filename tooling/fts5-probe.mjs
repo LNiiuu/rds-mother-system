@@ -149,6 +149,24 @@ function main() {
     if (!pass) for (const f of failed) console.log(`  - ${f.name}: ${f.detail}`);
   }
 
+  // GitHub Actions 里额外打一条 notice：把关键环境与结论暴露在 run 页面的
+  // Annotations 区域。原因：job 日志需要认证才能下载，而验收报告需要引用
+  // 「哪个 arch、哪个 Node 版本、哪个 SQLite 版本」。notice 是公开可见的。
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    const okCount = checks.filter((c) => c.ok).length;
+    const msg = [
+      `platform=${env.platform}`,
+      `arch=${env.arch}`,
+      `node=${env.node}`,
+      `sqlite=${env.sqlite || 'unknown'}`,
+      `runner_arch=${env.runnerArch || '-'}`,
+      `image=${env.imageOS || '-'}`,
+      `checks=${okCount}/${checks.length}`,
+      pass ? 'PASS' : 'FAIL'
+    ].join(' ');
+    console.log(`::notice title=FTS5 probe::${msg}`);
+  }
+
   // 明确不提供「跳过」出口：能力缺失就是失败，让 CI 变红。
   return pass ? 0 : 1;
 }
