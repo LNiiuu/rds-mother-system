@@ -67,7 +67,14 @@ test('B4 契约：传入相对路径时，path 仍被解析为绝对路径', () 
     assert.equal(r.status, 0, r.stderr);
     const j = JSON.parse(r.stdout);
     assert.equal(path.isAbsolute(j.path), true, '相对输入也输出绝对路径');
-    assert.equal(j.path, path.join(dir, 'session.v4.jsonl.zstd'));
+    // 比的是「指向同一个文件」，不是「字符串相同」。
+    // macOS 上 os.tmpdir() 常经 /var → /private/var 的符号链接，子进程的
+    // process.cwd() 返回 realpath，字面比较会误报。两边都取真实路径。
+    assert.equal(
+      fs.realpathSync(j.path),
+      fs.realpathSync(path.join(dir, 'session.v4.jsonl.zstd')),
+      '相对输入应解析到同一个文件'
+    );
   });
 });
 
