@@ -112,7 +112,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | 测试 | **196 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2，工作区与干净克隆各跑一遍） | E1 |
 | CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42595065685](https://github.com/LNiiuu/rds-mother-system/actions/runs/42595065685)，6 个 job 全 success，1m21s（2026-11-09） | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
-| macOS | **未验证** | E3 |
+| macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）。Intel Mac 与其他 macOS 版本未覆盖 | E1 |
 | CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |
 | `render-role` 角色包渲染 | **模板已入库，渲染器未入库**。`core/templates/role-packet.md` 与 `run-record.json` 定义执行包格式并随包分发；生成它的 `rds-render-role.ps1` 只存在于本地工作区，不随包分发 | — |
 | `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。身份需用 `rds init-dev` 生成，升级为覆盖安装 | — |

@@ -105,6 +105,15 @@
 | [productization/M5-test-report.md](productization/M5-test-report.md) | B6 测试：173 → 196，三个新文件的用例逐个说明守什么 |
 | [productization/M5-ci-validation-report.md](productization/M5-ci-validation-report.md) | B6 CI：run 42594239389，6/6 job，1m23s，四条「真跑过」的证据 |
 
+### M6：macOS 兼容性验证（2026-11-11）
+
+| 文档 | 内容 |
+|---|---|
+| [productization/M6-macos-acceptance.md](productization/M6-macos-acceptance.md) | **M6 验收**：runner 架构与版本、FTS5 探针六条断言、doctor/测试/smoke 结果、过程中修掉的过强断言、已验证与未验证的边界 |
+| [productization/M5-macos-assessment.md](productization/M5-macos-assessment.md) | 前置评估（M5 收尾时做的只读分析）：八维度静态核对、8 条平台差异、成本收益、最小方案 |
+
+> M6 与 M5 并列，不是 M5 的一部分。M5 的验收范围明确不含 macOS（见 [M5-closure.md](productization/M5-closure.md) §4.2）。
+
 ---
 
 ## 2. 旧遗留清单的现状

@@ -14,10 +14,15 @@
 | Node.js | **>= 22.15.0** | `node:sqlite` 自 22.5 起提供；`zlib` 的 zstd（`rds ledger` 解析会话必需）到 22.15 才进 v22 分支。22.22.x 与 24.x 已实测通过 |
 | npm | 随 Node 附带 | 只用于安装本包；运行时不依赖任何第三方库 |
 | Git | 可选 | 仅 `tooling/sync.ps1`、`tooling/backup.ps1` 等运维脚本需要；MARS 本体不需要 |
-| PowerShell | 仅 Windows 需要 5.1+ | 只用于 `.ps1` 脚本；`rds` 命令本身在两个平台等价 |
+| PowerShell | 仅 Windows 需要 5.1+ | 只用于 `.ps1` 脚本；`rds` 命令本身在 Linux / Windows / macOS 上等价 |
 | 网络 | **不需要** | 安装后完全离线可用；本包不调用任何 AI API |
 
-macOS **未实机验证**（E3）：代码层面无 Windows 专有依赖（仅 4 处 `powershell.exe` 出现在测试与脚本中），但未在真机跑过，故不作承诺。
+**平台支持**（证据见 §11）：
+
+| 平台 | 状态 |
+|---|---|
+| Linux / Windows | CI 实测通过（Ubuntu + Windows × Node 22/24） |
+| macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）。未覆盖 Intel Mac 与其他 macOS 版本；`core/scripts/new-project.ps1` 需要 pwsh，macOS 请用 §8 的手工方式 |
 
 ---
 
@@ -320,7 +325,7 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 |---|---|---|
 | 测试状态 | **173 项全通过，fail=0，skipped=0**（2026-11-09，Windows × Node 22.22.2，`b89cbb2`）。M3 起含分层检查与行为基线；M4 起含契约、脚本、数据库、版本、配置、诊断六类测试 | 测试已完全去环境化：不依赖作者会话、本机 DSH 或绝对路径 |
 | Linux / Ubuntu | **由 CI 实测通过**（Node 22 / 24 各一格），最近一次 `run 42583509413` @ `b89cbb2` | 跨平台结论有 E1 证据，不再是静态推断 |
-| macOS | **未实机验证** | 代码层无 Windows 专有依赖（`powershell.exe` 只出现在测试与脚本中），但未跑过即不承诺 |
+| macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x，run `<见 M6 验收报告>`）。未覆盖 Intel Mac 与其他 macOS 版本；`new-project.ps1` 需要 pwsh | 正文按系统级实测标注，不作超范围承诺 |
 | M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置是**启动快照**：改 `role-routing.json` 后需重启 MCP 才生效 |
 | `rds ledger` | 只读动作：**不会创建数据库**；库已存在时才写审计 | 审计主体记为哨兵 `'local'`，不是已认证 principal |
 | `ledger.json` 的 `sessions[].path` | 一律是**绝对路径**，用途是能直接打开原文件 | 产物不适合提交到版本库或直接分享。需要可移植输出时，`rds ledger --path-style` 尚未实现（方案见 `docs/checks/productization/M5-path-portability.md`） |

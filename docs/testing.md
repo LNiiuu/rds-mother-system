@@ -126,7 +126,7 @@ Required 测试验证的是**引擎行为**：存储与治理、鉴权与越界�
 |---|---|---|
 | 真实 DSH 客户端联调 | 只有 External 测试 + 历史记录 | 需真机 |
 | 真实设备上的 Frida / pcap | M1-0 阶段记录为 BLOCKED | 需真机 |
-| macOS | 未实机验证 | 无设备；CI 矩阵未含 `macos-latest` |
+| macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）；Intel Mac 与其他 macOS 版本未覆盖 | 见 [M6 验收报告](checks/productization/M6-macos-acceptance.md) |
 | Node 22.15.0 精确边界 | 只测 22.x / 24.x 最新补丁版 | 需固定版本 runner |
 | 并发写与多语句事务 | 只验证 `busy_timeout > 0` | 需压测设计 |
 | 性能与压力 | 无基准 | 无需求提出 |
@@ -135,18 +135,21 @@ Required 测试验证的是**引擎行为**：存储与治理、鉴权与越界�
 
 ## 6. CI
 
-### 6.1 六个 job
+### 6.1 七个 job
 
 `.github/workflows/ci.yml`：
 
 | job | 平台 | 内容 |
 |---|---|---|
-| `required (ubuntu-latest / node 22)` | Ubuntu | 环境信息 → doctor → config → layers → test → gate-selfcheck → smoke |
+| `required (ubuntu-latest / node 22)` | Ubuntu | 环境信息 → doctor → config → layers → docs:check → test → gate-selfcheck → smoke |
 | `required (ubuntu-latest / node 24)` | Ubuntu | 同上 |
 | `required (windows-latest / node 22)` | Windows | 同上 |
 | `required (windows-latest / node 24)` | Windows | 同上 |
+| `macos (macos-latest / node 22)` | macOS arm64 | 环境信息 → **FTS5 探针** → doctor → test → smoke |
 | `structure-selfcheck` | Windows | `tests/self/run.ps1`：必需文件、8 张角色卡、6 套 REA 工作流、8 份 manifest、项目名检查 |
 | `g1-powershell` | Windows | `tests/git-review/run.ps1`：六个夹具真实执行 |
+
+macOS job 的第一步是 **FTS5 探针**（`tooling/fts5-probe.mjs`）：它走 `mars/src/db.js` 的真实路径建 FTS5 表并做写入/查询，失败即停。这一步的存在是因为「darwin 构建是否启用 FTS5」无法靠静态阅读确定。探针还负责在 annotation 里记录 runner 架构、Node 精确版本与内置 SQLite 版本。
 
 ### 6.2 怎么判断 CI 真跑过
 
