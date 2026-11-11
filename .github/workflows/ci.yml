@@ -65,6 +65,39 @@ jobs:
         shell: bash
         run: bash tooling/ci-smoke.sh
 
+  # macOS FTS5 前置探针（macOS 兼容性验证的第一步）。
+  #
+  # 为什么先做这一步：darwin 构建的 node:sqlite 是否启用 FTS5，静态阅读无法确定，
+  # 而整个引擎的检索压在这一条上。先用一条最短路径验掉：
+  #   - 记录 runner 实际架构、process.arch、Node 精确版本、内置 SQLite 版本
+  #   - 走项目真实路径（mars/src/db.js 的 openDb → initSchema → CREATE VIRTUAL TABLE ... fts5）
+  #   - 测创建、写入、MATCH 查询、memories+fts 联表检索
+  # 失败即红。不提供跳过或降级出口——FTS5 不可用时「兼容」这个结论不成立。
+  macos-probe:
+    name: fts5 probe (macos-latest)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22.x'
+
+      - name: 环境与 FTS5 前置探针
+        shell: bash
+        run: |
+          set +e
+          node tooling/fts5-probe.mjs > probe.txt 2>&1
+          code=$?
+          cat probe.txt
+          {
+            echo '## FTS5 probe'
+            echo '```'
+            cat probe.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
+
   # 母体系结构自检：PowerShell 实现，只在 Windows 跑。
   # 项目名检查已拆分——活跃资产必须为 0，历史记录（mars/docs 等）只告警。
   structure-selfcheck:
