@@ -25,6 +25,21 @@ M3 解决的问题：域逻辑直接依赖 DSH、文件系统布局与进程环�
 
 正确用法：读设计意图 → 对照 [docs/PROJECT-MAP.md](../PROJECT-MAP.md) 看现状 → 若两者不一致，以 PROJECT-MAP 为准。
 
+### 「属 M5 清理范围」是什么意思
+
+M3 的设计文档里有几处写「属 M5 清理范围」（`current-state.md` 的目录树与失效项表、`migration-plan.md` 的「不做」清单），指的是当时的计划：由 M5 统一处理 `mars/docs/` 与 `docs/checks/` 里的过期内容与机器路径。
+
+M5 已完成，但**清理方式不是删除或改写**：
+
+| 做了什么 | 在哪 |
+|---|---|
+| 给每份文档标注性质（CURRENT / DESIGN / EVIDENCE / HISTORICAL）与生效范围 | [docs/checks/README.md](../checks/README.md)、[mars/docs/README.md](../../mars/docs/README.md) |
+| 集中登记「已知失效：哪里失效、当前事实是什么、去哪看」 | [docs/README.md](../README.md) §4 |
+| 保留全部历史文本原样——它们是带日期的证据 | 未改动 |
+| 让 `rds doctor` 的 `paths:docs` 继续只告警不失败 | `bin/doctor.mjs` |
+
+所以再看到「属 M5 清理范围」，正确理解是：**这件事已经处理过，处理方式是标注而非删除**。
+
 ---
 
 ## 2. 行为基线（`CURRENT`，持续有效）
