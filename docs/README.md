@@ -28,7 +28,7 @@
 ### 我想核对它是否可信
 
 1. [docs/checks/README.md](checks/README.md) —— 全部验收证据的索引（按里程碑分组，标注结论与生效范围）
-2. [docs/checks/productization/](checks/productization/) —— M1–M5 各阶段的验收报告
+2. [docs/checks/productization/](checks/productization/) —— M1–M6 各阶段的验收报告
 3. [docs/architecture/m3/baseline/](architecture/m3/baseline/) —— 7 个对外面的行为基线快照，`npm run baseline` 每次都会比对
 
 ---
@@ -94,6 +94,7 @@
 
 | 范围 | 位置 |
 |---|---|
+| M6 收尾 | [checks/productization/M6-closure.md](checks/productization/M6-closure.md)（验收报告为 [M6-macos-acceptance.md](checks/productization/M6-macos-acceptance.md)） |
 | M5 收尾 | [checks/productization/M5-final-acceptance.md](checks/productization/M5-final-acceptance.md)（另有 7 份明细） |
 | M4 封版 | [checks/productization/M4-closure.md](checks/productization/M4-closure.md) |
 | M4 明细 | `docs/checks/productization/M4-*.md`（9 份） |
@@ -140,7 +141,7 @@ MARS 的历史设计与评审记录，共 40 份。索引见 [mars/docs/README.m
 | `docs/architecture/m3/migration-plan.md` | 通篇为「将要做」 | 已执行完毕，B0–B5 各有 tag | `git tag -l 'm3-*'` |
 | `mars/docs/architecture.md` | 模块清单只有 10 个域文件 | 现有 22 个域文件 + 5 端口 + 8 适配器 | [docs/PROJECT-MAP.md](PROJECT-MAP.md) |
 | `mars/docs/interfaces.md` §3 | 授权动作含 `ledger.read` | 该动作已在 M3 移除，改为 `ledger.parse` | [CHANGELOG.md](../CHANGELOG.md) M3 段 |
-| `docs/checks/GITHUB.md` | 「状态：未接入」 | 已推送，CI 已运行 6 个 job | [M2.1 CI 报告](checks/productization/M2.1-ci-validation-report.md) |
+| `docs/checks/GITHUB.md` | 「状态：未接入」 | 已推送，CI 已运行 7 个 job（含 macOS） | [M2.1 CI 报告](checks/productization/M2.1-ci-validation-report.md) |
 | `docs/checks/productization/remaining-issues.md` | M1/M2 时的 10 项遗留 | 6 项已关闭，4 项仍在 | [docs/checks/README.md](checks/README.md) §2 |
 
 ---

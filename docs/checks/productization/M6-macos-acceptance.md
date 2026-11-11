@@ -21,6 +21,7 @@
 | 发行包端到端（打包→安装→全链路） | **PASS** |
 | 过程中发现的缺陷 | **1 个**：一条测试断言在 macOS 上过强（字面路径比较），已修 |
 | 是否需要改产品代码 | **不需要**（只改了一处测试断言） |
+| 最终提交的 CI（`b904842`） | **run 43051690255：completed / success，7 / 7 job success，1m06s** |
 
 ---
 
@@ -242,13 +243,63 @@ status: ok
 
 ## 7. CI 证据
 
+### 7.1 最终 run（收尾判定依据）
+
 | 项 | 值 |
 |---|---|
-| 首次全绿 run | **43050909002** @ `818b93c1c40e9066460832c3cd98a4da9d2ea0ab` |
-| 判定 | **7 / 7 job success** |
-| 失败到通过的转折 | `ffc9439`（macos 红）→ 修复 → `818b93c`（全绿） |
+| run | **43051690255**（run number 24） |
+| commit | `b904842779f56c5640e043debb6cb300e17ddb5c` |
+| 触发 | `push` 到 `main`，`.github/workflows/ci.yml` |
+| 起止 | 2026-11-11T15:46:26Z → 15:47:32Z |
+| `status` / `conclusion` | **`completed` / `success`** |
+| 总时长 | **1 分 06 秒** |
+| job | **7 / 7 success** |
 
-### 7.1 macos job 的步骤与耗时（run 43050909002）
+七个 job 的逐项记录（来源：`actions/runs/43051690255/jobs`）：
+
+| job | `status` | `conclusion` | 起止（UTC） | 耗时 |
+|---|---|---|---|---|
+| `required (ubuntu-latest / node 24.x)` | completed | success | 15:46:28 → 15:46:40 | 12s |
+| `required (ubuntu-latest / node 22.x)` | completed | success | 15:46:29 → 15:46:41 | 12s |
+| `macos (macos-latest / node 22.x)` | completed | success | 15:46:29 → 15:46:43 | **14s** |
+| `g1 (windows-latest / powershell)` | completed | success | 15:46:29 → 15:46:52 | 23s |
+| `required (windows-latest / node 22.x)` | completed | success | 15:46:29 → 15:47:31 | 62s |
+| `required (windows-latest / node 24.x)` | completed | success | 15:46:29 → 15:47:32 | 63s |
+| `structure self-check (windows-latest)` | completed | success | 15:46:30 → 15:47:10 | 40s |
+
+macos job 的十二个步骤全部 `success`，其中关键四步：
+
+| 步骤 | 起止（UTC） | 耗时 |
+|---|---|---|
+| 环境信息 | 15:46:32 → 15:46:32 | <1s |
+| **FTS5 前置探针** | 15:46:32 → 15:46:32 | <1s |
+| 自检（doctor） | 15:46:32 → 15:46:32 | <1s |
+| **Required 测试门禁** | 15:46:32 → 15:46:38 | **6s** |
+| **发行包端到端** | 15:46:38 → 15:46:40 | **2s** |
+| 证据汇总（annotation） | 15:46:40 → 15:46:40 | <1s |
+
+这个 run 的两条 annotation 原文（公开可读，无需下载日志）：
+
+```
+FTS5 probe     : platform=darwin arch=arm64 node=v22.23.4 sqlite=3.53.4 runner_arch=ARM64 image=macos26 checks=6/6 PASS
+macos evidence : status: ok | GATE PASS tests=196 pass=196 fail=0 skipped=0 | SMOKE PASS
+```
+
+两条都与 [§1](#1-环境)、[§3](#3-三项验收) 的数字一致：**同一份证据，不是另一次运行的结论**。
+
+> 判定口径：只用 `actions/runs/{id}` 的 `conclusion` 加 `actions/runs/{id}/jobs` 的逐 job 记录。
+> `commits/{sha}/check-runs` 对 job 级状态的更新会滞后（M5 封版时已记录过反例）。
+
+### 7.2 首个全绿 run（失败到通过的转折点）
+
+| 项 | 值 |
+|---|---|
+| 首个全绿 run | **43050909002** @ `818b93c1c40e9066460832c3cd98a4da9d2ea0ab` |
+| 判定 | **7 / 7 job success** |
+| 起止 | 2026-11-11T15:41:43Z → 15:43:07Z，总时长 **1 分 24 秒** |
+| 转折 | `ffc9439`（macos 红）→ 修复 → `818b93c`（全绿） |
+
+### 7.3 macos job 的步骤与耗时（run 43050909002）
 
 | # | 步骤 | 起止（UTC） | 耗时 |
 |---|---|---|---|
@@ -262,7 +313,7 @@ status: ok
 | 8 | **发行包端到端** | 15:42:08 → 15:42:11 | **3s** |
 | — | 整个 job | 15:41:48 → 15:42:15 | **27s** |
 
-### 7.2 七个 job 的耗时对照（同一 run）
+### 7.4 七个 job 的耗时对照（run 43050909002）
 
 | job | 耗时 |
 |---|---|
@@ -276,6 +327,10 @@ status: ok
 
 macOS job 比 Windows 的 `required` 更快，主要因为它只跑三步（探针 + doctor + 测试 + smoke），没有 config/layers/docs:check 的重复。
 
+> 两次 run 的 macos 耗时不同（27s vs 14s），差异来自 runner 冷热与 checkout 速度，
+> 不是验证内容变化：两次的步骤集合与断言完全相同，`818b93c` 之后只改了输出方式（annotation）与文档。
+> 引用耗时时应带 run id，不要当成固定值。
+
 ---
 
 ## 8. Git 与保护工作核对
@@ -288,7 +343,8 @@ macOS job 比 Windows 的 `required` 更快，主要因为它只跑三步（探�
 | `ffc9439` | 探针通过，改为完整 `macos` job（doctor + test + smoke） | **7 job 中 macos 红**（测试门禁 11s） |
 | `6d4a7ec` | 测试门禁失败时把 TAP 摘要写入 step summary | 诊断用（被下一次 push 取消） |
 | `818b93c` | 修 `path-portability` 的字面路径断言（改比 realpath） | **7/7 全绿** |
-| `df03d7c` | 把 doctor/test/smoke 的结论固化成 annotation | 见 §9（只改输出方式，不改验证内容） |
+| `df03d7c` | 把 doctor/test/smoke 的结论固化成 annotation | run 43051314697 全绿；annotation 生效 |
+| `b904842` | 本报告与三处文档同步（纯文档） | **run 43051690255：7/7 全绿，1m06s**，见 §7.1 |
 
 ### 8.2 保护工作
 
@@ -298,7 +354,7 @@ macOS job 比 Windows 的 `required` 更快，主要因为它只跑三步（探�
 | M6 起点 | 49 |
 | M6 各批次提交后 | **49**（每次提交后核对，未触及任何受保护文件） |
 
-M6 只新增/修改了 3 个文件：`tooling/fts5-probe.mjs`（新）、`.github/workflows/ci.yml`、`mars/tests/ledger/path-portability.test.js`。**没有动任何受保护的 49 项。**
+M6 的代码改动只有 3 个文件：`tooling/fts5-probe.mjs`（新）、`.github/workflows/ci.yml`、`mars/tests/ledger/path-portability.test.js`；另有 5 个文档文件在 `b904842` 中同步。**没有动任何受保护的 49 项。**
 
 ### 8.3 没有做的事
 
@@ -317,14 +373,14 @@ M6 只新增/修改了 3 个文件：`tooling/fts5-probe.mjs`（新）、`.githu
 
 怎么用：打开任一 macos job 的页面，在 **Annotations** 区域能看到两条：
 
-| 标题 | 内容示例（来自 `818b93c` 的 run） |
+| 标题 | 最终 run（`43051690255` @ `b904842`）的原文 |
 |---|---|
 | `FTS5 probe` | `platform=darwin arch=arm64 node=v22.23.4 sqlite=3.53.4 runner_arch=ARM64 image=macos26 checks=6/6 PASS` |
 | `macos evidence` | `status: ok \| GATE PASS tests=196 pass=196 fail=0 skipped=0 \| SMOKE PASS` |
 
 这条机制从 `df03d7c` 起生效。**它不改变任何验证内容**，只是让结果可核对。
 
-> 本节不写具体 run id：每次 macos run 都会产生这两条 annotation，用最新一次即可。
+> 每次 macos run 都会产生这两条 annotation，内容随实际结果变化。
 > 判定仍以 `actions/runs/{id}` 的 `conclusion` 加 `actions/runs/{id}/jobs` 的逐 job 记录为准——
 > `check-runs` 端点对 job 级状态的更新会滞后（M5 封版时已记录过这一点）。
 

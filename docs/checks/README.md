@@ -110,6 +110,7 @@
 | 文档 | 内容 |
 |---|---|
 | [productization/M6-macos-acceptance.md](productization/M6-macos-acceptance.md) | **M6 验收**：runner 架构与版本、FTS5 探针六条断言、doctor/测试/smoke 结果、过程中修掉的过强断言、已验证与未验证的边界 |
+| [productization/M6-closure.md](productization/M6-closure.md) | **M6 收尾**：最终 run 43051690255 @ `b904842` 的 run/job/步骤三级证据、`COMPLETED` 判定、六项复核（HEAD / 工作区 / 49 项指纹 / 20 个 Tag / 报告一致性 / 链接） |
 | [productization/M5-macos-assessment.md](productization/M5-macos-assessment.md) | 前置评估（M5 收尾时做的只读分析）：八维度静态核对、8 条平台差异、成本收益、最小方案 |
 
 > M6 与 M5 并列，不是 M5 的一部分。M5 的验收范围明确不含 macOS（见 [M5-closure.md](productization/M5-closure.md) §4.2）。
@@ -118,12 +119,12 @@
 
 ## 2. 旧遗留清单的现状
 
-[M1/M2 遗留清单](productization/remaining-issues.md) 列了 10 项。截至 M5 起点：
+[M1/M2 遗留清单](productization/remaining-issues.md) 列了 10 项。截至 M6 收尾：
 
 | # | 问题 | 现状 |
 |---|---|---|
 | 1 | CI 未真实运行 | **已关闭**（M2.1） |
-| 2 | Ubuntu / macOS 未实机验证 | **部分关闭**：Ubuntu 由 CI 覆盖；macOS 仍未验证 |
+| 2 | Ubuntu / macOS 未实机验证 | **已关闭（有限范围）**：Ubuntu 由 CI 覆盖；macOS 由 `macos-latest`（macos26 / arm64 / Node 22）覆盖。Intel Mac 与其他 macOS 版本仍不承诺，见 [M6-closure.md](productization/M6-closure.md) §5 |
 | 3 | `tests/self/run.ps1` 有 1 项 FAIL | **已关闭**（M2.1 拆分活跃/历史） |
 | 4 | `serverInfo.version` 不一致 | **已关闭**（M4-B4） |
 | 5 | G1 工作流未提交 | **已关闭**（G1 整体入库） |
