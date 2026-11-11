@@ -113,7 +113,12 @@ jobs:
 
       - name: 自检（doctor：node:sqlite+FTS5 / zlib zstd / 路径卫生）
         shell: bash
-        run: node bin/rds.mjs doctor
+        run: |
+          set +e
+          node bin/rds.mjs doctor > doctor.txt 2>&1
+          code=$?
+          cat doctor.txt
+          exit $code
 
       - name: Required 测试门禁
         shell: bash
@@ -141,7 +146,36 @@ jobs:
 
       - name: 发行包端到端（打包→检查→安装→全链路）
         shell: bash
-        run: bash tooling/ci-smoke.sh
+        run: |
+          set +e
+          bash tooling/ci-smoke.sh > smoke.txt 2>&1
+          code=$?
+          cat smoke.txt
+          exit $code
+
+      # 把三项结论固化成一条 annotation。
+      # 原因：job 日志需要认证才能下载，而验收报告要引用「doctor 什么状态、
+      # 测试多少项通过、smoke 是否通过」。annotation 是公开可读的。
+      - name: 证据汇总（annotation）
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          doc=$(grep -Eo 'status: [a-z]+' doctor.txt 2>/dev/null | head -1)
+          tst=$(grep -Eo 'GATE (PASS|FAIL) +tests=[0-9]+ pass=[0-9]+ fail=[0-9]+ skipped=[0-9]+' test-out.txt 2>/dev/null | head -1)
+          smk=$(grep -Eo 'SMOKE (PASS|FAIL)' smoke.txt 2>/dev/null | head -1)
+          [ -n "$doc" ] || doc='doctor=missing'
+          [ -n "$tst" ] || tst='test=missing'
+          [ -n "$smk" ] || smk='smoke=missing'
+          msg="${doc} | ${tst} | ${smk}"
+          echo "$msg"
+          echo "::notice title=macos evidence::${msg}"
+          {
+            echo '## evidence'
+            echo '```'
+            echo "$msg"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # 母体系结构自检：PowerShell 实现，只在 Windows 跑。
   # 项目名检查已拆分——活跃资产必须为 0，历史记录（mars/docs 等）只告警。
