@@ -29,6 +29,13 @@ async function reaPreflight({ runtime: rt, args }) {
 
 async function reaRun({ db, runtime: rt, args, reaEvidenceBase }) {
   if (!args.workflow) throw new Error('BAD_REQUEST 需要 --workflow <W-01..W-06>');
+  // M15：声明了任务类型就校验工作流是否属于该类型，避免"类型说是二进制分析，实际跑了流量分析"
+  let taskTypeCheck = null;
+  if (args['task-type']) {
+    const taskTypes = require('./runtime/task-types');
+    taskTypes.assertWorkflowAllowed(String(args['task-type']), String(args.workflow));
+    taskTypeCheck = { task_type: String(args['task-type']), allowed: true };
+  }
   const input = {
     root: args.root || args.path,
     sample: args.sample,
@@ -45,6 +52,7 @@ async function reaRun({ db, runtime: rt, args, reaEvidenceBase }) {
     input,
     evidenceBase: args.out || reaEvidenceBase
   });
+  if (taskTypeCheck) out.task_type = taskTypeCheck.task_type;
   json({
     rea_run_id: out.rea_run_id,
     workflow_id: out.workflow_id,

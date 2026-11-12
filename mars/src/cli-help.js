@@ -375,7 +375,8 @@ const TOPICS = {
       '任务状态机。合法迁移才允许；每次迁移写 task_events。' +
       'complete 必须给 --evidence，否则拒绝。plan 是确定性规则：实现+测试会拆成两个任务。',
     subcommands: [
-      ['plan', '按目标拆任务（--objective，可 --to-role 覆盖）'],
+      ['plan', '按目标拆任务（--objective；给 --type 走类型规则，否则关键词拆分）'],
+      ['types', '列出八种任务类型及其工作流/证据要求'],
       ['create', '建单任务（--title）'],
       ['list', '按项目列任务（--project，可 --status）'],
       ['show', '任务详情与事件（--task）'],
@@ -456,7 +457,7 @@ const TOPICS = {
   },
 
   agent: {
-    usage: 'rds agent <create|list|show|start|chain|status|cancel|stop> [选项]',
+    usage: 'rds agent <create|list|show|providers|start|chain|reap|status|cancel|stop> [选项]',
     summary:
       'Agent 定义与执行（M12）。create 只登记定义，不执行；start 才会真正发起一次 run。' +
       'start 用 --provider 指定的适配器：mock 是确定性模拟（usage_source=estimated），' +
@@ -469,6 +470,7 @@ const TOPICS = {
       ['start', '发起并同步执行一次 run（--agent --objective，可 --task/--task-file/--packet/--budget/--timeout/--workspace）'],
       ['status', '查 run 状态与用量（--run）'],
       ['chain', '交接链：多 Agent 依次执行并自动交接（--agents id1,id2,...）'],
+      ['providers', '列出 provider 契约、能力清单与就绪状态'],
       ['reap', '清理心跳陈旧的 RUNNING run（--stale <ms>）'],
       ['cancel', '请求取消（--run）'],
       ['stop', '停用 Agent（--agent）']
@@ -478,7 +480,7 @@ const TOPICS = {
       ['--agent <id>', 'Agent ID（create 时可显式指定）'],
       ['--to-role <R0-R7>', 'create 时的角色（当前执行角色用 --role）'],
       ['--name <name>', 'Agent 名字'],
-      ['--provider <name>', 'mock | openai-compat，默认 mock'],
+      ['--provider <name>', 'mock | openai-compat | anthropic，默认 mock'],
       ['--model <id>', '模型名'],
       ['--tools <a,b>', '进一步收窄可用工具（不能超出角色权限）'],
       ['--mock-file <json>', 'mock provider 的脚本文件'],
@@ -575,6 +577,7 @@ const TOPICS = {
     ],
     args: [
       ['--workflow <id>', 'W-01 .. W-06'],
+      ['--task-type <t>', '声明任务类型；会校验 workflow 是否属于该类型'],
       ['--root <dir>', 'W-01 的代码库根'],
       ['--sample <file>', 'W-02/W-03/W-04/W-05 的样本路径（只读）'],
       ['--entry <addr|name>', 'W-04 的起始函数'],

@@ -1,0 +1,280 @@
+{
+  "demo": "m15-joint",
+  "simulated_models": true,
+  "note": "模型是确定性 mock；REA 工具执行、样本哈希、调用图、测试结果均为真实",
+  "sample": "C:/Windows/System32/where.exe",
+  "case_a": {
+    "task_type": "binary_analysis",
+    "tasks": [
+      {
+        "task_id": "tsk_0ab2d2f1efd3",
+        "title": "二进制静态分析 · R5",
+        "assigned_role": "R5",
+        "status": "PLANNED"
+      },
+      {
+        "task_id": "tsk_36fdf5fac177",
+        "title": "二进制静态分析 · R4",
+        "assigned_role": "R4",
+        "status": "PLANNED"
+      }
+    ],
+    "workflows": [
+      {
+        "rea_run_id": "reacaad13e0ee9c",
+        "workflow_id": "W-02",
+        "status": "PARTIAL",
+        "sample_sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+        "evidence_dir": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\rea\\W-02\\reacaad13e0ee9c",
+        "tool_versions": [
+          {
+            "name": "objdump",
+            "version": "GNU objdump (GNU Binutils) 2.39",
+            "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+            "kind": "external"
+          }
+        ],
+        "limitations": [
+          "反编译伪代码（需 Ghidra/IDA，本环境无）",
+          "类型恢复",
+          "完整 xref 图",
+          "动态行为"
+        ]
+      },
+      {
+        "rea_run_id": "reaf7298e9aa276",
+        "workflow_id": "W-04",
+        "status": "PARTIAL",
+        "sample_sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+        "evidence_dir": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\rea\\W-04\\reaf7298e9aa276",
+        "tool_versions": [
+          {
+            "name": "objdump",
+            "version": "GNU objdump (GNU Binutils) 2.39",
+            "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+          }
+        ],
+        "limitations": [
+          "只解析直接 call；间接调用只计数",
+          "剥离二进制用启发式划分函数边界",
+          "未做跨模块（DLL）解析"
+        ]
+      }
+    ],
+    "review": {
+      "run_id": "run8b82ae7229ad",
+      "status": "SUCCEEDED",
+      "verdict": "审核通过：W-02 的结构事实与 W-04 的调用图都带样本哈希与工具版本，结论限定在\"外部输入进入命令拼接属高风险\"，未超出证据范围。",
+      "reviewed": true
+    },
+    "evidence_summary": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\ws\\rea\\SUMMARY.md"
+  },
+  "case_b": {
+    "task_type": "development",
+    "parent_task": {
+      "task_id": "tsk_d70e32d497d1",
+      "title": "依据已审核的逆向结论重构 buildCommand"
+    },
+    "tasks": [
+      {
+        "task_id": "tsk_b32933d85063",
+        "title": "软件研发 · R1",
+        "assigned_role": "R1",
+        "status": "PLANNED"
+      },
+      {
+        "task_id": "tsk_2b81d05000d8",
+        "title": "软件研发 · R2",
+        "assigned_role": "R2",
+        "status": "PLANNED"
+      },
+      {
+        "task_id": "tsk_ec539c166198",
+        "title": "软件研发 · R3",
+        "assigned_role": "R3",
+        "status": "PLANNED"
+      },
+      {
+        "task_id": "tsk_495b6bfbc0bb",
+        "title": "软件研发 · R4",
+        "assigned_role": "R4",
+        "status": "PLANNED"
+      }
+    ],
+    "steps": [
+      {
+        "index": 0,
+        "agent_id": "agenta364d2893021",
+        "role_id": "R1",
+        "run_id": "run82ca9b63ed3f",
+        "session_id": "sess9c9b983a8774",
+        "status": "SUCCEEDED",
+        "text": "设计完成：基于已审核的逆向结论，改用逐参数转义，对外返回形状不变。",
+        "tool_rounds": 1,
+        "tokens_used": 1047,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": null
+      },
+      {
+        "index": 1,
+        "agent_id": "agent6002cef7d52f",
+        "role_id": "R2",
+        "run_id": "runb10f88daaf8a",
+        "session_id": "sessda310d755b0c",
+        "status": "SUCCEEDED",
+        "text": "实现完成：src/cmd.js 增加 quote()，buildCommand 对工具名与参数逐个转义。",
+        "tool_rounds": 1,
+        "tokens_used": 978,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "hofd9ce3f02561"
+      },
+      {
+        "index": 2,
+        "agent_id": "agentd77f25722486",
+        "role_id": "R3",
+        "run_id": "runa81a92664282",
+        "session_id": "sess250a67a50794",
+        "status": "SUCCEEDED",
+        "text": "验证完成：test/cmd.test.js 全部通过，详见 trace 的 run_test meta。",
+        "tool_rounds": 1,
+        "tokens_used": 663,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "hoff0cd52aed1f"
+      },
+      {
+        "index": 3,
+        "agent_id": "agent474abb04f678",
+        "role_id": "R4",
+        "run_id": "run97c0ed326a1f",
+        "session_id": "sessc92b96de68be",
+        "status": "SUCCEEDED",
+        "text": "评审通过：转义逻辑与设计一致，对外形状未变，测试通过。",
+        "tool_rounds": 1,
+        "tokens_used": 550,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "ho8d6d945f0e73"
+      }
+    ],
+    "handoffs": [
+      {
+        "handoff_id": "hofd9ce3f02561",
+        "from_agent": "agenta364d2893021",
+        "to_agent": "agent6002cef7d52f",
+        "from_run": "run82ca9b63ed3f",
+        "packet_id": "pkt_691c435e9073",
+        "tokens": 144
+      },
+      {
+        "handoff_id": "hoff0cd52aed1f",
+        "from_agent": "agent6002cef7d52f",
+        "to_agent": "agentd77f25722486",
+        "from_run": "runb10f88daaf8a",
+        "packet_id": "pkt_ee6668290244",
+        "tokens": 145
+      },
+      {
+        "handoff_id": "ho8d6d945f0e73",
+        "from_agent": "agentd77f25722486",
+        "to_agent": "agent474abb04f678",
+        "from_run": "runa81a92664282",
+        "packet_id": "pkt_5a3c4be14fea",
+        "tokens": 121
+      }
+    ],
+    "sessions_distinct": true,
+    "tests_before": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "skipped": 0,
+      "files": 1,
+      "exit_code": 0,
+      "timed_out": false
+    },
+    "tests_after": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "skipped": 0,
+      "files": 1,
+      "exit_code": 0,
+      "timed_out": false
+    },
+    "refactor_effective": true
+  },
+  "usage": {
+    "project_id": "joint",
+    "by_source": {
+      "provider": {
+        "input": 0,
+        "output": 0
+      },
+      "estimated": {
+        "input": 3379,
+        "output": 485
+      },
+      "unknown": {
+        "input": 0,
+        "output": 0
+      }
+    },
+    "by_agent": [
+      {
+        "agent_id": "agent474abb04f678",
+        "usage_source": "estimated",
+        "i": 487,
+        "o": 63,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agent6002cef7d52f",
+        "usage_source": "estimated",
+        "i": 844,
+        "o": 134,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agenta364d2893021",
+        "usage_source": "estimated",
+        "i": 925,
+        "o": 122,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agentb8ea5cba69e3",
+        "usage_source": "estimated",
+        "i": 532,
+        "o": 94,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agentd77f25722486",
+        "usage_source": "estimated",
+        "i": 591,
+        "o": 72,
+        "t": 1,
+        "c": 2
+      }
+    ]
+  },
+  "rea_runs": [
+    {
+      "id": "reaf7298e9aa276",
+      "wf": "W-04",
+      "status": "PARTIAL"
+    },
+    {
+      "id": "reacaad13e0ee9c",
+      "wf": "W-02",
+      "status": "PARTIAL"
+    }
+  ]
+}

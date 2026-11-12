@@ -53,7 +53,9 @@
     "mars/src/adapters/rea/w05-pcap.js",
     "mars/src/adapters/rea/w06-frida.js",
     "mars/src/adapters/rea/registry.js",
-    "mars/src/cli-rea.js"
+    "mars/src/cli-rea.js",
+    "mars/src/runtime/task-types.js",
+    "mars/src/adapters/provider-anthropic.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -104,12 +106,14 @@
     "mars/src/adapters/rea/w05-pcap.js": "M14：W-05 PCAP 纯 JS 解析（不依赖 tshark，不解密 TLS）",
     "mars/src/adapters/rea/w06-frida.js": "M14：W-06 Frida（无工具则 BLOCKED，不提供模拟执行）",
     "mars/src/adapters/rea/registry.js": "M14：REA 工作流注册表与四值状态判定",
-    "mars/src/cli-rea.js": "M14：rea CLI 处理（不 require 适配器，走组合根注入）"
+    "mars/src/cli-rea.js": "M14：rea CLI 处理（不 require 适配器，走组合根注入）",
+    "mars/src/runtime/task-types.js": "M15：八种任务类型、角色链、工作流白名单与证据要求",
+    "mars/src/adapters/provider-anthropic.js": "M16：Anthropic Messages 协议适配器（system 顶层/tool_result 块/input_schema）"
   },
   "helpText": {
     "sha256": "2faee1a36b123c0a59258d0d6647cfc128d422ec4e4c02034261596b64151dcc",
-    "batch": "m14",
-    "reason": "新增 rea 命令组（list/status/preflight/run/inspect/runs）"
+    "batch": "m15+m16",
+    "reason": "task types 子命令、rea --task-type、agent providers"
   },
   "contractChanges": [
     {

@@ -330,6 +330,7 @@ function run(args) {
       if (sub === 'cancel') { cliAgent.agentCancel(ctx); return; }
       if (sub === 'chain') { return cliAgent.agentChain(ctx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
       if (sub === 'reap') { cliAgent.agentReap(ctx); return; }
+      if (sub === 'providers') { cliAgent.agentProviders(ctx); return; }
       die('agent 子命令: create | list | show | start | status | cancel | stop（--help 查看）', 2);
     }
     if (cmd === 'run') {
@@ -634,8 +635,20 @@ function run(args) {
           collab.assertPermission(role, 'task.plan');
           const objective = args.objective || args._[2];
           if (!objective) die('task plan 需要 --objective <文本>', 2);
+          // M15：给了 --type 就走类型规则（可预测），没给才用关键词拆分（启发式）
+          if (args.type) {
+            const taskTypes = require('./runtime/task-types');
+            console.log(JSON.stringify(taskTypes.planByType(db, {
+              project_id: args.project, task_type: String(args.type), objective, actor
+            }), null, 2));
+            return;
+          }
           const r = collab.planTasks(db, { project_id: args.project, objective, role: args['to-role'], actor });
           console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'types') {
+          console.log(JSON.stringify({ task_types: require('./runtime/task-types').list() }, null, 2));
           return;
         }
         if (sub === 'create') {
