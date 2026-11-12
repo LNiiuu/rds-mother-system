@@ -14,6 +14,7 @@ const { createSessionRegistry } = require('./session-registry');
 const { createDbAuditSink } = require('./adapters/db-audit-sink');
 const { createMockProvider } = require('./adapters/provider-mock');
 const { createOpenAiCompatProvider } = require('./adapters/provider-openai-compat');
+const { createAnthropicProvider } = require('./adapters/provider-anthropic');
 const { createFsToolExecutor } = require('./adapters/fs-tool-executor');
 const rea = require('./adapters/rea/registry');
 const { openDb, attachAuditSink } = require('./db');
@@ -72,7 +73,8 @@ function createRuntime(options = {}) {
         ? { [agent.agent_id]: agent.definition.mock.turns }
         : {}
     }),
-    'openai-compat': () => createOpenAiCompatProvider({ env })
+    'openai-compat': () => createOpenAiCompatProvider({ env }),
+    anthropic: () => createAnthropicProvider({ env })
   };
 
   return {

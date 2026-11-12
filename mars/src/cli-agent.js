@@ -285,6 +285,26 @@ function usageShow({ db, args }) {
   json(runtime.usageOfProject(db, args.project));
 }
 
+/** 列出所有 provider 的契约与就绪状态（只探测配置，不发请求）。 */
+function agentProviders({ runtime: rt }) {
+  const rows = rt.providerNames.map((name) => {
+    try {
+      const p = rt.providerFor(name, null);
+      return {
+        provider: name,
+        capabilities: p.capabilities,
+        health: p.healthCheck(),
+        // 明确标注：mock 是模拟，其它是真实协议但可能未配置
+        kind: name === 'mock' ? 'simulated' : 'network',
+        configured: typeof p.isConfigured === 'function' ? p.isConfigured() : true
+      };
+    } catch (e) {
+      return { provider: name, error: e.message };
+    }
+  });
+  json({ providers: rows, note: 'configured=false 表示缺凭据：真实调用为 NOT RUN，不是失败' });
+}
+
 // ---------------------------------------------------------------- M13 治理
 
 /** 清理心跳停止的 RUNNING run（判定 Agent 已失联）。 */
@@ -326,5 +346,5 @@ module.exports = {
   agentCreate, agentList, agentShow, agentStop, agentStart,
   agentStatus, agentCancel, agentChain,
   runList, runInspect, traceInspect, usageShow,
-  agentReap, lockList, policyList, policyCheck, budgetGateShow
+  agentReap, lockList, policyList, policyCheck, budgetGateShow, agentProviders
 };
