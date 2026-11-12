@@ -559,6 +559,37 @@ const TOPICS = {
     examples: ['rds policy check --role R7 --action git.push']
   },
 
+  rea: {
+    usage: 'rds rea <list|status|preflight|run|inspect|runs> [选项]',
+    summary:
+      'REA 逆向分析工作流（M14）。六套：W-01 代码理解、W-02 原生静态、W-03 APK、W-04 调用链、W-05 PCAP、W-06 Frida。' +
+      '状态四值含义严格：PASS 目标达成 / PARTIAL 部分达成（边界写在结果里）/ BLOCKED 前置不满足 / FAILED 跑了但失败。' +
+      'PARTIAL 不等于 PASS。缺工具就报 BLOCKED，不提供模拟执行。',
+    subcommands: [
+      ['list', '工作流清单与接口 schema'],
+      ['status', '当前环境各工作流的工具就绪状态'],
+      ['preflight', '只做前置检查（--workflow，样本参数同 run）'],
+      ['run', '执行并落证据（--workflow --root 或 --sample）'],
+      ['inspect', '查看一次分析（--run）'],
+      ['runs', '最近的分析记录']
+    ],
+    args: [
+      ['--workflow <id>', 'W-01 .. W-06'],
+      ['--root <dir>', 'W-01 的代码库根'],
+      ['--sample <file>', 'W-02/W-03/W-04/W-05 的样本路径（只读）'],
+      ['--entry <addr|name>', 'W-04 的起始函数'],
+      ['--depth <n>', 'W-04 展开深度，默认 3'],
+      ['--sample-kind <k>', 'capture | synthetic | unknown'],
+      ['--authorization <k>', 'W-06 必填：own-device | lab | written-consent'],
+      ['--out <dir>', '证据输出目录，默认 <db 同级>/rea']
+    ],
+    examples: [
+      'rds rea status',
+      'rds rea run --workflow W-01 --root .',
+      'rds rea run --workflow W-02 --sample C:/Windows/System32/where.exe'
+    ]
+  },
+
   help: {
     usage: 'rds help [命令]',
     summary: '不带参数打印顶层用法；带命令名打印该命令的详细说明。等价于 rds <命令> --help。',
@@ -619,6 +650,9 @@ MARS 记忆引擎
 治理（M13）
   lock                    list
   policy                  list | check
+
+专业引擎（M14）
+  rea                     list | status | preflight | run | inspect | runs
 
 公共选项
   --token <t>             凭证（也可用 MARS_TOKEN）

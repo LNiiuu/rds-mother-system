@@ -43,7 +43,17 @@
     "mars/src/cli-agent.js",
     "mars/src/runtime/locks.js",
     "mars/src/runtime/reliability.js",
-    "mars/src/runtime/policy.js"
+    "mars/src/runtime/policy.js",
+    "mars/src/adapters/rea/tools.js",
+    "mars/src/adapters/rea/evidence.js",
+    "mars/src/adapters/rea/w01-code.js",
+    "mars/src/adapters/rea/w02-binary.js",
+    "mars/src/adapters/rea/w03-apk.js",
+    "mars/src/adapters/rea/w04-callchain.js",
+    "mars/src/adapters/rea/w05-pcap.js",
+    "mars/src/adapters/rea/w06-frida.js",
+    "mars/src/adapters/rea/registry.js",
+    "mars/src/cli-rea.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -84,12 +94,22 @@
     "mars/src/cli-agent.js": "M12：agent/run/trace/usage 的 CLI 处理（不碰 fs）",
     "mars/src/runtime/locks.js": "M13：项目级工作区写锁；拿不到明确失败，不排队不覆盖",
     "mars/src/runtime/reliability.js": "M13：重试判定/退避/心跳陈旧检测/预算闸门（纯函数）",
-    "mars/src/runtime/policy.js": "M13：敏感操作准入矩阵；四类动作无任何角色拥有"
+    "mars/src/runtime/policy.js": "M13：敏感操作准入矩阵；四类动作无任何角色拥有",
+    "mars/src/adapters/rea/tools.js": "M14：外部工具探测与受控执行（execFile，无 shell）",
+    "mars/src/adapters/rea/evidence.js": "M14：样本哈希/工具版本/命令/复核步骤的证据落盘",
+    "mars/src/adapters/rea/w01-code.js": "M14：W-01 代码库理解（纯本地，零外部工具）",
+    "mars/src/adapters/rea/w02-binary.js": "M14：W-02 原生静态（binutils，能力边界写在结果里）",
+    "mars/src/adapters/rea/w03-apk.js": "M14：W-03 APK（缺 jadx 时 BLOCKED，但仍给 ZIP 结构事实）",
+    "mars/src/adapters/rea/w04-callchain.js": "M14：W-04 静态调用图（剥离二进制用启发式边界）",
+    "mars/src/adapters/rea/w05-pcap.js": "M14：W-05 PCAP 纯 JS 解析（不依赖 tshark，不解密 TLS）",
+    "mars/src/adapters/rea/w06-frida.js": "M14：W-06 Frida（无工具则 BLOCKED，不提供模拟执行）",
+    "mars/src/adapters/rea/registry.js": "M14：REA 工作流注册表与四值状态判定",
+    "mars/src/cli-rea.js": "M14：rea CLI 处理（不 require 适配器，走组合根注入）"
   },
   "helpText": {
-    "sha256": "897956d05997d06834cfc9c8db101379ed52df0ac087048b18f3318017449171",
-    "batch": "m13",
-    "reason": "新增 lock / policy 命令与 agent reap"
+    "sha256": "2faee1a36b123c0a59258d0d6647cfc128d422ec4e4c02034261596b64151dcc",
+    "batch": "m14",
+    "reason": "新增 rea 命令组（list/status/preflight/run/inspect/runs）"
   },
   "contractChanges": [
     {

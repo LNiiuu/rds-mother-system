@@ -2,7 +2,7 @@
 // 数据库结构与增量迁移（M3 / B5 从 db.js 拆出）。
 //
 // 只增不改：既有行的含义不变，不删数据、不重写数据。每一步都幂等，可在每次 open 时安全执行。
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 function initSchema(db) {
   db.exec(`
@@ -347,6 +347,28 @@ function initSchema(db) {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_locks_target
       ON workspace_locks (project_id, scope, target);
+
+    -- ============ M14 REA 工作流执行记录 ============
+    -- 每次分析一行；样本哈希与工具版本必须落库，否则结论无法复核。
+    CREATE TABLE IF NOT EXISTS rea_runs (
+      rea_run_id TEXT PRIMARY KEY,
+      workflow_id TEXT NOT NULL,
+      sample_path TEXT,
+      sample_sha256 TEXT,
+      sample_bytes INTEGER,
+      sample_kind TEXT,
+      status TEXT NOT NULL,
+      tool_versions_json TEXT,
+      input_json TEXT,
+      result_json TEXT,
+      evidence_dir TEXT,
+      error_code TEXT,
+      error_message TEXT,
+      started_at TEXT,
+      finished_at TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_rea_runs_wf ON rea_runs (workflow_id, created_at);
   `);
   migrate(db);
   db.exec("CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(memory_id UNINDEXED, content, tokenize='unicode61')");

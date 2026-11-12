@@ -1,0 +1,297 @@
+{
+  "status": "PASS",
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "check": "objdump 可用",
+        "ok": true,
+        "detail": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+      },
+      {
+        "check": "sample 已提供",
+        "ok": true
+      },
+      {
+        "check": "sample 存在且是文件",
+        "ok": true,
+        "detail": "C:\\Windows\\System32\\where.exe"
+      }
+    ],
+    "blocked_reason": null,
+    "tools": [
+      {
+        "name": "objdump",
+        "present": true,
+        "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+        "version": "GNU objdump (GNU Binutils) 2.39",
+        "probe_ok": true
+      }
+    ]
+  },
+  "result": {
+    "sample": {
+      "path": "C:\\Windows\\System32\\where.exe",
+      "bytes": 65536,
+      "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+      "kind": "authorized-local-file"
+    },
+    "file": {
+      "format": "pei-x86-64",
+      "architecture": "i386:x86-64",
+      "flags": "HAS_RELOC, EXEC_P, HAS_LINENO, HAS_DEBUG, HAS_LOCALS, D_PAGED",
+      "start_address": "0x0000000140001300"
+    },
+    "sections": [
+      {
+        "name": ".text",
+        "size": 30080,
+        "vma": "0x140001000",
+        "file_offset": "0x1000"
+      },
+      {
+        "name": "fothk",
+        "size": 4096,
+        "vma": "0x140009000",
+        "file_offset": "0x9000"
+      },
+      {
+        "name": ".rdata",
+        "size": 6764,
+        "vma": "0x14000a000",
+        "file_offset": "0xa000"
+      },
+      {
+        "name": ".data",
+        "size": 2112,
+        "vma": "0x14000c000",
+        "file_offset": "0xc000"
+      },
+      {
+        "name": ".pdata",
+        "size": 1068,
+        "vma": "0x14000d000",
+        "file_offset": "0xd000"
+      },
+      {
+        "name": ".rsrc",
+        "size": 2064,
+        "vma": "0x14000e000",
+        "file_offset": "0xe000"
+      },
+      {
+        "name": ".reloc",
+        "size": 136,
+        "vma": "0x14000f000",
+        "file_offset": "0xf000"
+      }
+    ],
+    "imports": [
+      {
+        "library": "msvcrt.dll",
+        "symbol_count": 33,
+        "symbols": [
+          "__iob_func",
+          "_memicmp",
+          "_errno",
+          "wcstod",
+          "wcstol",
+          "wcstoul",
+          "wcschr",
+          "_fileno",
+          "_get_osfhandle",
+          "fprintf",
+          "fflush",
+          "_vsnwprintf",
+          "?terminate@@YAXXZ",
+          "wcstok",
+          "_commode",
+          "_fmode",
+          "__C_specific_handler",
+          "_initterm",
+          "__setusermatherr",
+          "_cexit",
+          "_exit",
+          "exit",
+          "__set_app_type",
+          "__wgetmainargs",
+          "_amsg_exit",
+          "_XcptFilter",
+          "localtime",
+          "towupper",
+          "_wstat",
+          "wcsrchr",
+          "_wgetenv",
+          "wcspbrk",
+          "memset"
+        ]
+      },
+      {
+        "library": "KERNEL32.dll",
+        "symbol_count": 57,
+        "symbols": [
+          "TerminateProcess",
+          "HeapValidate",
+          "HeapFree",
+          "GetProcessHeap",
+          "GetConsoleOutputCP",
+          "ExitProcess",
+          "WriteConsoleW",
+          "CompareStringA",
+          "GetThreadLocale",
+          "CompareStringW",
+          "lstrlenW",
+          "GetUserDefaultLCID",
+          "GetStdHandle",
+          "GetConsoleMode",
+          "GetFileType",
+          "WideCharToMultiByte",
+          "FindStringOrdinal",
+          "LocalFree",
+          "FormatMessageW",
+          "SetThreadUILanguage",
+          "GetModuleFileNameW",
+          "FindFirstFileExW",
+          "SetLastError",
+          "GetFullPathNameW",
+          "FindNextFileW",
+          "GetLongPathNameW",
+          "SetErrorMode",
+          "GetEnvironmentVariableW",
+          "FindClose",
+          "CreateFileW",
+          "GetFileAttributesW",
+          "GetFileInformationByHandle",
+          "GetLastError",
+          "FileTimeToSystemTime",
+          "CloseHandle",
+          "HeapSetInformation",
+          "FileTimeToLocalFileTime",
+          "GetCurrentDirectoryW",
+          "GetTimeFormatW",
+          "GetFileSize",
+          "GetDateFormatW",
+          "Sleep",
+          "SetUnhandledExceptionFilter",
+          "GetModuleHandleW",
+          "QueryPerformanceCounter",
+          "GetCurrentProcessId",
+          "GetCurrentThreadId",
+          "GetSystemTimeAsFileTime",
+          "GetTickCount",
+          "RtlCaptureContext",
+          "RtlLookupFunctionEntry",
+          "RtlVirtualUnwind",
+          "UnhandledExceptionFilter",
+          "GetCurrentProcess",
+          "HeapReAlloc",
+          "HeapSize",
+          "HeapAlloc"
+        ]
+      },
+      {
+        "library": "ntdll.dll",
+        "symbol_count": 2,
+        "symbols": [
+          "VerSetConditionMask",
+          "RtlVerifyVersionInfo"
+        ]
+      },
+      {
+        "library": "USER32.dll",
+        "symbol_count": 2,
+        "symbols": [
+          "LoadStringW",
+          "CharUpperW"
+        ]
+      },
+      {
+        "library": "WS2_32.dll",
+        "symbol_count": 1,
+        "symbols": [
+          "<none>"
+        ]
+      },
+      {
+        "library": "SHLWAPI.dll",
+        "symbol_count": 1,
+        "symbols": [
+          "StrTrimW"
+        ]
+      },
+      {
+        "library": "VERSION.dll",
+        "symbol_count": 3,
+        "symbols": [
+          "GetFileVersionInfoSizeExW",
+          "VerQueryValueW",
+          "GetFileVersionInfoExW"
+        ]
+      }
+    ],
+    "exports_count": 0,
+    "symbols": {
+      "total": 0,
+      "named": []
+    },
+    "strings": {
+      "total": 206,
+      "by_kind": {
+        "plain": 199,
+        "module": 7
+      },
+      "interesting": [
+        {
+          "kind": "module",
+          "value": "msvcrt.dll"
+        },
+        {
+          "kind": "module",
+          "value": "KERNEL32.dll"
+        },
+        {
+          "kind": "module",
+          "value": "ntdll.dll"
+        },
+        {
+          "kind": "module",
+          "value": "USER32.dll"
+        },
+        {
+          "kind": "module",
+          "value": "WS2_32.dll"
+        },
+        {
+          "kind": "module",
+          "value": "SHLWAPI.dll"
+        },
+        {
+          "kind": "module",
+          "value": "VERSION.dll"
+        }
+      ]
+    },
+    "capability": {
+      "done": [
+        "文件格式与架构",
+        "段表",
+        "导入表（DLL + 符号）",
+        "符号表",
+        "字符串提取与分类",
+        "入口地址"
+      ],
+      "not_done": [
+        "反编译伪代码（需 Ghidra/IDA，本环境无）",
+        "类型恢复",
+        "完整 xref 图",
+        "动态行为"
+      ],
+      "why_partial": "本环境无 Ghidra 且 WSL 被安全策略封禁；binutils 只能给出结构与符号级事实"
+    },
+    "inference_notes": [
+      "strings 的分类（url/registry/path/ip/module/message）是正则推断，可能误判",
+      "imports 的符号列表被截断到 60 条，symbol_count 是完整计数"
+    ]
+  },
+  "error": null
+}

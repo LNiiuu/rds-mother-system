@@ -15,6 +15,7 @@ const { createDbAuditSink } = require('./adapters/db-audit-sink');
 const { createMockProvider } = require('./adapters/provider-mock');
 const { createOpenAiCompatProvider } = require('./adapters/provider-openai-compat');
 const { createFsToolExecutor } = require('./adapters/fs-tool-executor');
+const rea = require('./adapters/rea/registry');
 const { openDb, attachAuditSink } = require('./db');
 const { KNOWN_CONTRACTS } = require('./ports/asset-resolver');
 const { PACKAGE_ROOT, resolveRoot, resolvePaths, loadRoutingConfig } = require('./paths');
@@ -85,6 +86,8 @@ function createRuntime(options = {}) {
     auditSinkFactory: createDbAuditSink,
     // 默认允许根是安装根；MCP 保持「未显式设置则不限制」的既有语义。
     projectRoots,
+    // M14：REA 工作流注册表。与 provider 一样，域层只拿到接口，不 require 适配器。
+    rea,
     allowedRoots: paths.allowedRootsFromEnv || [paths.root],
     // M12：provider 名称是外部输入，只允许落在注册表内的名字。
     providerNames: Object.keys(providerFactories),

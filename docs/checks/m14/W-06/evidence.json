@@ -1,0 +1,16 @@
+{
+  "rea_run_id": "read3080ce64cfa",
+  "workflow_id": "W-06",
+  "sample": null,
+  "tool_versions": [],
+  "commands": [],
+  "limitations": [
+    "未执行"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-12T14:44:11.596Z"
+}

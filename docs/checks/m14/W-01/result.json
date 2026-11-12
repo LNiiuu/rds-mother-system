@@ -1,0 +1,253 @@
+{
+  "status": "PASS",
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "check": "root 已提供",
+        "ok": true
+      },
+      {
+        "check": "root 存在",
+        "ok": true,
+        "detail": "D:\\M1"
+      },
+      {
+        "check": "root 是目录",
+        "ok": true
+      },
+      {
+        "check": "root 可读",
+        "ok": true
+      }
+    ],
+    "blocked_reason": null
+  },
+  "result": {
+    "root": "D:\\M1",
+    "files_scanned": 509,
+    "truncated": false,
+    "total_bytes": 42489426,
+    "by_extension": {
+      ".md": 207,
+      ".js": 118,
+      ".json": 67,
+      ".txt": 36,
+      ".ps1": 18,
+      ".mjs": 11,
+      ".patch": 10,
+      ".log": 9,
+      ".token": 6,
+      "(none)": 5,
+      ".db": 5,
+      ".yaml": 3,
+      ".jsonl": 3,
+      ".cjs": 3,
+      ".db-shm": 2,
+      ".db-wal": 2,
+      ".orig": 1,
+      ".csv": 1,
+      ".backup": 1,
+      ".sh": 1
+    },
+    "languages": [
+      {
+        "name": "Markdown",
+        "files": 207,
+        "bytes": 1231242
+      },
+      {
+        "name": "JavaScript",
+        "files": 132,
+        "bytes": 833604
+      },
+      {
+        "name": "JSON",
+        "files": 67,
+        "bytes": 326401
+      },
+      {
+        "name": "PowerShell",
+        "files": 18,
+        "bytes": 85561
+      },
+      {
+        "name": "YAML",
+        "files": 3,
+        "bytes": 2251
+      },
+      {
+        "name": "Shell",
+        "files": 1,
+        "bytes": 4427
+      }
+    ],
+    "top_dirs": [
+      {
+        "name": "mars",
+        "files": 219
+      },
+      {
+        "name": "docs",
+        "files": 173
+      },
+      {
+        "name": "core",
+        "files": 46
+      },
+      {
+        "name": "tooling",
+        "files": 38
+      },
+      {
+        "name": "rea",
+        "files": 17
+      },
+      {
+        "name": "(root)",
+        "files": 7
+      },
+      {
+        "name": "tests",
+        "files": 4
+      },
+      {
+        "name": "bin",
+        "files": 3
+      },
+      {
+        "name": "stacks",
+        "files": 2
+      }
+    ],
+    "manifests": [
+      {
+        "file": "package.json",
+        "type": "npm",
+        "name": "rds-mother-system",
+        "version": "0.1.0",
+        "main": null,
+        "bin": [
+          "rds"
+        ],
+        "scripts": [
+          "doctor",
+          "config",
+          "layers",
+          "baseline",
+          "docs:check",
+          "test",
+          "test:raw",
+          "test:external",
+          "test:gate-selfcheck",
+          "smoke",
+          "verify",
+          "pack:check",
+          "demo:m9-m11",
+          "demo:m12"
+        ],
+        "dependencies": 0,
+        "dev_dependencies": 0
+      }
+    ],
+    "entries": [
+      {
+        "path": "bin:rds",
+        "reason": "package.json bin"
+      },
+      {
+        "path": "bin/rds.mjs",
+        "reason": "cli entry"
+      }
+    ],
+    "tests": {
+      "files": 49,
+      "samples": [
+        "docs/checks/m7/acceptance.test.js",
+        "docs/checks/m7/spec/CR1.md",
+        "docs/checks/m7/spec/CR2.md",
+        "docs/checks/m7/spec/TASK.md",
+        "mars/tests/arch/agent-runtime.test.js",
+        "mars/tests/arch/assets.test.js",
+        "mars/tests/arch/audit.test.js",
+        "mars/tests/arch/cli-help.test.js",
+        "mars/tests/arch/collab.test.js",
+        "mars/tests/arch/config.test.js"
+      ],
+      "frameworks": [
+        {
+          "name": "node:test",
+          "evidence": "docs/checks/m7/acceptance.test.js"
+        }
+      ]
+    },
+    "largest": [
+      {
+        "path": "docs/history/initial-deployment/source/continuation-session.jsonl",
+        "bytes": 18564659,
+        "ext": ".jsonl"
+      },
+      {
+        "path": "docs/history/initial-deployment/source/original-session.jsonl",
+        "bytes": 18564571,
+        "ext": ".jsonl"
+      },
+      {
+        "path": "mars/var/mars.db",
+        "bytes": 589824,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T15-20-10-160Z.db",
+        "bytes": 360448,
+        "ext": ".db"
+      },
+      {
+        "path": "docs/checks/git-review/run-20261101-225350/diff.patch",
+        "bytes": 359291,
+        "ext": ".patch"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T13-20-52-532Z.db",
+        "bytes": 245760,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T13-06-51-559Z.db",
+        "bytes": 229376,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/experiments/p4/var/bench.db",
+        "bytes": 196608,
+        "ext": ".db"
+      },
+      {
+        "path": "docs/checks/git-review/run-20261101-225233/diff.patch",
+        "bytes": 170804,
+        "ext": ".patch"
+      },
+      {
+        "path": "docs/checks/git-review/run-20261101-225946/diff.patch",
+        "bytes": 80654,
+        "ext": ".patch"
+      }
+    ],
+    "readme": {
+      "path": "README.md",
+      "title": "RDS 母体系（Reusable Development System）",
+      "bytes": 6266
+    },
+    "not_done": [
+      "模块间依赖关系图（需 AST 或 W-04）",
+      "按符号搜索代码（需索引）",
+      "运行时行为"
+    ],
+    "inference_notes": [
+      "languages 由扩展名映射得出，是推断，不是编译/解析结果",
+      "entries 来自 manifest 字段与常见文件名约定，是候选而非确认",
+      "tests.frameworks 来自测试文件内容的关键字匹配，可能漏判"
+    ]
+  },
+  "error": null
+}

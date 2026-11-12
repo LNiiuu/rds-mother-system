@@ -1,0 +1,242 @@
+{
+  "status": "PARTIAL",
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "check": "objdump 可用",
+        "ok": true,
+        "detail": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+      },
+      {
+        "check": "sample 存在",
+        "ok": true,
+        "detail": "C:\\Windows\\System32\\where.exe"
+      }
+    ],
+    "blocked_reason": null,
+    "tools": [
+      {
+        "name": "objdump",
+        "present": true,
+        "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+        "version": "GNU objdump (GNU Binutils) 2.39",
+        "probe_ok": true
+      }
+    ]
+  },
+  "result": {
+    "sample": {
+      "path": "C:\\Windows\\System32\\where.exe",
+      "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+      "bytes": 65536
+    },
+    "entry": {
+      "address": "0x140001300",
+      "name": "sub_140001300",
+      "source": "pe-start-address"
+    },
+    "graph": {
+      "functions": 92,
+      "direct_edges": 277,
+      "indirect_call_sites": 23,
+      "instructions_scanned": 12795,
+      "reachable_from_entry": 2,
+      "stripped_like": false,
+      "symbol_count": 1
+    },
+    "levels": [
+      {
+        "depth": 0,
+        "nodes": [
+          {
+            "address": "0x140001300",
+            "name": "sub_140001300"
+          }
+        ],
+        "edges": [
+          {
+            "from": "sub_140001300",
+            "to": "sub_140001554"
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "nodes": [
+          {
+            "address": "0x140001554",
+            "name": "sub_140001554"
+          }
+        ],
+        "edges": []
+      }
+    ],
+    "hot_functions": [
+      {
+        "address": "0x140003dbc",
+        "name": "sub_140003dbc",
+        "calls": 22
+      },
+      {
+        "address": "0x140001f18",
+        "name": "sub_140001f18",
+        "calls": 18
+      },
+      {
+        "address": "0x140002ba0",
+        "name": "sub_140002ba0",
+        "calls": 18
+      },
+      {
+        "address": "0x1400075a0",
+        "name": "sub_1400075a0",
+        "calls": 18
+      },
+      {
+        "address": "0x1400034a0",
+        "name": "sub_1400034a0",
+        "calls": 15
+      },
+      {
+        "address": "0x140006e4c",
+        "name": "sub_140006e4c",
+        "calls": 13
+      },
+      {
+        "address": "0x140004b18",
+        "name": "sub_140004b18",
+        "calls": 12
+      },
+      {
+        "address": "0x14000197c",
+        "name": "sub_14000197c",
+        "calls": 11
+      },
+      {
+        "address": "0x140001000",
+        "name": ".text",
+        "calls": 7
+      },
+      {
+        "address": "0x14000577c",
+        "name": "sub_14000577c",
+        "calls": 7
+      },
+      {
+        "address": "0x140007c44",
+        "name": "sub_140007c44",
+        "calls": 7
+      },
+      {
+        "address": "0x140003c54",
+        "name": "sub_140003c54",
+        "calls": 6
+      },
+      {
+        "address": "0x140004df8",
+        "name": "sub_140004df8",
+        "calls": 6
+      },
+      {
+        "address": "0x140005c40",
+        "name": "sub_140005c40",
+        "calls": 5
+      },
+      {
+        "address": "0x140007ff0",
+        "name": "sub_140007ff0",
+        "calls": 5
+      }
+    ],
+    "inference": {
+      "kind": "static-disassembly",
+      "what_this_is": "从 objdump -d 的直接 call 指令读出的调用关系；函数边界按「调用目标 + 入口」推断",
+      "what_this_is_not": "不是运行时实测；间接调用（IAT/寄存器）只计数不解析；剥离二进制的函数边界是启发式，不等于编译器符号",
+      "boundary_rule": "函数边界 = {入口} ∪ {直接 call 目标} ∪ {显式符号}；每条 call 归属于地址不大于它的最近边界",
+      "indirect_calls_not_resolved": [
+        {
+          "at": "14000108b",
+          "via_iat": "0x14000a428"
+        },
+        {
+          "at": "1400010d6",
+          "via_iat": "0x14000a408"
+        },
+        {
+          "at": "140001128",
+          "via_iat": "0x14000a430"
+        },
+        {
+          "at": "140001184",
+          "via_iat": "0x14000a298"
+        },
+        {
+          "at": "140001295",
+          "via_iat": "0x14000a420"
+        },
+        {
+          "at": "1400012a4",
+          "via_iat": "0x14000a410"
+        },
+        {
+          "at": "1400012c3",
+          "via_iat": "0x14000a418"
+        },
+        {
+          "at": "1400012d3",
+          "via_iat": "0x14000a410"
+        },
+        {
+          "at": "14000136b",
+          "via_iat": "0x14000a3d8"
+        },
+        {
+          "at": "14000138b",
+          "via_iat": "0x14000a2a0"
+        },
+        {
+          "at": "140001412",
+          "via_iat": "0x14000a2a8"
+        },
+        {
+          "at": "140001589",
+          "via_iat": "0x14000a2c8"
+        },
+        {
+          "at": "140001597",
+          "via_iat": "0x14000a2b8"
+        },
+        {
+          "at": "1400015a3",
+          "via_iat": "0x14000a2c0"
+        },
+        {
+          "at": "1400015af",
+          "via_iat": "0x14000a2d0"
+        },
+        {
+          "at": "1400015bf",
+          "via_iat": "0x14000a2d0"
+        },
+        {
+          "at": "1400015da",
+          "via_iat": "0x14000a2b0"
+        },
+        {
+          "at": "140001663",
+          "via_iat": "0x14000a2a0"
+        },
+        {
+          "at": "14000166c",
+          "via_iat": "0x14000a2f0"
+        },
+        {
+          "at": "140001672",
+          "via_iat": "0x14000a2f8"
+        }
+      ]
+    }
+  },
+  "error": null
+}

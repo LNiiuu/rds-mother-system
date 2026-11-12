@@ -1,0 +1,133 @@
+{
+  "status": "BLOCKED",
+  "preflight": {
+    "ok": false,
+    "checks": [
+      {
+        "check": "工具 jadx 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 java 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 apktool 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "sample 存在",
+        "ok": true,
+        "detail": "C:\\Users\\liuch\\AppData\\Local\\Temp\\rea\\fake.apk"
+      },
+      {
+        "check": "sample 是 ZIP/APK",
+        "ok": true,
+        "detail": "PK 头匹配"
+      }
+    ],
+    "blocked_reason": "TOOL_MISSING:jadx",
+    "tools": [
+      {
+        "name": "jadx",
+        "present": false,
+        "path": null,
+        "version": null
+      },
+      {
+        "name": "java",
+        "present": false,
+        "path": null,
+        "version": null
+      },
+      {
+        "name": "apktool",
+        "present": false,
+        "path": null,
+        "version": null
+      }
+    ]
+  },
+  "result": {
+    "sample": {
+      "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\rea\\fake.apk",
+      "sha256": "bff9d88838d62ca288f42f1249417a8e89a78fa01b79a226c5000c8a267b635a",
+      "bytes": 839,
+      "kind": "authorized-local-file"
+    },
+    "structure": {
+      "entries": 7,
+      "dex_files": [
+        {
+          "name": "classes.dex",
+          "bytes": 8
+        },
+        {
+          "name": "classes2.dex",
+          "bytes": 8
+        }
+      ],
+      "has_binary_manifest": true,
+      "has_resources_arsc": true,
+      "native_libs": [
+        "lib/arm64-v8a/libnative.so"
+      ],
+      "assets_count": 1,
+      "signature_files": [
+        "META-INF/CERT.RSA"
+      ],
+      "largest": [
+        {
+          "name": "AndroidManifest.xml",
+          "bytes": 11
+        },
+        {
+          "name": "classes.dex",
+          "bytes": 8
+        },
+        {
+          "name": "classes2.dex",
+          "bytes": 8
+        },
+        {
+          "name": "lib/arm64-v8a/libnative.so",
+          "bytes": 3
+        },
+        {
+          "name": "META-INF/CERT.RSA",
+          "bytes": 3
+        },
+        {
+          "name": "resources.arsc",
+          "bytes": 3
+        },
+        {
+          "name": "assets/config.json",
+          "bytes": 1
+        }
+      ]
+    },
+    "missing_capability": {
+      "jadx": true,
+      "java": true,
+      "note": "本机无 jadx / java / apktool；WSL 被安全策略封禁，无法借用另一环境的工具链",
+      "not_done": [
+        "AndroidManifest 解码（权限/组件/API level）",
+        "DEX 反编译（Java/Kotlin 源码）",
+        "resources.arsc 解析",
+        "网络相关代码定位",
+        "可疑调用链"
+      ],
+      "what_structure_gives": "包内有哪些文件、DEX 数量与大小、是否有 native 库与签名文件——这是事实层，不是分析结论"
+    },
+    "inference_notes": [
+      "structure 来自 ZIP 中央目录，是字节级事实",
+      "has_binary_manifest 只说明文件存在，未解码内容",
+      "未做任何代码语义分析"
+    ]
+  },
+  "error": null
+}

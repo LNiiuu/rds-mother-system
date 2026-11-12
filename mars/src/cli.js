@@ -105,7 +105,9 @@ const KNOWN_COMMANDS = new Set([
   // M12 执行层
   'agent', 'run', 'trace', 'usage',
   // M13 治理
-  'lock', 'policy'
+  'lock', 'policy',
+  // M14 REA
+  'rea'
 ]);
 
 function run(args) {
@@ -296,7 +298,8 @@ function run(args) {
   // ---------- M12 执行层：agent / run / trace / usage ----------
   // 文件型参数（--mock-file / --packet / --task-file / --workspace）在这里读成内存对象，
   // 因为 cli.js 是入口、允许碰 fs；cli-agent.js 是域逻辑，不碰。
-  if (cmd === 'agent' || cmd === 'run' || cmd === 'trace' || cmd === 'usage') {
+  if (cmd === 'agent' || cmd === 'run' || cmd === 'trace' || cmd === 'usage'
+    || cmd === 'lock' || cmd === 'policy' || cmd === 'rea') {
     const cliAgent = require('./cli-agent');
     const sub = args._[1];
     const readJson = (file) => JSON.parse(fs.readFileSync(path.resolve(String(file)), 'utf8').replace(/^\uFEFF/, ''));
@@ -345,6 +348,17 @@ function run(args) {
     if (cmd === 'lock') {
       if (sub === 'list') { cliAgent.lockList(ctx); return; }
       die('lock 子命令: list', 2);
+    }
+    if (cmd === 'rea') {
+      const cliRea = require('./cli-rea');
+      const reaCtx = { db, args, runtime, auth, reaEvidenceBase: path.join(path.dirname(p.db), 'rea') };
+      if (sub === 'list') { return cliRea.reaList(reaCtx); }
+      if (sub === 'status') { return cliRea.reaStatus(reaCtx); }
+      if (sub === 'preflight') { return cliRea.reaPreflight(reaCtx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
+      if (sub === 'run') { return cliRea.reaRun(reaCtx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
+      if (sub === 'inspect') { cliRea.reaInspect(reaCtx); return; }
+      if (sub === 'runs') { cliRea.reaRuns(reaCtx); return; }
+      die('rea 子命令: list | status | preflight | run | inspect | runs', 2);
     }
     if (cmd === 'policy') {
       if (sub === 'list') { cliAgent.policyList(); return; }

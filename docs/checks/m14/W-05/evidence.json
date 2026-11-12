@@ -1,0 +1,30 @@
+{
+  "rea_run_id": "rea455f35ef7c33",
+  "workflow_id": "W-05",
+  "sample": {
+    "path": "C:/Users/liuch/AppData/Local/Temp/rea/synthetic.pcap",
+    "sha256": "088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8",
+    "bytes": 516,
+    "kind": "synthetic"
+  },
+  "tool_versions": [
+    {
+      "name": "rea-pcap-parser",
+      "version": "1.0.0",
+      "kind": "builtin"
+    }
+  ],
+  "commands": [],
+  "limitations": [
+    "libpcap only（pcapng 报 UNSUPPORTED_FORMAT）",
+    "未做 TCP 流重组，HTTP 只取单包首行",
+    "不解密、不解析 SNI",
+    "heuristics 是启发式，不是恶意判定"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-12T14:43:03.254Z"
+}
