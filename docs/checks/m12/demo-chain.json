@@ -1,0 +1,273 @@
+{
+  "demo": "m12-multi-agent-chain",
+  "simulated": true,
+  "note": "模型为确定性 mock（provider=mock，usage_source=estimated），不是真实模型调用；执行层、会话、交接、工具与测试是真实的",
+  "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m12-demo-4KOuBx\\ws",
+  "agents": [
+    {
+      "agent_id": "agentd546d7ab20e8",
+      "role_id": "R1",
+      "provider": "mock",
+      "model": "mock-1"
+    },
+    {
+      "agent_id": "agent1dd725e8d663",
+      "role_id": "R2",
+      "provider": "mock",
+      "model": "mock-1"
+    },
+    {
+      "agent_id": "agent7f068a32e25a",
+      "role_id": "R3",
+      "provider": "mock",
+      "model": "mock-1"
+    },
+    {
+      "agent_id": "agent4fa60ca1e293",
+      "role_id": "R4",
+      "provider": "mock",
+      "model": "mock-1"
+    }
+  ],
+  "chain": {
+    "steps": [
+      {
+        "index": 0,
+        "agent_id": "agentd546d7ab20e8",
+        "role_id": "R1",
+        "run_id": "rune52ff5d3ea04",
+        "session_id": "sess487d48f18619",
+        "status": "SUCCEEDED",
+        "text": "设计完成：sum 改为加法，保持 CommonJS 导出不变，只改 src/sum.js。",
+        "tool_rounds": 1,
+        "tokens_used": 637,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": null
+      },
+      {
+        "index": 1,
+        "agent_id": "agent1dd725e8d663",
+        "role_id": "R2",
+        "run_id": "run34b421bd394f",
+        "session_id": "sessa9cc96a35cfa",
+        "status": "SUCCEEDED",
+        "text": "实现完成：src/sum.js 的 sum 已改为 a + b，导出未变。未运行测试（交给验证环节）。",
+        "tool_rounds": 1,
+        "tokens_used": 919,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "ho8e2f42c47eda"
+      },
+      {
+        "index": 2,
+        "agent_id": "agent7f068a32e25a",
+        "role_id": "R3",
+        "run_id": "run456185afbcd7",
+        "session_id": "sess9d9759010dc7",
+        "status": "SUCCEEDED",
+        "text": "验证完成：已执行 test/sum.test.js，具体通过/失败数以 trace 里的 run_test meta 为准。",
+        "tool_rounds": 1,
+        "tokens_used": 658,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "hob3bf02714d45"
+      },
+      {
+        "index": 3,
+        "agent_id": "agent4fa60ca1e293",
+        "role_id": "R4",
+        "run_id": "runc63fca426246",
+        "session_id": "sess7b6b30249aa7",
+        "status": "SUCCEEDED",
+        "text": "评审通过：实现与设计一致（a + b，CommonJS 导出），改动范围仅 src/sum.js。",
+        "tool_rounds": 2,
+        "tokens_used": 1007,
+        "execution_kind": "simulated",
+        "error": null,
+        "handoff_in": "hob85efa8b228e"
+      }
+    ],
+    "handoffs": [
+      {
+        "handoff_id": "ho8e2f42c47eda",
+        "from_agent": "agentd546d7ab20e8",
+        "to_agent": "agent1dd725e8d663",
+        "from_run": "rune52ff5d3ea04",
+        "packet_id": "pkt_7189cf5da7ad",
+        "tokens": 136
+      },
+      {
+        "handoff_id": "hob3bf02714d45",
+        "from_agent": "agent1dd725e8d663",
+        "to_agent": "agent7f068a32e25a",
+        "from_run": "run34b421bd394f",
+        "packet_id": "pkt_bfa357d01545",
+        "tokens": 142
+      },
+      {
+        "handoff_id": "hob85efa8b228e",
+        "from_agent": "agent7f068a32e25a",
+        "to_agent": "agent4fa60ca1e293",
+        "from_run": "run456185afbcd7",
+        "packet_id": "pkt_defc62019594",
+        "tokens": 121
+      }
+    ],
+    "sessions_distinct": true,
+    "total_tokens_estimated": 3221
+  },
+  "tasks": {
+    "before": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "skipped": 0,
+      "files": 1,
+      "exit_code": 1,
+      "timed_out": false
+    },
+    "after": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "skipped": 0,
+      "files": 1,
+      "exit_code": 0,
+      "timed_out": false
+    },
+    "fixed": true
+  },
+  "handoff_count": 3,
+  "handoff_detail": [
+    {
+      "handoff_id": "ho8e2f42c47eda",
+      "from_agent": "agentd546d7ab20e8",
+      "to_agent": "agent1dd725e8d663",
+      "from_run": "rune52ff5d3ea04",
+      "packet_id": "pkt_7189cf5da7ad",
+      "files": [
+        "DESIGN.md"
+      ],
+      "evidence": [
+        "file:DESIGN.md#sha256=75ce0372ccd56c0fbcf030d18ec91cb9faab33217a59dcaf620f53ca74d33534",
+        "run:rune52ff5d3ea04"
+      ]
+    },
+    {
+      "handoff_id": "hob3bf02714d45",
+      "from_agent": "agent1dd725e8d663",
+      "to_agent": "agent7f068a32e25a",
+      "from_run": "run34b421bd394f",
+      "packet_id": "pkt_bfa357d01545",
+      "files": [
+        "src\\sum.js"
+      ],
+      "evidence": [
+        "file:src\\sum.js#sha256=42735ec7965362b5afb10784e51c6682583c6d547a094dd993707037894061b2",
+        "run:run34b421bd394f"
+      ]
+    },
+    {
+      "handoff_id": "hob85efa8b228e",
+      "from_agent": "agent7f068a32e25a",
+      "to_agent": "agent4fa60ca1e293",
+      "from_run": "run456185afbcd7",
+      "packet_id": "pkt_defc62019594",
+      "files": [],
+      "evidence": [
+        "test:tests=1,pass=1,fail=0",
+        "run:run456185afbcd7"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "runc63fca426246",
+      "agent_id": "agent4fa60ca1e293",
+      "role_id": "R4",
+      "status": "SUCCEEDED",
+      "session_id": "sess7b6b30249aa7",
+      "handoff_id": "hob85efa8b228e",
+      "tool_rounds": 2
+    },
+    {
+      "run_id": "run456185afbcd7",
+      "agent_id": "agent7f068a32e25a",
+      "role_id": "R3",
+      "status": "SUCCEEDED",
+      "session_id": "sess9d9759010dc7",
+      "handoff_id": "hob3bf02714d45",
+      "tool_rounds": 1
+    },
+    {
+      "run_id": "run34b421bd394f",
+      "agent_id": "agent1dd725e8d663",
+      "role_id": "R2",
+      "status": "SUCCEEDED",
+      "session_id": "sessa9cc96a35cfa",
+      "handoff_id": "ho8e2f42c47eda",
+      "tool_rounds": 1
+    },
+    {
+      "run_id": "rune52ff5d3ea04",
+      "agent_id": "agentd546d7ab20e8",
+      "role_id": "R1",
+      "status": "SUCCEEDED",
+      "session_id": "sess487d48f18619",
+      "handoff_id": null,
+      "tool_rounds": 1
+    }
+  ],
+  "usage": {
+    "project_id": "demo",
+    "by_source": {
+      "provider": {
+        "input": 0,
+        "output": 0
+      },
+      "estimated": {
+        "input": 2853,
+        "output": 368
+      },
+      "unknown": {
+        "input": 0,
+        "output": 0
+      }
+    },
+    "by_agent": [
+      {
+        "agent_id": "agent1dd725e8d663",
+        "usage_source": "estimated",
+        "i": 804,
+        "o": 115,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agent4fa60ca1e293",
+        "usage_source": "estimated",
+        "i": 921,
+        "o": 86,
+        "t": 2,
+        "c": 3
+      },
+      {
+        "agent_id": "agent7f068a32e25a",
+        "usage_source": "estimated",
+        "i": 585,
+        "o": 73,
+        "t": 1,
+        "c": 2
+      },
+      {
+        "agent_id": "agentd546d7ab20e8",
+        "usage_source": "estimated",
+        "i": 543,
+        "o": 94,
+        "t": 1,
+        "c": 2
+      }
+    ]
+  }
+}

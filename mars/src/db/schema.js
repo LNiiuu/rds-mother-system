@@ -2,7 +2,7 @@
 // 数据库结构与增量迁移（M3 / B5 从 db.js 拆出）。
 //
 // 只增不改：既有行的含义不变，不删数据、不重写数据。每一步都幂等，可在每次 open 时安全执行。
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 function initSchema(db) {
   db.exec(`
@@ -232,6 +232,121 @@ function initSchema(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_costs_project ON costs (project_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_costs_task ON costs (task_id);
+
+    -- ============ M12 执行层 ============
+    -- 与 M11 的分界：M11 的 tasks 记「要做什么」，这里记「谁真的做了、用什么会话、花了多少」。
+    -- 全部只加表，不动 tasks/orchestrator_runs 的任何列。
+
+    -- Agent 定义：一个角色可以有多份定义（不同 provider / model / 工具面）。
+    CREATE TABLE IF NOT EXISTS agents (
+      agent_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      role_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      definition_json TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_agents_project ON agents (project_id, status);
+
+    -- 模型会话：provider 侧的多轮上下文边界。不同 Agent 不共享。
+    CREATE TABLE IF NOT EXISTS agent_sessions (
+      session_id TEXT PRIMARY KEY,
+      agent_id TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      external_id TEXT,
+      status TEXT NOT NULL,
+      turn_count INTEGER NOT NULL DEFAULT 0,
+      tokens_in INTEGER NOT NULL DEFAULT 0,
+      tokens_out INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_sessions_agent ON agent_sessions (agent_id, status);
+
+    -- 一次执行。idempotency_key 在同一项目内唯一：重复提交返回同一个 run。
+    CREATE TABLE IF NOT EXISTS agent_runs (
+      run_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      agent_id TEXT NOT NULL,
+      session_id TEXT,
+      task_id TEXT,
+      handoff_id TEXT,
+      role_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      idempotency_key TEXT,
+      attempt INTEGER NOT NULL DEFAULT 1,
+      max_attempts INTEGER NOT NULL DEFAULT 1,
+      timeout_ms INTEGER,
+      budget_tokens INTEGER,
+      cancel_requested INTEGER NOT NULL DEFAULT 0,
+      heartbeat_at TEXT,
+      packet_id TEXT,
+      objective TEXT,
+      input_tokens_est INTEGER,
+      tool_rounds INTEGER NOT NULL DEFAULT 0,
+      output_json TEXT,
+      error_code TEXT,
+      error_message TEXT,
+      started_at TEXT,
+      finished_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_runs_project ON agent_runs (project_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_runs_status ON agent_runs (status);
+    CREATE INDEX IF NOT EXISTS idx_runs_task ON agent_runs (task_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_runs_idem
+      ON agent_runs (project_id, idempotency_key) WHERE idempotency_key IS NOT NULL;
+
+    -- 追踪：一个 run 的全部可观察动作，seq 单调递增。
+    CREATE TABLE IF NOT EXISTS run_events (
+      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      run_id TEXT NOT NULL,
+      seq INTEGER NOT NULL,
+      kind TEXT NOT NULL,
+      payload_json TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_run_events_run ON run_events (run_id, seq);
+
+    -- 用量：usage_source 三值严格区分，provider 与 estimated 永不混算。
+    CREATE TABLE IF NOT EXISTS agent_usage (
+      usage_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      run_id TEXT NOT NULL,
+      agent_id TEXT NOT NULL,
+      project_id TEXT NOT NULL,
+      task_id TEXT,
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      input_tokens INTEGER,
+      output_tokens INTEGER,
+      cached_tokens INTEGER,
+      tool_calls INTEGER,
+      usage_source TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_usage_project ON agent_usage (project_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_usage_run ON agent_usage (run_id);
+
+    -- 工作区锁：防止两个 Agent 同时改同一个工作区/文件。
+    CREATE TABLE IF NOT EXISTS workspace_locks (
+      lock_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      scope TEXT NOT NULL,
+      target TEXT NOT NULL,
+      run_id TEXT NOT NULL,
+      acquired_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_locks_target
+      ON workspace_locks (project_id, scope, target);
   `);
   migrate(db);
   db.exec("CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(memory_id UNINDEXED, content, tokenize='unicode61')");
@@ -257,6 +372,14 @@ function migrate(db) {
   ];
   for (const [name, type] of additions) {
     if (!projectCols.includes(name)) db.exec(`ALTER TABLE projects ADD COLUMN ${name} ${type}`);
+  }
+  // M12：成本账本关联到具体 run，便于从金额反查到执行。只加列，老行为 NULL。
+  const costCols = db.prepare("PRAGMA table_info('costs')").all().map((c) => c.name);
+  if (!costCols.includes('run_id')) db.exec('ALTER TABLE costs ADD COLUMN run_id TEXT');
+  // M12：交接从「角色到角色」升级为「Agent 实例到 Agent 实例」，并绑定来源 run。
+  const handoffCols = db.prepare("PRAGMA table_info('handoffs')").all().map((c) => c.name);
+  for (const [name, type] of [['from_agent', 'TEXT'], ['to_agent', 'TEXT'], ['from_run', 'TEXT'], ['to_run', 'TEXT'], ['objective', 'TEXT']]) {
+    if (!handoffCols.includes(name)) db.exec(`ALTER TABLE handoffs ADD COLUMN ${name} ${type}`);
   }
 }
 

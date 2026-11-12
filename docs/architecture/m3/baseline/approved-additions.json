@@ -31,7 +31,16 @@
     "mars/src/context-budget.js",
     "mars/src/context-ops.js",
     "mars/src/collab.js",
-    "mars/src/adapters/fs-project-roots.js"
+    "mars/src/adapters/fs-project-roots.js",
+    "mars/src/ports/model-provider.js",
+    "mars/src/ports/tool-executor.js",
+    "mars/src/adapters/provider-mock.js",
+    "mars/src/adapters/provider-openai-compat.js",
+    "mars/src/adapters/fs-tool-executor.js",
+    "mars/src/runtime/agent-runtime.js",
+    "mars/src/runtime/handoff.js",
+    "mars/src/runtime/chain.js",
+    "mars/src/cli-agent.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -60,12 +69,21 @@
     "mars/src/context-budget.js": "M9：模型上下文预算计算，估算方法与阈值集中在此",
     "mars/src/context-ops.js": "M10：确定性压缩（去重/折叠/归档）与原文恢复，L0 保护",
     "mars/src/collab.js": "M11：角色权限、任务状态机、调度、交接、成本账本",
-    "mars/src/adapters/fs-project-roots.js": "M9：项目根目录的 realpath 解析与当前项目指针；域模块不直接碰 fs"
+    "mars/src/adapters/fs-project-roots.js": "M9：项目根目录的 realpath 解析与当前项目指针；域模块不直接碰 fs",
+    "mars/src/ports/model-provider.js": "M12：模型 Provider 端口（5 个最小方法 + 能力清单规范）",
+    "mars/src/ports/tool-executor.js": "M12：工具执行器端口（list/invoke/healthCheck，无任意命令）",
+    "mars/src/adapters/provider-mock.js": "M12：确定性 mock provider；用量强制 estimated",
+    "mars/src/adapters/provider-openai-compat.js": "M12：OpenAI 兼容 HTTP 适配器，不绑定厂商，凭据只走环境变量",
+    "mars/src/adapters/fs-tool-executor.js": "M12：白名单工具执行器（读/列/写/跑测试），根目录 realpath 约束",
+    "mars/src/runtime/agent-runtime.js": "M12：执行层域逻辑 —— Agent/会话/run/事件/用量/权限",
+    "mars/src/runtime/handoff.js": "M12：结构化交接与为下一棒重编译上下文",
+    "mars/src/runtime/chain.js": "M12：交接链执行（自动流转 + 每棒独立 session）",
+    "mars/src/cli-agent.js": "M12：agent/run/trace/usage 的 CLI 处理（不碰 fs）"
   },
   "helpText": {
-    "sha256": "72bbf857f6a051a0fe5620c7687a6cb645827232982631f3b5ab29e65a3a62d6",
-    "batch": "m8+m9+m10+m11",
-    "reason": "新增 budget/context/role/task/handoff/cost 命令与 project 子命令；帮助文本随命令面扩展"
+    "sha256": "5d5b7331bc825cda7aa4f99ce07d94ac7f4e71d44d9bf81308e8dd75d7dbf43e",
+    "batch": "m12",
+    "reason": "新增执行层命令组 agent/run/trace/usage"
   },
   "contractChanges": [
     {

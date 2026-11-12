@@ -455,6 +455,84 @@ const TOPICS = {
     ]
   },
 
+  agent: {
+    usage: 'rds agent <create|list|show|start|chain|status|cancel|stop> [选项]',
+    summary:
+      'Agent 定义与执行（M12）。create 只登记定义，不执行；start 才会真正发起一次 run。' +
+      'start 用 --provider 指定的适配器：mock 是确定性模拟（usage_source=estimated），' +
+      'openai-compat 需要 MARS_LLM_BASE_URL / MARS_LLM_API_KEY / MARS_LLM_MODEL，缺一则明确失败，不静默降级。' +
+      '工具调用逐次过角色权限检查；工具白名单只有 read_file / list_dir / write_file / run_test，没有 shell。',
+    subcommands: [
+      ['create', '登记 Agent（--project --to-role --name --provider）'],
+      ['list', '列出 Agent（--project，可 --status）'],
+      ['show', '详情 + 会话 + 最近 run（--agent）'],
+      ['start', '发起并同步执行一次 run（--agent --objective，可 --task/--task-file/--packet/--budget/--timeout/--workspace）'],
+      ['status', '查 run 状态与用量（--run）'],
+      ['chain', '交接链：多 Agent 依次执行并自动交接（--agents id1,id2,...）'],
+      ['cancel', '请求取消（--run）'],
+      ['stop', '停用 Agent（--agent）']
+    ],
+    args: [
+      ['--project <id>', '项目 ID'],
+      ['--agent <id>', 'Agent ID（create 时可显式指定）'],
+      ['--to-role <R0-R7>', 'create 时的角色（当前执行角色用 --role）'],
+      ['--name <name>', 'Agent 名字'],
+      ['--provider <name>', 'mock | openai-compat，默认 mock'],
+      ['--model <id>', '模型名'],
+      ['--tools <a,b>', '进一步收窄可用工具（不能超出角色权限）'],
+      ['--mock-file <json>', 'mock provider 的脚本文件'],
+      ['--objective <文本>', '本次执行目标'],
+      ['--task <id>', '关联任务 ID'],
+      ['--task-file <md>', '任务正文文件，编译进上下文包'],
+      ['--packet <json>', '直接用现成上下文包，跳过编译'],
+      ['--workspace <dir>', '工具执行的工作区根（默认取项目 root_path）'],
+      ['--budget <n>', '本次 token 预算，超出即 FAILED/BUDGET_EXCEEDED'],
+      ['--timeout <ms>', '本次执行超时'],
+      ['--idempotency-key <k>', '同项目内相同 key 不重复执行'],
+      ['--agents <ids>', 'chain 的执行顺序，逗号分隔'],
+      ['--run <id>', 'run ID（status / cancel）']
+    ],
+    examples: [
+      'rds agent create --project demo --to-role R2 --name impl --provider mock',
+      'rds agent start --agent <id> --objective "实现导出" --workspace ./demo'
+    ]
+  },
+
+  run: {
+    usage: 'rds run <list|inspect> [选项]',
+    summary: '执行记录。list 只给摘要；inspect 给 run + 用量 + 完整 trace。',
+    subcommands: [
+      ['list', '列 run（--project / --agent / --status / --task / --limit）'],
+      ['inspect', '单个 run 全貌（--run）']
+    ],
+    args: [
+      ['--run <id>', 'run ID'],
+      ['--project <id>', '项目 ID'],
+      ['--agent <id>', 'Agent ID'],
+      ['--status <s>', 'PENDING|RUNNING|SUCCEEDED|FAILED|CANCELLED|TIMEOUT'],
+      ['--limit <n>', '条数上限']
+    ],
+    examples: ['rds run list --project demo', 'rds run inspect --run <run_id>']
+  },
+
+  trace: {
+    usage: 'rds trace inspect --run <id> [--limit <n>]',
+    summary: '按 seq 输出一次执行的全部事件：STATE / SESSION / CONTEXT / USAGE / TOOL / ERROR / CANCEL_REQUESTED。',
+    subcommands: [['inspect', '打印事件流（--run）']],
+    args: [['--run <id>', 'run ID'], ['--limit <n>', '事件条数上限']],
+    examples: ['rds trace inspect --run <run_id>']
+  },
+
+  usage: {
+    usage: 'rds usage show (--run <id> | --project <id>)',
+    summary:
+      '用量聚合。by_source 严格区分 provider（真实）与 estimated（估算）与 unknown（未知），' +
+      '三者不相加。mock provider 的用量一律落在 estimated。',
+    subcommands: [['show', '按 run 或按项目汇总']],
+    args: [['--run <id>', 'run ID'], ['--project <id>', '项目 ID']],
+    examples: ['rds usage show --run <run_id>', 'rds usage show --project demo']
+  },
+
   help: {
     usage: 'rds help [命令]',
     summary: '不带参数打印顶层用法；带命令名打印该命令的详细说明。等价于 rds <命令> --help。',
@@ -505,6 +583,12 @@ MARS 记忆引擎
   mcp                     MCP 网关（默认禁用，需 --enable）
   share                   create | approve | revoke | list
   orchestrate             plan | start | approve | feedback | status | suggest
+
+执行层（M12）
+  agent                   create | list | show | start | status | cancel | stop
+  run                     list | inspect
+  trace                   inspect
+  usage                   show
 
 公共选项
   --token <t>             凭证（也可用 MARS_TOKEN）

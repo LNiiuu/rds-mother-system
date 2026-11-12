@@ -39,7 +39,8 @@
     "smoke": "bash tooling/ci-smoke.sh",
     "verify": "npm run doctor && npm run config && npm run layers && npm run docs:check && npm run test",
     "pack:check": "npm pack --dry-run",
-    "demo:m9-m11": "node tooling/m9-m11-demo.cjs"
+    "demo:m9-m11": "node tooling/m9-m11-demo.cjs",
+    "demo:m12": "node tooling/m12-multi-agent-demo.cjs"
   },
   "keywords": [
     "rds",

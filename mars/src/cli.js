@@ -101,7 +101,9 @@ const KNOWN_COMMANDS = new Set([
   'init', 'init-dev', 'put', 'get', 'list', 'search', 'review', 'alias',
   'compile', 'fragment', 'stats', 'audit', 'ledger', 'mcp', 'project',
   'share', 'orchestrate', 'help',
-  'budget', 'context', 'role', 'task', 'handoff', 'cost'
+  'budget', 'context', 'role', 'task', 'handoff', 'cost',
+  // M12 执行层
+  'agent', 'run', 'trace', 'usage'
 ]);
 
 function run(args) {
@@ -288,6 +290,56 @@ function run(args) {
   const auth = loadAuth(runtime);
   const db = runtime.openDb(p.db);
   const role = auth.role;
+
+  // ---------- M12 执行层：agent / run / trace / usage ----------
+  // 文件型参数（--mock-file / --packet / --task-file / --workspace）在这里读成内存对象，
+  // 因为 cli.js 是入口、允许碰 fs；cli-agent.js 是域逻辑，不碰。
+  if (cmd === 'agent' || cmd === 'run' || cmd === 'trace' || cmd === 'usage') {
+    const cliAgent = require('./cli-agent');
+    const sub = args._[1];
+    const readJson = (file) => JSON.parse(fs.readFileSync(path.resolve(String(file)), 'utf8').replace(/^\uFEFF/, ''));
+    if (args['mock-file']) args.mockScript = readJson(args['mock-file']);
+    if (args.packet) args.packet = readJson(args.packet);
+    if (args['task-file']) args.taskText = fs.readFileSync(path.resolve(String(args['task-file'])), 'utf8');
+    if (args.workspace) args.workspaceRoot = path.resolve(String(args.workspace));
+
+    const compilePacket = (input) => compileContext(db, auth.principal, auth.routing, {
+      project_id: input.project_id,
+      task_id: input.task_id || 'T-UNKNOWN',
+      role_id: input.role_id,
+      budget: input.budget,
+      task: input.task,
+      objective: input.objective,
+      assets
+    }).packet;
+
+    const ctx = { db, args, runtime, auth, compilePacket };
+
+    if (cmd === 'agent') {
+      if (sub === 'create') { cliAgent.agentCreate(ctx); return; }
+      if (sub === 'list') { cliAgent.agentList(ctx); return; }
+      if (sub === 'show') { cliAgent.agentShow(ctx); return; }
+      if (sub === 'stop') { cliAgent.agentStop(ctx); return; }
+      if (sub === 'start') { return cliAgent.agentStart(ctx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
+      if (sub === 'status') { cliAgent.agentStatus(ctx); return; }
+      if (sub === 'cancel') { cliAgent.agentCancel(ctx); return; }
+      if (sub === 'chain') { return cliAgent.agentChain(ctx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
+      die('agent 子命令: create | list | show | start | status | cancel | stop（--help 查看）', 2);
+    }
+    if (cmd === 'run') {
+      if (sub === 'list') { cliAgent.runList(ctx); return; }
+      if (sub === 'inspect') { cliAgent.runInspect(ctx); return; }
+      die('run 子命令: list | inspect', 2);
+    }
+    if (cmd === 'trace') {
+      if (sub === 'inspect') { cliAgent.traceInspect(ctx); return; }
+      die('trace 子命令: inspect', 2);
+    }
+    if (cmd === 'usage') {
+      if (sub === 'show' || sub === undefined) { cliAgent.usageShow(ctx); return; }
+      die('usage 子命令: show', 2);
+    }
+  }
 
   {
     if (cmd === 'put') {

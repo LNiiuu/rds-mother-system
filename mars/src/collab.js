@@ -12,49 +12,49 @@ const ROLES = {
   R0: {
     name: '协调者',
     duty: '任务拆分、上下文分发、协调',
-    permissions: ['project.create', 'project.remove', 'task.plan', 'task.create', 'task.assign', 'context.compile', 'context.compress', 'context.restore', 'handoff.create', 'cost.record', 'cost.read', 'memory.write'],
+    permissions: ['project.create', 'project.remove', 'task.plan', 'task.create', 'task.assign', 'context.compile', 'context.compress', 'context.restore', 'handoff.create', 'cost.record', 'cost.read', 'memory.write', 'tool.read_file', 'tool.list_dir'],
     forbidden: ['memory.review', 'git.push', 'release'],
   },
   R1: {
     name: '架构师',
     duty: '架构与接口设计',
-    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record'],
+    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record', 'tool.read_file', 'tool.list_dir', 'tool.write_file'],
     forbidden: ['git.push', 'release', 'task.assign'],
   },
   R2: {
     name: '实施者',
     duty: '代码与接口实现',
-    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record'],
+    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record', 'tool.read_file', 'tool.list_dir', 'tool.write_file', 'tool.run_test'],
     forbidden: ['memory.review', 'git.push', 'release'],
   },
   R3: {
     name: '验证者',
     duty: '测试与验收',
-    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record'],
+    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record', 'tool.read_file', 'tool.list_dir', 'tool.run_test'],
     forbidden: ['memory.review', 'git.push', 'release'],
   },
   R4: {
     name: '评审者',
     duty: '需求核对与变更审查',
-    permissions: ['memory.review', 'context.compile', 'context.restore', 'handoff.create', 'cost.read'],
+    permissions: ['memory.review', 'context.compile', 'context.restore', 'handoff.create', 'cost.read', 'tool.read_file', 'tool.list_dir'],
     forbidden: ['git.push', 'release'],
   },
   R5: {
     name: '研究者',
     duty: '技术调研与证据收集',
-    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record'],
+    permissions: ['context.compile', 'context.restore', 'handoff.create', 'memory.write', 'cost.record', 'tool.read_file', 'tool.list_dir'],
     forbidden: ['git.push', 'release', 'memory.review'],
   },
   R6: {
     name: '安全审查',
     duty: '风险与权限检查',
-    permissions: ['context.compile', 'context.restore', 'handoff.create', 'cost.read'],
+    permissions: ['context.compile', 'context.restore', 'handoff.create', 'cost.read', 'tool.read_file', 'tool.list_dir'],
     forbidden: ['git.push', 'release', 'memory.review'],
   },
   R7: {
     name: '交付管理',
     duty: '本地 Git 与版本整理',
-    permissions: ['git.status', 'git.commit', 'context.compile', 'context.restore', 'handoff.create'],
+    permissions: ['git.status', 'git.commit', 'context.compile', 'context.restore', 'handoff.create', 'tool.read_file', 'tool.list_dir'],
     forbidden: ['git.push', 'release', 'memory.review'],
   },
 };
@@ -308,8 +308,8 @@ function recordCost(db, input) {
   }
   db.prepare(`INSERT INTO costs
     (project_id, task_id, agent_id, model, provider, input_tokens, output_tokens, cached_tokens,
-     tool_calls, estimated_cost, actual_cost, usage_source, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+     tool_calls, estimated_cost, actual_cost, usage_source, created_at, run_id)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
     input.project_id,
     input.task_id || null,
     input.agent_id || null,
@@ -322,7 +322,8 @@ function recordCost(db, input) {
     input.estimated_cost === undefined ? null : input.estimated_cost,
     input.actual_cost === undefined ? null : input.actual_cost,
     source,
-    nowIso()
+    nowIso(),
+    input.run_id || null
   );
   return { recorded: true, usage_source: source };
 }

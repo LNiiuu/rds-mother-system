@@ -12,6 +12,9 @@ const { createTokenFileIdentity } = require('./adapters/token-file-identity');
 const { createDshSessionSource } = require('./adapters/dsh-session-source');
 const { createSessionRegistry } = require('./session-registry');
 const { createDbAuditSink } = require('./adapters/db-audit-sink');
+const { createMockProvider } = require('./adapters/provider-mock');
+const { createOpenAiCompatProvider } = require('./adapters/provider-openai-compat');
+const { createFsToolExecutor } = require('./adapters/fs-tool-executor');
 const { openDb, attachAuditSink } = require('./db');
 const { KNOWN_CONTRACTS } = require('./ports/asset-resolver');
 const { PACKAGE_ROOT, resolveRoot, resolvePaths, loadRoutingConfig } = require('./paths');
@@ -59,6 +62,18 @@ function createRuntime(options = {}) {
   }
 
 
+  // M12：执行层装配。provider 与工具执行器都在这里注入，
+  // 域模块只认端口，不认具体厂商，也不碰 fs/env。
+  // mock 需要知道该 Agent 的脚本：脚本存在 agent.definition.mock 里，装配时注入。
+  const providerFactories = {
+    mock: (agent) => createMockProvider({
+      scriptByAgent: agent && agent.definition && agent.definition.mock && Array.isArray(agent.definition.mock.turns)
+        ? { [agent.agent_id]: agent.definition.mock.turns }
+        : {}
+    }),
+    'openai-compat': () => createOpenAiCompatProvider({ env })
+  };
+
   return {
     root: paths.root,
     paths,
@@ -70,7 +85,17 @@ function createRuntime(options = {}) {
     auditSinkFactory: createDbAuditSink,
     // 默认允许根是安装根；MCP 保持「未显式设置则不限制」的既有语义。
     projectRoots,
-    allowedRoots: paths.allowedRootsFromEnv || [paths.root]
+    allowedRoots: paths.allowedRootsFromEnv || [paths.root],
+    // M12：provider 名称是外部输入，只允许落在注册表内的名字。
+    providerNames: Object.keys(providerFactories),
+    providerFor(name, agent) {
+      const make = providerFactories[name];
+      if (!make) throw new Error('PROVIDER_UNKNOWN ' + name + '（可用：' + Object.keys(providerFactories).join(',') + '）');
+      return make(agent);
+    },
+    toolExecutorFor(root) {
+      return createFsToolExecutor({ root });
+    }
   };
 }
 
