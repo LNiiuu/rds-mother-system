@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## Unreleased — M12–M17 执行层与专业引擎
+
+### 新增
+- **M12 Agent Runtime**：Schema v6；`agents`/`agent_sessions`/`agent_runs`/`run_events`/`agent_usage`/`workspace_locks`；
+  端口 `model-provider`（5 方法 + 8 项能力清单）、`tool-executor`；适配器 `provider-mock`/`provider-openai-compat`/`fs-tool-executor`；
+  run 状态机 6 态；逐次工具权限；用量三值 provider/estimated/unknown 永不混算；结构化交接与交接链
+- **M13 可靠调度**：项目级工作区写锁、可重试错误指数退避、心跳与 `agent reap`（AGENT_LOST）、
+  项目预算闸门、`policy` 敏感动作矩阵（file.delete/git.push/release/network 无任何角色拥有）
+- **M14 REA**：Schema v7 `rea_runs`；六套工作流统一接口（schema/preflight/execute/render）；
+  W-01/W-02/W-04/W-05 可执行，W-03/W-06 因缺 jadx/frida 为 BLOCKED；证据三件套
+- **M15 联合**：八种任务类型 + 类型-工作流校验；研发 × REA 联合演示
+- **M16 适配器**：`provider-anthropic`（Messages 协议）；`agent providers` 能力清单核对
+- CLI：`agent`（create/list/show/providers/start/chain/reap/status/cancel/stop）、`run`、`trace`、`usage`、
+  `lock`、`policy`、`rea`、`task types`
+
+### 变更（行为）
+- `agent start` 在 provider 未配置时直接失败（`PROVIDER_UNAVAILABLE`），**不静默降级为 mock**
+- `task plan` 给了 `--type` 时走类型规则，不再走关键词拆分
+
+### 兼容性
+- Schema v7 为只加表/只加列；v4 老库打开时幂等迁移（本机 31 条记忆库已实测）
+- 既有 24 个命令的行为与输出未改（JSON 键基线通过）
+
+### 未完成
+- 真实模型调用 NOT RUN（无凭据）；流式、会话恢复、并发调度、进程级隔离均未实现
+- W-03/W-06 即使补齐工具也还需要实现 execute（见 `docs/rea.md` §8）
+
 ## Unreleased — M9–M11 上下文基础设施与协作
 
 新增

@@ -28,7 +28,7 @@
 ### 我想核对它是否可信
 
 1. [docs/checks/README.md](checks/README.md) —— 全部验收证据的索引（按里程碑分组，标注结论与生效范围）
-2. [docs/checks/productization/](checks/productization/) —— M1–M11 各阶段的验收报告
+2. [docs/checks/productization/](checks/productization/) —— M1–M17 各阶段的验收报告
 3. [docs/architecture/m3/baseline/](architecture/m3/baseline/) —— 7 个对外面的行为基线快照，`npm run baseline` 每次都会比对
 
 ---
@@ -71,6 +71,8 @@
 | [docs/maintainer-guide.md](maintainer-guide.md) | 维护者指南：按症状查、72 个错误码表、备份与恢复、版本与兼容、发布流程、回滚、什么时候该停手 | 出问题、要发版、要交接 |
 | [docs/testing.md](testing.md) | 三类测试、门禁判据、fixture 约定、覆盖范围声明 | 要改测试 |
 | [docs/versioning.md](versioning.md) | 三个版本命名空间、五条规则、Node 版本承诺 | 要发版、要改 Schema |
+| [docs/agents.md](agents.md) | 多 Agent 使用：定义、启动、交接链、provider、工具面、已知边界 | 要用执行层 |
+| [docs/rea.md](rea.md) | REA 六套工作流：状态、命令、证据结构、怎么读结论、安全边界 | 要做逆向分析 |
 | [docs/PROJECT-MAP.md](PROJECT-MAP.md) | RDS/MARS 关系、目录职责、分层规则、数据流、改动影响面 | 要改代码 |
 | [CHANGELOG.md](../CHANGELOG.md) | 每个里程碑的变更、删除、不变与测试数字 | 要知道「什么时候变的」 |
 

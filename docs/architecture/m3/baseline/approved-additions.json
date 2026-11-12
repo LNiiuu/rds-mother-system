@@ -55,7 +55,9 @@
     "mars/src/adapters/rea/registry.js",
     "mars/src/cli-rea.js",
     "mars/src/runtime/task-types.js",
-    "mars/src/adapters/provider-anthropic.js"
+    "mars/src/adapters/provider-anthropic.js",
+    "docs/agents.md",
+    "docs/rea.md"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",

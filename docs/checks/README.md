@@ -157,6 +157,22 @@
 
 ---
 
+### M12–M17：执行层、专业引擎与产品化（2026-11-12）
+
+| 文档 | 内容 |
+|---|---|
+| [m12/M12-0-baseline-audit.md](m12/M12-0-baseline-audit.md) | 只读基线审计：Git/指纹/数据库备份、分层约束、**执行层为空的证据**、外部能力可用性 |
+| [m12/M12-1-runtime-design.md](m12/M12-1-runtime-design.md) | Runtime 架构：端口为什么只有 5 个方法、状态机、权限强度、兼容性、测试矩阵 |
+| [productization/M12-M17-closure.md](productization/M12-M17-closure.md) | **六个里程碑的封版记录**：目标/变更/决策/测试/失败/CI/成本/安全/Git/未完成 |
+| [final/RDS-MARS-final-acceptance.md](final/RDS-MARS-final-acceptance.md) | **最终验收报告 A–L**：能力总览、里程碑状态、多 Agent 证据、REA 六套证据、联合案例、跨平台、测试/CI/安装、费用、安全、Git、限制、推送方案 |
+| [m12/demo-chain.json](m12/demo-chain.json) | 4 Agent 交接链原始输出（独立 session 4/4、3 次交接、测试 fail=1 → pass=1） |
+| [m14/](m14/) | REA 六套工作流的真实 result.json / report.md / evidence.json |
+| [m14/joint-demo.json](m14/joint-demo.json) | M15 联合演示原始输出（逆向 → 审核 → 重构） |
+
+> 本轮判定：M12/M13/M14/M15/M17 `COMPLETED`（有明确边界），M16 `COMPLETED WITH WARNINGS`
+> （两个真实协议适配器已实现并契约测试，但**真实网络调用 NOT RUN**，无凭据）。
+> 总体 `COMPLETED WITH WARNINGS`：不允许把 mock 全链路写成「真实多 Agent 已验证」。
+
 ## 2. 旧遗留清单的现状
 
 [M1/M2 遗留清单](productization/remaining-issues.md) 列了 10 项。截至 M6 收尾：

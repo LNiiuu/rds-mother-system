@@ -15,10 +15,18 @@ async function reaStatus({ runtime: rt }) {
   json({ workflows: await rt.rea.status(), checked_at: nowIso() });
 }
 
+/** --root 是全局安装根；rea 的代码根必须用 --path，否则会改掉安装根并导致契约加载失败。 */
+function assertNotInstallRoot(args) {
+  if (args.root !== undefined) {
+    throw new Error('BAD_REQUEST rea 的代码根请用 --path <dir>；--root 是安装根（会在启动前改变安装目录）');
+  }
+}
+
 async function reaPreflight({ runtime: rt, args }) {
   if (!args.workflow) throw new Error('BAD_REQUEST 需要 --workflow <W-01..W-06>');
+  assertNotInstallRoot(args);
   const input = {
-    root: args.root || args.path,
+    root: args.path,
     sample: args.sample,
     target: args.target,
     purpose: args.purpose,
@@ -29,6 +37,7 @@ async function reaPreflight({ runtime: rt, args }) {
 
 async function reaRun({ db, runtime: rt, args, reaEvidenceBase }) {
   if (!args.workflow) throw new Error('BAD_REQUEST 需要 --workflow <W-01..W-06>');
+  assertNotInstallRoot(args);
   // M15：声明了任务类型就校验工作流是否属于该类型，避免"类型说是二进制分析，实际跑了流量分析"
   let taskTypeCheck = null;
   if (args['task-type']) {
@@ -37,7 +46,7 @@ async function reaRun({ db, runtime: rt, args, reaEvidenceBase }) {
     taskTypeCheck = { task_type: String(args['task-type']), allowed: true };
   }
   const input = {
-    root: args.root || args.path,
+    root: args.path,
     sample: args.sample,
     entry: args.entry,
     depth: args.depth ? Number(args.depth) : undefined,

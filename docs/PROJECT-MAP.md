@@ -56,7 +56,7 @@ MARS 的代码不是按「文件类型」分的，是按**依赖方向**分的�
 │ L0 入口层                                                 │
 │   bin/rds.mjs        版本门禁 / version / doctor / validate│
 │                      / test，其余原样转交                  │
-│   mars/src/cli.js    28 个 MARS 子命令的分发              │
+│   mars/src/cli.js    33 个 MARS 子命令的分发              │
 │   mars/src/mcp-stdio.js  MCP stdio 服务（5 个工具）        │
 └───────────────────────┬──────────────────────────────────┘
                         │ 只调组合根
@@ -154,6 +154,9 @@ rds put ──► store.propose ──► memories 表 (status=proposed)
 | 你想改 | 主要文件 | 会牵动 | 必须同步 |
 |---|---|---|---|
 | 新增上下文/协作能力 | `mars/src/projects.js`、`context-budget.js`、`context-ops.js`、`collab.js`、`adapters/fs-project-roots.js` | DB Schema（只加表/列）、`cli-help.js`、基线 packFiles、M9–M11 文档 |
+| 新增执行层能力（Agent/Run） | `mars/src/runtime/agent-runtime.js`、`chain.js`、`handoff.js`、`locks.js`、`reliability.js`、`policy.js`、`task-types.js`；适配器 `provider-*`、`fs-tool-executor` | run 状态机、run_events、agent_usage、组合根装配 | `cli-agent.js`、帮助、基线 packFiles、`docs/agents.md` |
+| 新增/修改 REA 工作流 | `mars/src/adapters/rea/w0*.js`、`registry.js` | workflow 接口（schema/preflight/execute/render）、四值状态、`rea_runs` | `cli-rea.js`、`docs/rea.md`、任务类型的 workflows 白名单 |
+| 改 Provider 协议 | `mars/src/adapters/provider-*.js`、`ports/model-provider.js` | 能力清单 8 个布尔键、usage_source 三值、重试判定 | 契约测试、`agent providers`、`docs/agents.md` |
 | 新增一个 CLI 子命令 | `mars/src/cli.js`（`KNOWN_COMMANDS` + 分发分支）、`bin/rds.mjs`（内建命令表） | 顶层帮助文本、`docs/architecture/m3/baseline/cli-help.txt`、`exit-codes.json` | 帮助文本、基线、CHANGELOG |
 | 改 CLI 参数或输出形状 | 对应域模块 + `cli.js` | **公开契约**：`cli-json-keys.json` 基线、`docs/install.md` 示例、下游脚本 | 基线登记（`approved-additions.json`）→ 需授权 |
 | 改数据库表结构 | `mars/src/db/schema.js`（`SCHEMA_VERSION` + `migrate`） | 旧库兼容、`DB_SCHEMA_NEWER` 分支、备份恢复 | `docs/versioning.md`、迁移说明、测试 |

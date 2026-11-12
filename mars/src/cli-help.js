@@ -578,7 +578,7 @@ const TOPICS = {
     args: [
       ['--workflow <id>', 'W-01 .. W-06'],
       ['--task-type <t>', '声明任务类型；会校验 workflow 是否属于该类型'],
-      ['--root <dir>', 'W-01 的代码库根'],
+      ['--path <dir>', 'W-01 的代码库根（不要用 --root：那是安装根）'],
       ['--sample <file>', 'W-02/W-03/W-04/W-05 的样本路径（只读）'],
       ['--entry <addr|name>', 'W-04 的起始函数'],
       ['--depth <n>', 'W-04 展开深度，默认 3'],
@@ -588,7 +588,7 @@ const TOPICS = {
     ],
     examples: [
       'rds rea status',
-      'rds rea run --workflow W-01 --root .',
+      'rds rea run --workflow W-01 --path .',
       'rds rea run --workflow W-02 --sample C:/Windows/System32/where.exe'
     ]
   },

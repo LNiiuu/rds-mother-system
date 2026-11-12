@@ -145,6 +145,13 @@ function run(args) {
     die('未知命令: ' + cmd + '（rds --help 查看命令）', 2);
   }
 
+  // M17：--root 是全局安装根，在 createRuntime 之前就被消费。
+  // rea 的代码根必须用 --path，否则会改掉安装根并以"契约缺失"的形式报错——
+  // 那个错误信息会把人引向错误方向，所以在这里就拦住。
+  if (cmd === 'rea' && args.root !== undefined) {
+    die('rea 的代码根请用 --path <dir>；--root 是安装根（会改变安装目录）', 2);
+  }
+
   const runtime = createRuntime({ argv: args });
   const p = runtime.paths;
   const assets = runtime.assets;
