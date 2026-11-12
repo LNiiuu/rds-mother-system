@@ -7,6 +7,9 @@
 
 const runtime = require('./runtime/agent-runtime');
 const { executeChain } = require('./runtime/chain');
+const reliability = require('./runtime/reliability');
+const locks = require('./runtime/locks');
+const policy = require('./runtime/policy');
 const projects = require('./projects');
 const collab = require('./collab');
 
@@ -107,6 +110,7 @@ async function agentStart({ db, args, runtime: rt, auth, compilePacket }) {
     packet_id: packet ? packet.packet_id : null,
     input_tokens_est: packet ? packet.tokens_estimated : null,
     timeout_ms: args.timeout ? Number(args.timeout) : undefined,
+    max_attempts: args['max-attempts'] ? Number(args['max-attempts']) : undefined,
     budget_tokens: args.budget ? Number(args.budget) : (agent.definition.budget_tokens || null),
     idempotency_key: args['idempotency-key'] || null
   });
@@ -121,6 +125,21 @@ async function agentStart({ db, args, runtime: rt, auth, compilePacket }) {
     tokens: packet ? packet.tokens_estimated : null,
     sections: packet ? (packet.sections || []).map((s) => ({ id: s.id, tokens: s.token_estimate })) : []
   });
+
+  // M13：项目级预算闸门。项目配置里写了 budget_tokens 就生效；超了直接拒绝，不烧钱。
+  const projectBudget = (() => {
+    try {
+      const cfg = project.config_json ? JSON.parse(project.config_json) : {};
+      return cfg.budget_tokens ? Number(cfg.budget_tokens) : null;
+    } catch { return null; }
+  })();
+  if (projectBudget) {
+    const gate = reliability.budgetGate(db, { project_id: agent.project_id, limit: projectBudget });
+    if (!gate.ok) {
+      json({ refused: true, reason: 'PROJECT_BUDGET_EXCEEDED', gate, note: '项目预算已用尽，未发起模型调用' });
+      return;
+    }
+  }
 
   const provider = rt.providerFor(agent.provider, agent);
   const health = provider.healthCheck();
@@ -266,8 +285,46 @@ function usageShow({ db, args }) {
   json(runtime.usageOfProject(db, args.project));
 }
 
+// ---------------------------------------------------------------- M13 治理
+
+/** 清理心跳停止的 RUNNING run（判定 Agent 已失联）。 */
+function agentReap({ db, args }) {
+  const staleMs = args.stale ? Number(args.stale) : 120000;
+  const before = reliability.staleRuns(db, staleMs);
+  const reaped = reliability.reapStale(db, staleMs);
+  json({
+    stale_ms: staleMs,
+    candidates: before.length,
+    reaped,
+    note: reaped.length ? '已标为 FAILED/AGENT_LOST，未删除任何数据' : '没有心跳陈旧的 run'
+  });
+}
+
+function lockList({ db, args }) {
+  json({ locks: locks.listLocks(db, args.project), note: '过期锁在下次申请时被忽略并清理' });
+}
+
+function policyList() {
+  json({ actions: policy.matrix(), never_granted: policy.NEVER_GRANTED });
+}
+
+function policyCheck({ args }) {
+  if (!args.role || !args.action) throw new Error('BAD_REQUEST 需要 --role 与 --action');
+  json({ ...policy.check(String(args.role), String(args.action)), role: args.role });
+}
+
+function budgetGateShow({ db, args }) {
+  if (!args.project) throw new Error('BAD_REQUEST 需要 --project');
+  json(reliability.budgetGate(db, {
+    project_id: args.project,
+    task_id: args.task || null,
+    limit: args.limit ? Number(args.limit) : null
+  }));
+}
+
 module.exports = {
   agentCreate, agentList, agentShow, agentStop, agentStart,
   agentStatus, agentCancel, agentChain,
-  runList, runInspect, traceInspect, usageShow
+  runList, runInspect, traceInspect, usageShow,
+  agentReap, lockList, policyList, policyCheck, budgetGateShow
 };

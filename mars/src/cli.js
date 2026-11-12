@@ -103,7 +103,9 @@ const KNOWN_COMMANDS = new Set([
   'share', 'orchestrate', 'help',
   'budget', 'context', 'role', 'task', 'handoff', 'cost',
   // M12 执行层
-  'agent', 'run', 'trace', 'usage'
+  'agent', 'run', 'trace', 'usage',
+  // M13 治理
+  'lock', 'policy'
 ]);
 
 function run(args) {
@@ -324,6 +326,7 @@ function run(args) {
       if (sub === 'status') { cliAgent.agentStatus(ctx); return; }
       if (sub === 'cancel') { cliAgent.agentCancel(ctx); return; }
       if (sub === 'chain') { return cliAgent.agentChain(ctx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
+      if (sub === 'reap') { cliAgent.agentReap(ctx); return; }
       die('agent 子命令: create | list | show | start | status | cancel | stop（--help 查看）', 2);
     }
     if (cmd === 'run') {
@@ -338,6 +341,15 @@ function run(args) {
     if (cmd === 'usage') {
       if (sub === 'show' || sub === undefined) { cliAgent.usageShow(ctx); return; }
       die('usage 子命令: show', 2);
+    }
+    if (cmd === 'lock') {
+      if (sub === 'list') { cliAgent.lockList(ctx); return; }
+      die('lock 子命令: list', 2);
+    }
+    if (cmd === 'policy') {
+      if (sub === 'list') { cliAgent.policyList(); return; }
+      if (sub === 'check') { cliAgent.policyCheck(ctx); return; }
+      die('policy 子命令: list | check', 2);
     }
   }
 

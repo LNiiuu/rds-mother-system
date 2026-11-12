@@ -19,6 +19,8 @@
 
 const { nowIso, newId, estimateTokens, stableJson } = require('../util');
 const { ROLES } = require('../collab');
+const locks = require('./locks');
+const { shouldRetry } = require('./reliability');
 
 const RUN_STATUS = ['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', 'CANCELLED', 'TIMEOUT'];
 const TERMINAL = new Set(['SUCCEEDED', 'FAILED', 'CANCELLED', 'TIMEOUT']);
@@ -411,28 +413,27 @@ async function executeRun(ctx) {
     .run(nowIso(), nowIso(), run.run_id);
   run = getRun(db, run.run_id);
 
-  // 会话：run 没带 session 就新建一个，保证不同 run 不共享上下文。
-  let session = run.session_id ? getSession(db, run.session_id) : null;
-  if (!session) {
-    session = createSession(db, agent, { model: run.model });
-    db.prepare('UPDATE agent_runs SET session_id = ? WHERE run_id = ?').run(session.session_id, run.run_id);
-    run = getRun(db, run.run_id);
-    emit(db, run.run_id, 'SESSION', { session_id: session.session_id, provider: run.provider, model: run.model });
-  }
-
-  let providerSession = session.external_id;
-  if (!providerSession) {
-    const created = await provider.createSession({
-      session_id: session.session_id, agent_id: agent.agent_id, model: run.model
+  // M13：执行前拿工作区写锁。拿不到就明确失败——不排队、不覆盖别人的改动。
+  // 只在真的会写东西（注入了执行器）时才拿，只读 run 不互斥。
+  let lockHeld = false;
+  if (ctx.lockWorkspace !== false && executor) {
+    const got = locks.acquire(db, {
+      project_id: run.project_id, run_id: run.run_id,
+      ttl_ms: Number(run.timeout_ms || 120000) + 30000
     });
-    providerSession = created.session_id;
-    db.prepare('UPDATE agent_sessions SET external_id = ?, updated_at = ? WHERE session_id = ?')
-      .run(providerSession, nowIso(), session.session_id);
+    if (!got.ok) {
+      const now = nowIso();
+      db.prepare(`UPDATE agent_runs SET status = 'FAILED', error_code = 'WORKSPACE_LOCKED',
+        error_message = ?, finished_at = ?, updated_at = ? WHERE run_id = ?`)
+        .run('工作区已被 run ' + got.holder.run_id + ' 占用', now, now, run.run_id);
+      emit(db, run.run_id, 'ERROR', { code: 'WORKSPACE_LOCKED', holder: got.holder });
+      emit(db, run.run_id, 'STATE', { from: 'RUNNING', to: 'FAILED', note: 'WORKSPACE_LOCKED' });
+      return { run: getRun(db, run.run_id), skipped: false, output: null, locked: false };
+    }
+    lockHeld = true;
+    emit(db, run.run_id, 'LOCK', { scope: 'workspace', run_id: run.run_id, expires_at: got.lock.expires_at });
   }
 
-  const tools = executor ? toolSpecsFor(agent, executor) : [];
-  const messages = [buildSystemPrompt(agent, run), buildContextMessage(packet)];
-  const maxRounds = Number(ctx.maxToolRounds || DEFAULT_MAX_TOOL_ROUNDS);
   const budget = Number(run.budget_tokens || ctx.budgetTokens || 0) || null;
   const startedAt = Date.now();
   let spent = 0;
@@ -443,6 +444,60 @@ async function executeRun(ctx) {
   let errorMessage = null;
 
   try {
+    // 会话：run 没带 session 就新建一个，保证不同 run 不共享上下文。
+    let session = run.session_id ? getSession(db, run.session_id) : null;
+    if (!session) {
+      session = createSession(db, agent, { model: run.model });
+      db.prepare('UPDATE agent_runs SET session_id = ? WHERE run_id = ?').run(session.session_id, run.run_id);
+      run = getRun(db, run.run_id);
+      emit(db, run.run_id, 'SESSION', { session_id: session.session_id, provider: run.provider, model: run.model });
+    }
+
+    let providerSession = session.external_id;
+    if (!providerSession) {
+      const created = await provider.createSession({
+        session_id: session.session_id, agent_id: agent.agent_id, model: run.model
+      });
+      providerSession = created.session_id;
+      db.prepare('UPDATE agent_sessions SET external_id = ?, updated_at = ? WHERE session_id = ?')
+        .run(providerSession, nowIso(), session.session_id);
+    }
+
+    const tools = executor ? toolSpecsFor(agent, executor) : [];
+    const messages = [buildSystemPrompt(agent, run), buildContextMessage(packet)];
+    const maxRounds = Number(ctx.maxToolRounds || DEFAULT_MAX_TOOL_ROUNDS);
+
+    // 单次模型调用的重试。只对可重试错误重试；确定性拒绝不重试。
+    const callModel = async () => {
+      let attempt = 1;
+      for (;;) {
+        try {
+          return await provider.sendMessage(providerSession, { messages, tools, timeoutMs: run.timeout_ms });
+        } catch (e) {
+          const code = e.code || 'PROVIDER_ERROR';
+          const verdict = shouldRetry({
+            code, attempt,
+            maxAttempts: Number(run.max_attempts || 1),
+            budgetExhausted: Boolean(budget && spent > budget)
+          });
+          emit(db, run.run_id, 'RETRY', {
+            attempt, code, retry: verdict.retry, reason: verdict.reason, delay_ms: verdict.delay_ms
+          });
+          if (!verdict.retry) throw e;
+          attempt += 1;
+          db.prepare('UPDATE agent_runs SET attempt = ?, updated_at = ? WHERE run_id = ?')
+            .run(attempt, nowIso(), run.run_id);
+          await new Promise((resolve) => setTimeout(resolve, verdict.delay_ms));
+          const cur = getRun(db, run.run_id);
+          if (cur && cur.cancel_requested) {
+            const err = new Error('PROVIDER_CANCELLED');
+            err.code = 'PROVIDER_CANCELLED';
+            throw err;
+          }
+        }
+      }
+    };
+
     while (rounds <= maxRounds) {
       // ---- 检查点 1：取消
       const fresh = getRun(db, run.run_id);
@@ -467,7 +522,7 @@ async function executeRun(ctx) {
       }
       heartbeat(db, run.run_id);
 
-      const reply = await provider.sendMessage(providerSession, { messages, tools, timeoutMs: run.timeout_ms });
+      const reply = await callModel();
       const used = reply.usage
         ? { ...reply.usage, usage_source: reply.usage_source || 'unknown' }
         : { input: estimateTokens(messages.map((m) => m.content).join('\n')), output: estimateTokens(reply.text), cached: 0, usage_source: 'estimated' };
@@ -525,8 +580,18 @@ async function executeRun(ctx) {
     }
     errorMessage = e.message;
     emit(db, run.run_id, 'ERROR', { code, message: e.message });
+  } finally {
+    if (lockHeld) {
+      const r = locks.release(db, run.run_id);
+      emit(db, run.run_id, 'LOCK', { released: true, count: r.released });
+    }
   }
 
+  // 保证状态一定收敛：异常路径也可能走到这里（status 已被 catch 赋值）
+  if (!status) {
+    status = 'FAILED';
+    errorCode = errorCode || 'RUN_NO_TERMINAL_STATE';
+  }
   const output = {
     text: finalText,
     tool_rounds: rounds,
@@ -542,7 +607,7 @@ async function executeRun(ctx) {
     .run(status, stableJson(output), errorCode, errorMessage, nowIso(), nowIso(), run.run_id);
   emit(db, run.run_id, 'STATE', { from: 'RUNNING', to: status, note: errorCode });
 
-  return { run: getRun(db, run.run_id), skipped: false, output };
+  return { run: getRun(db, run.run_id), skipped: false, output, locked: true };
 }
 
 /** 单个工具调用的权限 + 执行。权限被拒也返回结构化结果，由调用方回灌给模型。 */

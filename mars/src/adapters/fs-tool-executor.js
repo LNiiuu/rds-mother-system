@@ -199,7 +199,9 @@ function createFsToolExecutor(options = {}) {
           default: return fail('TOOL_UNKNOWN', '未注册的工具: ' + name + '（白名单：' + TOOLS.map((t) => t.name).join(',') + '）');
         }
       } catch (e) {
-        return fail(e.code || 'TOOL_ERROR', e.message);
+        // 把 Node 的 errno 收敛成稳定错误码，避免上层看到 ENOENT/EACCES 这类平台细节。
+        const map = { ENOENT: 'TOOL_NOT_FOUND', EACCES: 'TOOL_ACCESS_DENIED', EPERM: 'TOOL_ACCESS_DENIED', EISDIR: 'TOOL_NOT_A_FILE' };
+        return fail(map[e.code] || e.code || 'TOOL_ERROR', e.message);
       }
     },
     healthCheck() {

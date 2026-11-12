@@ -469,6 +469,7 @@ const TOPICS = {
       ['start', '发起并同步执行一次 run（--agent --objective，可 --task/--task-file/--packet/--budget/--timeout/--workspace）'],
       ['status', '查 run 状态与用量（--run）'],
       ['chain', '交接链：多 Agent 依次执行并自动交接（--agents id1,id2,...）'],
+      ['reap', '清理心跳陈旧的 RUNNING run（--stale <ms>）'],
       ['cancel', '请求取消（--run）'],
       ['stop', '停用 Agent（--agent）']
     ],
@@ -489,6 +490,7 @@ const TOPICS = {
       ['--budget <n>', '本次 token 预算，超出即 FAILED/BUDGET_EXCEEDED'],
       ['--timeout <ms>', '本次执行超时'],
       ['--idempotency-key <k>', '同项目内相同 key 不重复执行'],
+      ['--max-attempts <n>', '可重试错误的最大尝试次数（默认 1）'],
       ['--agents <ids>', 'chain 的执行顺序，逗号分隔'],
       ['--run <id>', 'run ID（status / cancel）']
     ],
@@ -531,6 +533,30 @@ const TOPICS = {
     subcommands: [['show', '按 run 或按项目汇总']],
     args: [['--run <id>', 'run ID'], ['--project <id>', '项目 ID']],
     examples: ['rds usage show --run <run_id>', 'rds usage show --project demo']
+  },
+
+  lock: {
+    usage: 'rds lock list [--project <id>]',
+    summary:
+      '工作区写锁。run 执行前按项目拿锁，拿不到就 FAILED/WORKSPACE_LOCKED，不排队、不覆盖。' +
+      '过期锁在下次申请时被忽略并清理；list 只读。',
+    subcommands: [['list', '当前持锁情况（--project 可过滤）']],
+    args: [['--project <id>', '项目 ID']],
+    examples: ['rds lock list --project demo']
+  },
+
+  policy: {
+    usage: 'rds policy <list|check> [选项]',
+    summary:
+      '敏感操作准入矩阵。file.delete / git.push / release / network 四类**没有任何角色拥有**，' +
+      '因此永远拒绝——这比文档约定强一档：没有授权路径。' +
+      '强度仍是 CLI/运行时入口校验，不是 OS 沙箱；工具层也没有 run_command / git / 网络工具。',
+    subcommands: [
+      ['list', '动作 × 角色全矩阵'],
+      ['check', '单个判定（--role --action）']
+    ],
+    args: [['--role <R0-R7>', '角色'], ['--action <name>', '动作名，见 list']],
+    examples: ['rds policy check --role R7 --action git.push']
   },
 
   help: {
@@ -585,10 +611,14 @@ MARS 记忆引擎
   orchestrate             plan | start | approve | feedback | status | suggest
 
 执行层（M12）
-  agent                   create | list | show | start | status | cancel | stop
+  agent                   create | list | show | start | chain | reap | status | cancel | stop
   run                     list | inspect
   trace                   inspect
   usage                   show
+
+治理（M13）
+  lock                    list
+  policy                  list | check
 
 公共选项
   --token <t>             凭证（也可用 MARS_TOKEN）

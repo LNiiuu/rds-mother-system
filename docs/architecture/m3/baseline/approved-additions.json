@@ -40,7 +40,10 @@
     "mars/src/runtime/agent-runtime.js",
     "mars/src/runtime/handoff.js",
     "mars/src/runtime/chain.js",
-    "mars/src/cli-agent.js"
+    "mars/src/cli-agent.js",
+    "mars/src/runtime/locks.js",
+    "mars/src/runtime/reliability.js",
+    "mars/src/runtime/policy.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -78,12 +81,15 @@
     "mars/src/runtime/agent-runtime.js": "M12：执行层域逻辑 —— Agent/会话/run/事件/用量/权限",
     "mars/src/runtime/handoff.js": "M12：结构化交接与为下一棒重编译上下文",
     "mars/src/runtime/chain.js": "M12：交接链执行（自动流转 + 每棒独立 session）",
-    "mars/src/cli-agent.js": "M12：agent/run/trace/usage 的 CLI 处理（不碰 fs）"
+    "mars/src/cli-agent.js": "M12：agent/run/trace/usage 的 CLI 处理（不碰 fs）",
+    "mars/src/runtime/locks.js": "M13：项目级工作区写锁；拿不到明确失败，不排队不覆盖",
+    "mars/src/runtime/reliability.js": "M13：重试判定/退避/心跳陈旧检测/预算闸门（纯函数）",
+    "mars/src/runtime/policy.js": "M13：敏感操作准入矩阵；四类动作无任何角色拥有"
   },
   "helpText": {
-    "sha256": "5d5b7331bc825cda7aa4f99ce07d94ac7f4e71d44d9bf81308e8dd75d7dbf43e",
-    "batch": "m12",
-    "reason": "新增执行层命令组 agent/run/trace/usage"
+    "sha256": "897956d05997d06834cfc9c8db101379ed52df0ac087048b18f3318017449171",
+    "batch": "m13",
+    "reason": "新增 lock / policy 命令与 agent reap"
   },
   "contractChanges": [
     {
