@@ -1,0 +1,78 @@
+STEP1 init
+{
+  "db": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m8-e2e\\mars.db",
+  "stats": {
+    "memories": 0,
+    "approved": 0,
+    "proposed": 0,
+    "rejected": 0,
+    "deprecated": 0,
+    "superseded": 0,
+    "expired": 0,
+    "fragments": 0,
+    "manifests": 0,
+    "aliases": 0,
+    "audit": 0
+  }
+}
+exit=0
+STEP2 init-dev R0
+exit=0
+1
+STEP3 project register
+{
+  "project_id": "demo",
+  "display_name": "E2E",
+  "owner_principal": "e2e-r0",
+  "share_policy": "default",
+  "created_at": "2026-11-12T12:45:48.007Z"
+}
+exit=0
+STEP4 put L3
+{"memory_id":"mem_8d57ef3dfb36","status":"proposed","duplicate":false}
+memory=mem_8d57ef3dfb36
+STEP5 init-dev R4 --add
+exit=0
+STEP6 review
+{
+  "memory_id": "mem_8d57ef3dfb36",
+  "project_id": "demo",
+  "memory_type": "L3",
+  "content": "E2E：所有金额以整数分处理",
+  "source_ref": "TASK.md",
+  "source_version": "v1",
+  "content_hash": "5a7819493f9f390060d512c7baa8a2082aaf7d7241f92ab145f41e26629b1cac",
+  "status": "approved",
+  "confidence": 0.5,
+  "visibility": "project",
+  "role_scope": [],
+  "tags": [],
+  "relations": [],
+  "evidence_refs": [],
+  "provenance": {
+    "origin": "agent",
+    "collected_at": "2026-11-12T12:45:48.538Z",
+    "agent_role": "R0",
+    "approved_by": "e2e-r4",
+    "approved_at": "2026-11-12T12:45:49.656Z"
+  },
+  "created_by": "e2e-r0",
+  "created_at": "2026-11-12T12:45:48.538Z",
+  "updated_at": "2026-11-12T12:45:49.657Z",
+  "expires_at": null
+}
+exit=0
+STEP7 compile md
+已写出 C:\Users\liuch\AppData\Local\Temp\m8-e2e\packet.md format=md tokens=1005/4000 bytes=5228
+exit=0
+bytes=5228
+STEP8 audit
+audit_entries=7
+{"context.compile":1,"memory.list":3,"memory.review":1,"memory.propose":1,"project.register":1}
+== orchestrate plan ==
+plan=pln_5dcb36d1-ee2
+class=verification
+risk=low
+agents=R3
+requires_human_approval=false
+exit=0

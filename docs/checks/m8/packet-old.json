@@ -1,0 +1,291 @@
+{
+  "packet": {
+    "packet_id": "pkt_9a1727e502cf",
+    "manifest_id": "man_ede6548ea798",
+    "project_id": "xsum",
+    "task_id": "XSUM-1",
+    "role_id": "R0",
+    "role_profile": "总控",
+    "created_at": "2026-11-12T12:46:04.187Z",
+    "compiler_version": "mars-compiler/0.1.0",
+    "token_budget": 4000,
+    "tokens_estimated": 344,
+    "estimate_label": "[ESTIMATE]",
+    "sections": [
+      {
+        "id": "sec_task",
+        "title": "任务要求",
+        "kind": "task",
+        "content": "任务: XSUM-1",
+        "token_estimate": 4,
+        "source_refs": [
+          "task-card:XSUM-1"
+        ],
+        "truncated": false
+      },
+      {
+        "id": "sec_facts",
+        "title": "相关项目事实",
+        "kind": "facts",
+        "content": "- [mem_5a13e865d0b6] (L2, TASK.md@v1) 退出码 0=无行级错误 2=有行级错误 1=致命；致命错误 stderr 输出 ERROR <CODE> <message>\n- [mem_312115e193ca] (L2, TASK.md@v1) stats 与 errors 始终按全部输入统计；--since/--until 只影响 rows",
+        "token_estimate": 61,
+        "source_refs": [
+          "TASK.md@v1",
+          "TASK.md@v1"
+        ],
+        "truncated": false
+      },
+      {
+        "id": "sec_decisions",
+        "title": "已批准决策",
+        "kind": "decisions",
+        "content": "- [mem_16b69984eb8c] (L3, CR2.md@v1) CR2：汇率支持扁平与 {base,rates} 两种；带 base 时 amount_T=amount×rates[T]/rates[S]，rates[base] 必须为 1（误差 1e-9）；扁平仍只支持 CNY 目标；S 或 T 缺失→E_RATE\n- [mem_e69be1862651] (L3, CR1.md@v1) CR1：新增 --group-by category|currency；currency 时分组键为 month+原币种，JSON 键名 currency，CSV 表头 month,currency,total,count；--top 与排序语义不变\n- [mem_116b0cb5815c] (L3, TASK.md@v1) 金额一律按字符串解析为整数分，禁止浮点累加；换算后四舍五入、负数远离零\n- [mem_c3edae2871c4] (L3, TASK.md@v1) 去重：同一 id 跨文件保留输入顺序第一条，其余计入 duplicates；无 id 不参与去重\n- [mem_d644adb574f0] (L3, TASK.md@v1) 排序：month 升序，再按分组键码点升序；--top 在每月内按 abs(total) 降序、并列按键升序\n- [mem_6a90b653aede] (L3, TASK.md@v1) 输出：JSON {target,rows,errors,stats}；CSV 表头 month,<分组键>,total,count；--out 时 stdout 为空；--dry-run 只输出四项",
+        "token_estimate": 245,
+        "source_refs": [
+          "CR2.md@v1",
+          "CR1.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1"
+        ],
+        "truncated": false
+      },
+      {
+        "id": "sec_prohibitions",
+        "title": "禁止事项",
+        "kind": "prohibitions",
+        "content": "- 不得替专业角色作技术判断\n- 不得将 proposed 记忆升级为 approved\n- 不得绕过审批直接写入正式记忆",
+        "token_estimate": 28,
+        "source_refs": [
+          "role-routing:R0"
+        ],
+        "truncated": false
+      },
+      {
+        "id": "sec_evidence",
+        "title": "证据引用",
+        "kind": "evidence",
+        "content": "（未提供证据引用）",
+        "token_estimate": 6,
+        "source_refs": [],
+        "truncated": false
+      }
+    ],
+    "missing": [
+      {
+        "kind": "state",
+        "description": "未提供当前任务状态",
+        "blocking": false
+      },
+      {
+        "kind": "evidence",
+        "description": "本角色需要可直接访问的原始证据，但未提供",
+        "blocking": true
+      }
+    ],
+    "prohibited": [
+      "不得替专业角色作技术判断",
+      "不得将 proposed 记忆升级为 approved",
+      "不得绕过审批直接写入正式记忆"
+    ],
+    "evidence_refs": []
+  },
+  "manifest": {
+    "manifest_id": "man_ede6548ea798",
+    "project_id": "xsum",
+    "task_id": "XSUM-1",
+    "role_id": "R0",
+    "created_at": "2026-11-12T12:46:04.184Z",
+    "token_budget": 4000,
+    "tokens_estimated": 344,
+    "estimate_label": "[ESTIMATE]",
+    "entries": [
+      {
+        "source_ref": "task-card:XSUM-1",
+        "source_version": "current",
+        "content_hash": "4cedc7a9a76fe10fdf4e6b1554717eb2c3a25379ef5f2a5b895358c0e8b629b7",
+        "content_type": "task",
+        "inclusion_reason": "任务要求",
+        "token_estimate": 4,
+        "visibility": "project",
+        "status": "approved",
+        "section": "sec_task",
+        "fragment_id": "frag_cedb7905c7ee"
+      },
+      {
+        "source_ref": "TASK.md@v1",
+        "source_version": "v1",
+        "content_hash": "1b1f5049494bea1085a74a6008d6b9267c4f158ab159e212163213078795b8fa",
+        "content_type": "fact",
+        "inclusion_reason": "相关项目事实",
+        "token_estimate": 61,
+        "visibility": "project",
+        "status": "approved",
+        "section": "sec_facts",
+        "fragment_id": "frag_68525cb33cf0"
+      },
+      {
+        "source_ref": "CR2.md@v1",
+        "source_version": "v1",
+        "content_hash": "11467873506fa4bf127dac18bd7b6ed4e0fa1f151df59b6ab307634f95e7f801",
+        "content_type": "decision",
+        "inclusion_reason": "已批准决策",
+        "token_estimate": 245,
+        "visibility": "project",
+        "status": "approved",
+        "section": "sec_decisions",
+        "fragment_id": "frag_970d1586343b"
+      },
+      {
+        "source_ref": "role-routing:R0",
+        "source_version": "current",
+        "content_hash": "ec7fe2fed7357e5b1971099da9cd7cc4c1e151244052197ea897355db370551f",
+        "content_type": "prohibition",
+        "inclusion_reason": "禁止事项",
+        "token_estimate": 28,
+        "visibility": "project",
+        "status": "approved",
+        "section": "sec_prohibitions",
+        "fragment_id": "frag_3f7efd2e6288"
+      },
+      {
+        "source_ref": "packet:sec_evidence",
+        "source_version": "current",
+        "content_hash": "8235eb400e57b22e13a770ed4fba6bf5226b6f248d226c067034be30067fecf7",
+        "content_type": "evidence",
+        "inclusion_reason": "证据引用",
+        "token_estimate": 6,
+        "visibility": "project",
+        "status": "approved",
+        "section": "sec_evidence",
+        "fragment_id": "frag_50cdce016661"
+      }
+    ],
+    "fragments": [
+      {
+        "fragment_id": "frag_cedb7905c7ee",
+        "content_hash": "4cedc7a9a76fe10fdf4e6b1554717eb2c3a25379ef5f2a5b895358c0e8b629b7",
+        "content_type": "task",
+        "content_length": 10,
+        "ref_count": 4,
+        "original_ref": "task-card:XSUM-1"
+      },
+      {
+        "fragment_id": "frag_68525cb33cf0",
+        "content_hash": "1b1f5049494bea1085a74a6008d6b9267c4f158ab159e212163213078795b8fa",
+        "content_type": "fact",
+        "content_length": 188,
+        "ref_count": 7,
+        "original_ref": "TASK.md@v1"
+      },
+      {
+        "fragment_id": "frag_970d1586343b",
+        "content_hash": "11467873506fa4bf127dac18bd7b6ed4e0fa1f151df59b6ab307634f95e7f801",
+        "content_type": "decision",
+        "content_length": 719,
+        "ref_count": 5,
+        "original_ref": "CR2.md@v1"
+      },
+      {
+        "fragment_id": "frag_3f7efd2e6288",
+        "content_hash": "ec7fe2fed7357e5b1971099da9cd7cc4c1e151244052197ea897355db370551f",
+        "content_type": "prohibition",
+        "content_length": 61,
+        "ref_count": 7,
+        "original_ref": "role-routing:R0"
+      },
+      {
+        "fragment_id": "frag_50cdce016661",
+        "content_hash": "8235eb400e57b22e13a770ed4fba6bf5226b6f248d226c067034be30067fecf7",
+        "content_type": "evidence",
+        "content_length": 9,
+        "ref_count": 7,
+        "original_ref": "packet:sec_evidence"
+      }
+    ]
+  },
+  "budget": {
+    "sections": [
+      {
+        "id": "sec_task",
+        "title": "任务要求",
+        "kind": "task",
+        "content": "任务: XSUM-1",
+        "token_estimate": 4,
+        "source_refs": [
+          "task-card:XSUM-1"
+        ],
+        "protected": true,
+        "truncated": false
+      },
+      {
+        "id": "sec_facts",
+        "title": "相关项目事实",
+        "kind": "facts",
+        "content": "- [mem_5a13e865d0b6] (L2, TASK.md@v1) 退出码 0=无行级错误 2=有行级错误 1=致命；致命错误 stderr 输出 ERROR <CODE> <message>\n- [mem_312115e193ca] (L2, TASK.md@v1) stats 与 errors 始终按全部输入统计；--since/--until 只影响 rows",
+        "token_estimate": 61,
+        "source_refs": [
+          "TASK.md@v1",
+          "TASK.md@v1"
+        ],
+        "source_version": "v1",
+        "visibility": "project",
+        "status": "approved",
+        "protected": false,
+        "truncated": false
+      },
+      {
+        "id": "sec_decisions",
+        "title": "已批准决策",
+        "kind": "decisions",
+        "content": "- [mem_16b69984eb8c] (L3, CR2.md@v1) CR2：汇率支持扁平与 {base,rates} 两种；带 base 时 amount_T=amount×rates[T]/rates[S]，rates[base] 必须为 1（误差 1e-9）；扁平仍只支持 CNY 目标；S 或 T 缺失→E_RATE\n- [mem_e69be1862651] (L3, CR1.md@v1) CR1：新增 --group-by category|currency；currency 时分组键为 month+原币种，JSON 键名 currency，CSV 表头 month,currency,total,count；--top 与排序语义不变\n- [mem_116b0cb5815c] (L3, TASK.md@v1) 金额一律按字符串解析为整数分，禁止浮点累加；换算后四舍五入、负数远离零\n- [mem_c3edae2871c4] (L3, TASK.md@v1) 去重：同一 id 跨文件保留输入顺序第一条，其余计入 duplicates；无 id 不参与去重\n- [mem_d644adb574f0] (L3, TASK.md@v1) 排序：month 升序，再按分组键码点升序；--top 在每月内按 abs(total) 降序、并列按键升序\n- [mem_6a90b653aede] (L3, TASK.md@v1) 输出：JSON {target,rows,errors,stats}；CSV 表头 month,<分组键>,total,count；--out 时 stdout 为空；--dry-run 只输出四项",
+        "token_estimate": 245,
+        "source_refs": [
+          "CR2.md@v1",
+          "CR1.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1",
+          "TASK.md@v1"
+        ],
+        "source_version": "v1",
+        "visibility": "project",
+        "status": "approved",
+        "protected": true,
+        "truncated": false
+      },
+      {
+        "id": "sec_prohibitions",
+        "title": "禁止事项",
+        "kind": "prohibitions",
+        "content": "- 不得替专业角色作技术判断\n- 不得将 proposed 记忆升级为 approved\n- 不得绕过审批直接写入正式记忆",
+        "token_estimate": 28,
+        "source_refs": [
+          "role-routing:R0"
+        ],
+        "protected": true,
+        "truncated": false
+      },
+      {
+        "id": "sec_evidence",
+        "title": "证据引用",
+        "kind": "evidence",
+        "content": "（未提供证据引用）",
+        "token_estimate": 6,
+        "source_refs": [],
+        "protected": true,
+        "truncated": false
+      }
+    ],
+    "tokens": 344,
+    "truncated": [],
+    "protected_kept": [
+      "sec_task",
+      "sec_decisions",
+      "sec_prohibitions",
+      "sec_evidence"
+    ],
+    "over_budget": false
+  }
+}

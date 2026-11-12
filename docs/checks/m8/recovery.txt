@@ -1,0 +1,38 @@
+== backup ==
+{
+  "file": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m8-e2e\\backups\\mars-2026-11-12T12-52-01-816Z.db",
+  "bytes": 155648,
+  "sha256": "42b0a7546eb45a32cb0fe463b36f5eeba719bf461430e4e4e2b78170265851e0",
+  "counts": {
+    "memories": 1,
+    "fragments": 4,
+    "manifests": 1,
+    "aliases": 0,
+    "audit": 7,
+    "rate_limits": 0
+  },
+  "integrity": "ok"
+}
+exit=0
+snapshot=/tmp/m8-e2e/backups/mars-2026-11-12T12-52-01-816Z.db
+== verify ==
+{
+  "file": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m8-e2e\\backups\\mars-2026-11-12T12-52-01-816Z.db",
+  "bytes": 155648,
+  "sha256": "42b0a7546eb45a32cb0fe463b36f5eeba719bf461430e4e4e2b78170265851e0",
+  "counts": {
+    "memories": 1,
+    "fragments": 4,
+    "manifests": 1,
+    "aliases": 0,
+    "audit": 7,
+    "rate_limits": 0
+  },
+  "integrity": "ok"
+}
+exit=0
+== restore to new path ==
+== query restored db ==
+approved_rows=1
+content=E2E：所有金额以整数分处理
+exit=0

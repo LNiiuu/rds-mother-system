@@ -128,6 +128,19 @@
 > M7 的结论是**负向**的（未证明 MARS 有可测价值），不是「未完成」。
 > 实验按预注册完成，四个预注册哈希执行前后一致；结论的局限写在最终报告 §3。
 
+### M8：最小可用产品落地（2026-11-12）
+
+| 文档 | 内容 |
+|---|---|
+| [productization/M8-implementation-record.md](productization/M8-implementation-record.md) | M8-1 身份数据保护（默认拒绝覆盖、`--add` / `--replace`、7 例测试）+ M8-2 上下文包改动与兼容性 |
+| [productization/M8-packet-comparison.md](productization/M8-packet-comparison.md) | M8-4 前后对比：同内容 JSON −27.3%、读取成本 −57.0%、实测 token −56.3%、编译无退化 |
+| [productization/M8-e2e-verification.md](productization/M8-e2e-verification.md) | M8-3 九环节强制/约定划分 + M8-5 干净克隆、安装流程、备份恢复、CI 状态 |
+| [productization/M8-final-acceptance.md](productization/M8-final-acceptance.md) | **M8 验收**：五个必答问题、交付物清单、已知限制、发布阻塞项 |
+
+> M8 判定：阶段 `COMPLETED`，产品「达到 MVP，未达正式发布」。
+> 唯一未闭环的验收项是 **CI**——M8 改动未推送，CI 无法运行，不得记为通过。
+> 原始数据在 [m8/](m8/)。
+
 ---
 
 ## 2. 旧遗留清单的现状

@@ -1,0 +1,49 @@
+{
+  "measured_at": "2026-11-12",
+  "baseline_M7": {
+    "source": "git archive ada7848（M7 封版点）的 compile",
+    "format": "json",
+    "bytes": 11101,
+    "content_tokens": 344,
+    "bytes_per_token": 32.3,
+    "duplicate_bytes": 2517,
+    "duplicate_ratio": 0.227
+  },
+  "after_M8_json": {
+    "format": "json",
+    "bytes": 8074,
+    "content_tokens": 344,
+    "bytes_per_token": 23.5,
+    "duplicate_bytes": 0,
+    "duplicate_ratio": 0,
+    "delta_bytes_pct": -27.3
+  },
+  "after_M8_md": {
+    "format": "md",
+    "bytes": 6589,
+    "content_tokens": 1293,
+    "bytes_per_token": 5.1,
+    "task_text_verbatim": true,
+    "note": "含任务正文 4231 B"
+  },
+  "read_cost_for_task": {
+    "m7_packet_plus_task_md": 15332,
+    "m8_md": 6589,
+    "delta_pct": -57
+  },
+  "compile_ms_median": {
+    "old_json": 368,
+    "new_json": 374,
+    "new_md": 369,
+    "runs": 5
+  },
+  "token_note": "content_tokens 为编译器自报 [ESTIMATE]；bytes 为精确值；未使用供应商级 tokenizer",
+  "measured_provider_tokens": {
+    "method": "同一会话连续 Read 两个文件，取相邻调用 prompt_tokens 差值；含 Read 行号与工具包装，单样本",
+    "old_json": 6381,
+    "new_md": 2786,
+    "delta_pct": -56.3,
+    "byte_delta_pct": -40.6,
+    "note": "新 MD 还额外携带 4231 B 任务正文；token 降幅大于字节降幅，因为 JSON 的引号/括号/哈希更难分词"
+  }
+}

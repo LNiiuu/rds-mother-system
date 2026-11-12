@@ -112,7 +112,7 @@ $env:MARS_TOKEN = "粘贴刚才那串"
 ```
 
 > `principals.json` 里只存 token 的 SHA-256，不存明文。丢了只能重建。
-> `rds init-dev` 会**整个覆盖** `principals.json`。已有身份时不要重复执行。
+> 重复执行 `rds init-dev` 会被拒绝（`IDENTITY_EXISTS`）；要加身份用 `--add`，要重建用 `--replace`。
 
 ---
 
@@ -164,28 +164,18 @@ rds list --project demo --status proposed
 
 自己批自己会被拒绝（`SELF_REVIEW_DENIED`）。所以需要一个**不同的身份**。
 
-`rds init-dev` 只能整份覆盖身份文件，`rds principal add` 尚未实现，因此这一步用一段脚本追加：
+`rds init-dev --add` 可以追加一个身份，同时保留已有身份与 token：
 
 ```bash
-node -e '
-const fs = require("fs"), c = require("crypto");
-const p = process.env.MARS_PRINCIPALS;
-const cfg = JSON.parse(fs.readFileSync(p, "utf8"));
-const t = c.randomBytes(24).toString("hex");
-cfg.principals.push({
-  token_sha256: c.createHash("sha256").update(t).digest("hex"),
-  principal_id: "dev-r4",
-  project_ids: ["demo"],
-  roles: ["R4"],
-  note: "local approver"
-});
-fs.writeFileSync(p, JSON.stringify(cfg, null, 2));
-fs.writeFileSync(p + ".r4token", t);
-console.log("R4 token 已写入 " + p + ".r4token");
-'
+rds init-dev --principal dev-r4 --projects demo --roles R4 --add | tee /tmp/r4.out
+R4_TOKEN=$(grep '^DEV_TOKEN=' /tmp/r4.out | cut -d= -f2)
+printf '%s' "$R4_TOKEN" > "$MARS_PRINCIPALS.r4token"
 ```
 
-预期：`R4 token 已写入 /home/you/rds-data/principals.json.r4token`
+> 不加 `--add` 时，如果文件里已有身份，命令会直接拒绝（`IDENTITY_EXISTS`），不会改动文件。
+> 只有 `--replace` 才会重建并让旧 token 失效。
+
+预期：`$MARS_PRINCIPALS.r4token` 里是 48 位十六进制 token；原 R0 token 仍然有效。
 
 然后审批：
 

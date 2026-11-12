@@ -188,38 +188,26 @@ ERROR SELF_REVIEW_DENIED
 
 这是**故意**的——写入与审批必须由不同主体完成。
 
-**为什么需要手工加身份**：`rds init-dev` 每次都会**整个覆盖** `principals.json`，它没有「追加一个身份」的选项；`rds principal add` 尚未实现（见 §11）。所以第二个身份要手工追加。
-
-**第一步：追加一个 R4 审批身份，并把新 token 存到单独文件**
-
-Linux / macOS：
+**第一步：追加一个 R4 审批身份**
 
 ```bash
-node -e '
-const fs = require("fs"), c = require("crypto");
-const p = process.env.MARS_PRINCIPALS;
-const cfg = JSON.parse(fs.readFileSync(p, "utf8"));
-const t = c.randomBytes(24).toString("hex");
-cfg.principals.push({
-  token_sha256: c.createHash("sha256").update(t).digest("hex"),
-  principal_id: "dev-r4",
-  project_ids: ["demo"],
-  roles: ["R4"],
-  note: "local approver"
-});
-fs.writeFileSync(p, JSON.stringify(cfg, null, 2));
-fs.writeFileSync(p + ".r4token", t);
-console.log("R4 token 已写入 " + p + ".r4token");
-'
+rds init-dev --principal dev-r4 --projects demo --roles R4 --add | tee /tmp/r4.out
+R4_TOKEN=$(grep '^DEV_TOKEN=' /tmp/r4.out | cut -d= -f2)
+printf '%s' "$R4_TOKEN" > "$MARS_PRINCIPALS.r4token"
 ```
 
-Windows PowerShell（等价，避免引号转义问题）：
+PowerShell 等价：
 
 ```powershell
-node -e "const fs=require('fs'),c=require('crypto');const p=process.env.MARS_PRINCIPALS;const cfg=JSON.parse(fs.readFileSync(p,'utf8'));const t=c.randomBytes(24).toString('hex');cfg.principals.push({token_sha256:c.createHash('sha256').update(t).digest('hex'),principal_id:'dev-r4',project_ids:['demo'],roles:['R4'],note:'local approver'});fs.writeFileSync(p,JSON.stringify(cfg,null,2));fs.writeFileSync(p+'.r4token',t);console.log('R4 token 已写入 '+p+'.r4token')"
+rds init-dev --principal dev-r4 --projects demo --roles R4 --add | Tee-Object -FilePath r4.out
+$r4 = ((Select-String -Path r4.out -Pattern '^DEV_TOKEN=').Line -split '=')[1]
+Set-Content -NoNewline "$env:MARS_PRINCIPALS.r4token" $r4
 ```
 
-> 脚本只追加一条记录，不会清空已有身份。但请先备份 `principals.json`——它不可从 token 反推重建。
+- `--add` 只追加一条记录，**保留已有身份与 token**。
+- 不加 `--add` 且文件里已有身份时，命令会拒绝执行（`IDENTITY_EXISTS`），文件一个字节都不会改。
+- 确实要重建（旧 token 全部作废）才用 `--replace`。
+- `rds principal add` 仍未实现（见 §11），但日常的「加一个审批身份」已经不需要写脚本。
 
 **第二步：用 R4 身份审批，再用 R0 身份检索**
 
@@ -323,7 +311,7 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 
 | 项 | 现状 | 影响 |
 |---|---|---|
-| 测试状态 | **173 项全通过，fail=0，skipped=0**（2026-11-09，Windows × Node 22.22.2，`b89cbb2`）。M3 起含分层检查与行为基线；M4 起含契约、脚本、数据库、版本、配置、诊断六类测试 | 测试已完全去环境化：不依赖作者会话、本机 DSH 或绝对路径 |
+| 测试状态 | **210 项全通过，fail=0，skipped=0**（2026-11-12，Windows × Node 22.22.2，`c0fe381`）。M8 新增 14 项：7 项身份数据保护、7 项上下文包格式 | 测试已完全去环境化：不依赖作者会话、本机 DSH 或绝对路径 |
 | Linux / Ubuntu | **由 CI 实测通过**（Node 22 / 24 各一格），最近一次 `run 42583509413` @ `b89cbb2` | 跨平台结论有 E1 证据，不再是静态推断 |
 | macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x，run `<见 M6 验收报告>`）。未覆盖 Intel Mac 与其他 macOS 版本；`new-project.ps1` 需要 pwsh | 正文按系统级实测标注，不作超范围承诺 |
 | M3 适配层 | 5 个端口 + 8 个适配器 + 组合根已落地；`npm run layers` 可复现分层检查 | 配置是**启动快照**：改 `role-routing.json` 后需重启 MCP 才生效 |
@@ -333,12 +321,12 @@ powershell -NoProfile -File .\tooling\backup.ps1 -Root <仓库根> -OutDir <备�
 | `tests/self/run.ps1` | 通过。项目名检查已拆分：活跃资产 0 命中；历史记录多处仅告警 | 历史记录（`mars/docs`、`docs/checks`、`docs/history`）属证据，不改写 |
 | `doctor` 的 `paths:docs` | 源码树触发 `warn`（数十个历史证据文件含作者机器路径）；发行包为 `ok` | 预期行为，不是安装缺陷。历史证据只归档标注，不替换正文 |
 | 版本号 | `VERSION` = `package.json` = `serverInfo.version` = 0.1.0 | 规则见 [docs/versioning.md](versioning.md)；`SCHEMA_VERSION` 与账本格式版本是独立维度 |
-| `rds principal add/revoke/list` | **未实现** | 第二个身份需按 §7 的脚本追加；这是有意不做空壳命令 |
+| `rds principal add/revoke/list` | **未实现**。追加身份已由 `rds init-dev --add` 覆盖；撤销与列出仍需手工改文件 | 不提供空壳命令 |
 | `rds upgrade` / `rds uninstall` / `rds backup` | **未实现** | 升级 = `git pull && npm install -g .`；备份用 `tooling/backup.ps1`（源码树）或手工拷库 |
 | `render-role` 角色包渲染 | **未纳入仓库与发行包**。工作区存在未入库的 PowerShell 实现 | 干净克隆与发行包中都不存在，不要按文档去找 |
 | 发布渠道 | 未发布到 npm registry | 用本地路径安装（§3） |
 | `rds test` | 发行包不含 `mars/tests/`，只在源码仓库可用；`--raw` 查看未加工输出 | 想跑测试请用源码树 |
-| CI | **全部绿**：Windows/Ubuntu × Node 22/24 四组 + structure self-check + g1，共 6 个 job。G1 六个夹具真实执行（耗时 27s，非跳过） | 详见 [docs/checks/productization/M4-ci-validation-report.md](checks/productization/M4-ci-validation-report.md) |
+| CI | **全部绿**（最后一次运行：run 43051690255 @ `b904842`，7 个 job 全 success，1m06s，含 macOS）。M8 的改动**尚未推送**，因此还没有对应的 CI run；本地等价门禁全绿 | CI 需要 push 才能触发；本阶段未授权推送 |
 | Node 22.15 精确边界 | `engines` 声明 `>=22.15.0`；CI 跑 22.x / 24.x 的**最新补丁版**，未固定 22.15.0 实测 | 22.15 的依据是 zstd 回移植的文档事实 |
 
 ---

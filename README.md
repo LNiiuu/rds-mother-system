@@ -109,17 +109,19 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **196 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2，工作区与干净克隆各跑一遍） | E1 |
-| CI（Windows + Ubuntu × Node 22/24） | **四组全绿**：[run 42595065685](https://github.com/LNiiuu/rds-mother-system/actions/runs/42595065685)，6 个 job 全 success，1m21s（2026-11-09） | E1 |
+| 测试 | **210 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2；M8 起工作区与干净克隆各跑一遍） | E1 |
+| CI（Windows + Ubuntu × Node 22/24 + macOS） | **7 个 job 全绿**：[run 43051690255](https://github.com/LNiiuu/rds-mother-system/actions/runs/43051690255)，1m06s（2026-11-11）。M8 改动尚未推送，暂无对应 CI | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）。Intel Mac 与其他 macOS 版本未覆盖 | E1 |
 | CLI 子命令帮助 | **22 个命令全部有 `--help` / `-h`**，且帮助先于任何副作用（不建库、不写文件） | E1 |
+| 上下文包 | `--task-file` 携带任务正文、`--format md` 精简输出、`--no-manifest`；同内容 JSON 比 M7 小 **27.3%**，理解任务的读取量 **−57.0%** | E1 |
+| 身份数据安全 | `init-dev` 默认**拒绝覆盖**已有身份；`--add` 追加、`--replace` 显式重建；7 例回归测试守着 | E1 |
 | `render-role` 角色包渲染 | **模板已入库，渲染器未入库**。`core/templates/role-packet.md` 与 `run-record.json` 定义执行包格式并随包分发；生成它的 `rds-render-role.ps1` 只存在于本地工作区，不随包分发 | — |
-| `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。身份需用 `rds init-dev` 生成，升级为覆盖安装 | — |
+| `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。追加身份用 `rds init-dev --add`；升级为覆盖安装 | — |
 
 未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。
 
-测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 196/196**。
+测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 210/210**。
 `npm test` 走门禁 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0`；
 缺 fixture 或静默 skip 会让门禁失败，而不是显示绿灯。分类与运行方式见 [docs/testing.md](docs/testing.md)。
 
