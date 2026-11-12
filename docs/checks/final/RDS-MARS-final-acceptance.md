@@ -1,7 +1,8 @@
 # RDS/MARS 最终验收报告（M12–M17）
 
 **日期**：2026-11-12（+08:00）
-**验收基线**：代码提交 `5a71cad`（M16 封版）。其后为文档批次，验收规则同 M6-closure §7——文档提交不改变功能结论。
+**验收基线**：`1db2319`（干净克隆实测点）。本报告自身所在的提交是其后一个纯文档提交；
+验收规则同 M6-closure §7——文档提交不改变功能结论。
 **最终状态**：**READY FOR USER AUTHORIZATION**
 
 > 本报告只写真实执行过的结果。未运行的一律标 `NOT RUN`，被阻塞的标 `BLOCKED`，部分达成的标 `PARTIAL`。
@@ -165,11 +166,13 @@ mock:ready  openai-compat:not_configured  anthropic:not_configured
 ### G.3 干净克隆
 
 ```
-HEAD=5a71cad  dirty=0  跟踪文件 455
+HEAD=1db2319  dirty=0  跟踪文件 460
 doctor   status: ok (fail=0 warn=1 checks=11)   # warn 为源码树预期的 paths:docs
 CONFIG PASS / LAYERS PASS (problems=0) / DOCS PASS
 GATE PASS  tests=290 pass=290 fail=0 skipped=0
 BASELINE PASS  7 个面均与基线一致
+PACK PASS     141 个文件 / 207,394 B，禁止项 0 命中
+SMOKE PASS    安装 → doctor → init → 写入 → 审批 → 检索 → 编译 全通过
 npm run demo:m12 → 修复生效 true
 npm run demo:m15 → 重构生效 true
 ```
@@ -209,7 +212,7 @@ ERROR rea 的代码根请用 --path <dir>；--root 是安装根（会改变安�
 | 模型调用费用 | **0 元**（全程 mock，未发起任何付费 API 请求） |
 | 网络访问 | 无（REA 分析为本地工具；provider 未配置故未联网） |
 | 新增依赖 | **0 个**（`dependencies` / `devDependencies` 仍为空） |
-| 磁盘 | 发行包 200 KB 级；证据目录百 KB 级 |
+| 磁盘 | 发行包 **207,394 B / 141 文件**；证据目录百 KB 级 |
 | 数据库 | 本机开发库 589,824 B → 迁移后新增 7 张表（只加表） |
 
 ---
@@ -252,8 +255,9 @@ ERROR rea 的代码根请用 --path <dir>；--root 是安装根（会改变安�
 | 项 | 值 |
 |---|---|
 | 分支 | `main` |
+| 验收时 HEAD | `1db2319` |
 | 本轮起点 | `61590c7` |
-| 本轮提交 | 6 个（见下表） |
+| 本轮提交 | 7 个（见下表） |
 | 相对 origin/main | **领先 11，落后 0**（含 M7–M11 的 5 个未推送提交） |
 | 远程写操作 | **未执行** |
 | 历史 Tag | 20 个，未动 |
@@ -265,7 +269,8 @@ ERROR rea 的代码根请用 --path <dir>；--root 是安装根（会改变安�
 | `96c289d` | M14 REA（35 文件，+4204/−8） |
 | `c5c0d70` | M15 联合 |
 | `5a71cad` | M16 适配器 |
-| `<M17>` | M17 文档、验收报告、安装日志 |
+| `0de978b` | M17 文档、封版记录、最终验收、安装日志 |
+| `1db2319` | 修正验收报告中的领先提交数 |
 
 受保护工作：49 项未跟踪文件逐字节未动（每次提交后核对）；本轮新增的报告与代码全部进 Git，不留散落文件。
 
