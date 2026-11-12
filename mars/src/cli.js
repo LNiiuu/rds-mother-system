@@ -9,6 +9,10 @@ const store = require('./store');
 const { retrieve } = require('./retrieval');
 const { compileContext } = require('./compiler');
 const { renderPacketMarkdown } = require('./render-md');
+const projects = require('./projects');
+const contextOps = require('./context-ops');
+const contextBudget = require('./context-budget');
+const collab = require('./collab');
 const { restoreFragment } = require('./manifest');
 const sharing = require('./sharing');
 const { sha256, writeJsonAtomic } = require('./util');
@@ -96,7 +100,8 @@ function main() {
 const KNOWN_COMMANDS = new Set([
   'init', 'init-dev', 'put', 'get', 'list', 'search', 'review', 'alias',
   'compile', 'fragment', 'stats', 'audit', 'ledger', 'mcp', 'project',
-  'share', 'orchestrate', 'help'
+  'share', 'orchestrate', 'help',
+  'budget', 'context', 'role', 'task', 'handoff', 'cost'
 ]);
 
 function run(args) {
@@ -353,8 +358,18 @@ function run(args) {
         project_id: args.project, task_id: task.id, role_id: role,
         budget: args.budget ? Number(args.budget) : undefined,
         query: args.query, state: args.state, task, evidence,
+        model: args.model, agent_id: args.agent,
+        autoCompress: args['auto-compress'] === true,
         assets
       });
+      if (result.compression) {
+        const c = result.compression;
+        if (c.validation_status === 'VALID') {
+          process.stderr.write(`WARN 已自动压缩：${c.before_tokens} -> ${c.after_tokens} tokens（${c.compression_id}）\n`);
+        } else {
+          process.stderr.write(`WARN 压缩未生效：${c.validation_status}（保持原文 ${c.before_tokens} tokens）\n`);
+        }
+      }
       // M8 / B2：budget 只留摘要。此前这里把 budget.sections（与 packet.sections 同内容）
       // 再序列化一遍，是文件体积翻倍的主因之一。需要分节内容请看 packet.sections。
       const budgetSummary = {
@@ -392,18 +407,280 @@ function run(args) {
       const auth = loadAuth(runtime);
       const db = runtime.openDb(auth.db);
       const role = auth.role;
-      if (!auth.principal.roles.includes(role)) die('角色未授权：' + role, 3);
       const sub = args._[1];
-      if (sub === 'register') {
-        const r = sharing.registerProject(db, auth.principal, role, { project_id: args.project, display_name: args.name, share_policy: args.policy });
-        console.log(JSON.stringify(r, null, 2));
-        return;
-      }
-      if (sub === 'list') {
-        console.log(JSON.stringify(sharing.listProjects(db), null, 2));
-        return;
+      try {
+        // 兼容：老的 register 不带 --root，仍走 sharing（只有名字与共享策略）
+        const projectRoot = args['project-root'];
+        if (sub === 'register' && !projectRoot) {
+          const r = sharing.registerProject(db, auth.principal, role, { project_id: args.project, display_name: args.name, share_policy: args.policy });
+          console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'create' || sub === 'register') {
+          collab.assertPermission(role, 'project.create');
+          const config = args.config ? JSON.parse(String(args.config)) : {};
+          const r = projects.create(db, auth.principal, {
+            project_id: args.project, name: args.name, root: projectRoot,
+            policy: args.policy || 'deny', config
+          }, { resolveRoot: runtime.projectRoots.resolveRoot });
+          console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'list') {
+          const rows = projects.list(db, { includeRemoved: args.all === true });
+          if (rows.length) { console.log(JSON.stringify(rows, null, 2)); return; }
+          console.log(JSON.stringify(sharing.listProjects(db), null, 2));
+          return;
+        }
+        if (sub === 'show') {
+          const row = projects.show(db, args.project);
+          if (!row) die('项目不存在：' + args.project, 2);
+          console.log(JSON.stringify(row, null, 2));
+          return;
+        }
+        if (sub === 'use') {
+          const row = projects.show(db, args.project);
+          if (!row) die('项目不存在：' + args.project, 2);
+          if (row.status === 'removed') die('项目已移除：' + args.project, 2);
+          const pointer = runtime.projectRoots.writeCurrent(auth.db, args.project);
+          console.log(JSON.stringify({ project_id: args.project, pointer }, null, 2));
+          return;
+        }
+        if (sub === 'current') {
+          console.log(JSON.stringify({ project_id: runtime.projectRoots.readCurrent(auth.db) }, null, 2));
+          return;
+        }
+        if (sub === 'remove') {
+          collab.assertPermission(role, 'project.remove');
+          console.log(JSON.stringify(projects.remove(db, args.project, args.confirm), null, 2));
+          return;
+        }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
       }
       die('未知 project 子命令: ' + sub);
+    }
+    if (cmd === 'budget') {
+      const sub = args._[1] || 'show';
+      try {
+        if (sub === 'models') {
+          console.log(JSON.stringify(contextBudget.listModels(), null, 2));
+          return;
+        }
+        const override = args['context-window'] ? { context_window: Number(args['context-window']) } : undefined;
+        const r = contextBudget.compute({
+          model: args.model,
+          estimatedInputTokens: args.tokens ? Number(args.tokens) : 0,
+          override,
+        });
+        console.log(JSON.stringify(r, null, 2));
+        return;
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+    }
+    if (cmd === 'context') {
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const sub = args._[1] || 'list';
+      try {
+        if (sub === 'list') {
+          console.log(JSON.stringify(contextOps.listRuns(db, { project_id: args.project, limit: args.limit ? Number(args.limit) : 20 }), null, 2));
+          return;
+        }
+        if (sub === 'show') {
+          if (!args.run) die('context show 需要 --run <id>', 2);
+          console.log(JSON.stringify(contextOps.getRun(db, args.run), null, 2));
+          return;
+        }
+        if (sub === 'restore') {
+          if (!args.compression) die('context restore 需要 --compression <id>', 2);
+          console.log(JSON.stringify(contextOps.restore(db, args.compression), null, 2));
+          return;
+        }
+        if (sub === 'analyze' || sub === 'compress') {
+          if (!args.file) die(`context ${sub} 需要 --file <packet.json>`, 2);
+          const doc = JSON.parse(fs.readFileSync(path.resolve(String(args.file)), 'utf8'));
+          const packet = doc.packet || doc;
+          if (sub === 'analyze') {
+            console.log(JSON.stringify(contextOps.analyze(packet.sections || []), null, 2));
+            return;
+          }
+          const result = contextOps.compress(packet.sections || [], { archive: args.archive === true });
+          if (args.out) {
+            const next = { ...packet, sections: contextOps.apply(result).map(({ archived, ...rest }) => rest), tokens_estimated: result.validationStatus === 'VALID' ? result.afterTokens : result.beforeTokens };
+            const out = path.resolve(String(args.out));
+            fs.mkdirSync(path.dirname(out), { recursive: true });
+            fs.writeFileSync(out, JSON.stringify(next, null, 2));
+          }
+          console.log(JSON.stringify({
+            compression_id: result.compressionId,
+            validation_status: result.validationStatus,
+            l0_preserved: result.l0Preserved,
+            before_tokens: result.beforeTokens,
+            after_tokens: result.afterTokens,
+            actions: result.actions,
+          }, null, 2));
+          return;
+        }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+      die('未知 context 子命令: ' + sub);
+    }
+    if (cmd === 'role') {
+      const sub = args._[1] || 'list';
+      try {
+        if (sub === 'list') {
+          console.log(JSON.stringify(collab.listRoles(), null, 2));
+          return;
+        }
+        if (sub === 'show') {
+          if (!args.role) die('role show 需要 --role <R0-R7>', 2);
+          console.log(JSON.stringify(collab.role(String(args.role)), null, 2));
+          return;
+        }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+      die('未知 role 子命令: ' + sub);
+    }
+    if (cmd === 'task') {
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const role = auth.role;
+      const actor = auth.principal.principal_id;
+      const sub = args._[1];
+      try {
+        if (sub === 'plan') {
+          collab.assertPermission(role, 'task.plan');
+          const objective = args.objective || args._[2];
+          if (!objective) die('task plan 需要 --objective <文本>', 2);
+          const r = collab.planTasks(db, { project_id: args.project, objective, role: args['to-role'], actor });
+          console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'create') {
+          collab.assertPermission(role, 'task.create');
+          if (!args.title) die('task create 需要 --title', 2);
+          const r = collab.createTask(db, {
+            project_id: args.project, title: args.title, description: args.description,
+            acceptance_criteria: args.acceptance, assigned_role: args['to-role'] ? String(args['to-role']) : null,
+            actor,
+          });
+          console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'list') {
+          console.log(JSON.stringify(collab.listTasks(db, { project_id: args.project, status: args.status, limit: args.limit ? Number(args.limit) : 50 }), null, 2));
+          return;
+        }
+        if (sub === 'show' || sub === 'events') {
+          if (!args.task) die(`task ${sub} 需要 --task <id>`, 2);
+          const task = collab.getTask(db, String(args.task));
+          if (!task) die('任务不存在：' + args.task, 2);
+          if (sub === 'show') console.log(JSON.stringify({ ...task, events: collab.events(db, task.task_id) }, null, 2));
+          else console.log(JSON.stringify(collab.events(db, task.task_id), null, 2));
+          return;
+        }
+        if (!args.task) die(`task ${sub} 需要 --task <id>`, 2);
+        const taskId = String(args.task);
+        if (sub === 'assign') {
+          collab.assertPermission(role, 'task.assign');
+          if (!args['to-role']) die('task assign 需要 --to-role <R0-R7>（--role 是当前执行角色）', 2);
+          console.log(JSON.stringify(collab.assign(db, taskId, { role: String(args['to-role']), agent: args.agent, actor }), null, 2));
+          return;
+        }
+        if (sub === 'start') { console.log(JSON.stringify(collab.transition(db, taskId, 'RUNNING', actor, args.note), null, 2)); return; }
+        if (sub === 'block') { console.log(JSON.stringify(collab.transition(db, taskId, 'BLOCKED', actor, args.reason || args.note), null, 2)); return; }
+        if (sub === 'submit') { console.log(JSON.stringify(collab.transition(db, taskId, 'REVIEW_PENDING', actor, args.note), null, 2)); return; }
+        if (sub === 'verify') { console.log(JSON.stringify(collab.transition(db, taskId, 'VERIFICATION_PENDING', actor, args.note), null, 2)); return; }
+        if (sub === 'complete') {
+          const evidence = args.evidence ? String(args.evidence).split(',').map((x) => x.trim()).filter(Boolean) : [];
+          console.log(JSON.stringify(collab.complete(db, taskId, { evidence, actor }), null, 2));
+          return;
+        }
+        if (sub === 'fail') { console.log(JSON.stringify(collab.fail(db, taskId, args.reason, actor), null, 2)); return; }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+      die('未知 task 子命令: ' + sub);
+    }
+    if (cmd === 'handoff') {
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const role = auth.role;
+      const sub = args._[1];
+      try {
+        if (sub === 'create') {
+          if (!args.task || !args['to-role']) die('handoff create 需要 --task 与 --to-role', 2);
+          const task = collab.getTask(db, String(args.task));
+          if (!task) die('任务不存在：' + args.task, 2);
+          const toRole = String(args['to-role']);
+          collab.role(toRole);
+          const summary = collab.buildHandoffSummary(db, task);
+          const text = [
+            `任务: ${task.title}`,
+            task.description ? `目标: ${task.description}` : null,
+            task.acceptance_criteria ? `验收标准: ${task.acceptance_criteria}` : null,
+            `当前状态: ${task.status}`,
+            `已完成: ${summary.completed_work.join(' | ') || '（无记录）'}`,
+            `未完成/风险: ${summary.open_items.join(' | ') || '（无记录）'}`,
+            `证据: ${summary.evidence_refs.join(', ') || '（无）'}`,
+          ].filter(Boolean).join('\n');
+          const result = compileContext(db, auth.principal, auth.routing, {
+            project_id: task.project_id, task_id: task.task_id, role_id: toRole,
+            budget: args.budget ? Number(args.budget) : undefined,
+            task: { id: task.task_id, objective: task.title, text },
+            state: JSON.stringify(summary),
+            assets,
+          });
+          const saved = collab.saveHandoff(db, {
+            task, toRole, fromRole: args['from-role'] || role,
+            packetId: result.packet.packet_id, summary,
+          });
+          console.log(JSON.stringify({ ...saved, tokens: result.packet.tokens_estimated, context_run: result.run_id }, null, 2));
+          return;
+        }
+        if (sub === 'list') {
+          if (!args.task) die('handoff list 需要 --task <id>', 2);
+          console.log(JSON.stringify(collab.listHandoffs(db, String(args.task)), null, 2));
+          return;
+        }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+      die('未知 handoff 子命令: ' + sub);
+    }
+    if (cmd === 'cost') {
+      const auth = loadAuth(runtime);
+      const db = runtime.openDb(auth.db);
+      const role = auth.role;
+      const sub = args._[1];
+      try {
+        if (sub === 'record') {
+          collab.assertPermission(role, 'cost.record');
+          const r = collab.recordCost(db, {
+            project_id: args.project, task_id: args.task, agent_id: args.agent,
+            model: args.model, provider: args.provider,
+            input_tokens: Number(args.input || 0), output_tokens: Number(args.output || 0),
+            cached_tokens: Number(args.cached || 0), tool_calls: Number(args.tools || 0),
+            estimated_cost: args['estimated-cost'] === undefined ? undefined : Number(args['estimated-cost']),
+            actual_cost: args['actual-cost'] === undefined ? undefined : Number(args['actual-cost']),
+            usage_source: args.source || 'estimated',
+          });
+          console.log(JSON.stringify(r, null, 2));
+          return;
+        }
+        if (sub === 'report') {
+          collab.assertPermission(role, 'cost.read');
+          console.log(JSON.stringify(collab.costReport(db, { project_id: args.project }), null, 2));
+          return;
+        }
+      } catch (err) {
+        die(String((err && err.message) || err), 4);
+      }
+      die('未知 cost 子命令: ' + sub);
     }
     if (cmd === 'share') {
       const auth = loadAuth(runtime);

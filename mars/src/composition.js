@@ -6,6 +6,7 @@
 //
 // 硬约束（tooling/layering-check.mjs 检查）：<= 120 行；不含业务分支；不 import 域业务模块。
 const { createFsAssetResolver } = require('./adapters/fs-asset-resolver');
+const projectRoots = require('./adapters/fs-project-roots');
 const { createCliIdentity } = require('./adapters/cli-identity');
 const { createTokenFileIdentity } = require('./adapters/token-file-identity');
 const { createDshSessionSource } = require('./adapters/dsh-session-source');
@@ -68,6 +69,7 @@ function createRuntime(options = {}) {
     openDb: openAuditedDb,
     auditSinkFactory: createDbAuditSink,
     // 默认允许根是安装根；MCP 保持「未显式设置则不限制」的既有语义。
+    projectRoots,
     allowedRoots: paths.allowedRootsFromEnv || [paths.root]
   };
 }

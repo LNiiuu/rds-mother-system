@@ -26,7 +26,12 @@
     "mars/src/session-registry.js",
     "mars/src/version.js",
     "mars/src/cli-help.js",
-    "mars/src/render-md.js"
+    "mars/src/render-md.js",
+    "mars/src/projects.js",
+    "mars/src/context-budget.js",
+    "mars/src/context-ops.js",
+    "mars/src/collab.js",
+    "mars/src/adapters/fs-project-roots.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -50,12 +55,17 @@
     "mars/src/db/stats.js": "B5：统计查询，从 db.js 拆出",
     "mars/src/version.js": "M4 / B4：产品版本的单一读取点（serverInfo.version 不再硬编码 0.2.0）",
     "mars/src/cli-help.js": "M5 / B3：CLI 帮助文本的唯一真相。此前 bin/rds.mjs 与 cli.js 各写一份且已分叉（简版漏了 orchestrate）",
-    "mars/src/render-md.js": "M8 / B2：上下文包的 Markdown 渲染器。与 compiler 分离，便于单独测试与替换；不进任何数据契约"
+    "mars/src/render-md.js": "M8 / B2：上下文包的 Markdown 渲染器。与 compiler 分离，便于单独测试与替换；不进任何数据契约",
+    "mars/src/projects.js": "M9：多项目注册、根目录 realpath 归一化、软删除（不删源码与记忆）",
+    "mars/src/context-budget.js": "M9：模型上下文预算计算，估算方法与阈值集中在此",
+    "mars/src/context-ops.js": "M10：确定性压缩（去重/折叠/归档）与原文恢复，L0 保护",
+    "mars/src/collab.js": "M11：角色权限、任务状态机、调度、交接、成本账本",
+    "mars/src/adapters/fs-project-roots.js": "M9：项目根目录的 realpath 解析与当前项目指针；域模块不直接碰 fs"
   },
   "helpText": {
-    "sha256": "66142b59518484581a8de443d60d91a055e3b05e2e0f63027b7c4198c591d234",
-    "batch": "m5-b3+m5-b4",
-    "reason": "B3：补齐 orchestrate 与 project/share 子命令说明、新增 help 命令与 -h 别名、按显示宽度对齐参数列。B4：doctor 条目去掉写死的检查项数（新增 paths:assets 后从 10 变 11，写死会每次都要改帮助）。两批都只增补说明，未删改任何子命令或 flag 拼写。基线文件保留 M3 时点的原文"
+    "sha256": "72bbf857f6a051a0fe5620c7687a6cb645827232982631f3b5ab29e65a3a62d6",
+    "batch": "m8+m9+m10+m11",
+    "reason": "新增 budget/context/role/task/handoff/cost 命令与 project 子命令；帮助文本随命令面扩展"
   },
   "contractChanges": [
     {

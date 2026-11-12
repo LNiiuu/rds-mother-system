@@ -8,6 +8,8 @@ const DEFAULT_PROTECTIONS = ['task', 'decisions', 'evidence', 'prohibitions'];
 const { buildManifest } = require('./manifest');
 const { authorize, roleProfile } = require('./authz');
 const { AppError } = require('./errors');
+const contextOps = require('./context-ops');
+const contextBudget = require('./context-budget');
 
 // M3 / B1：packet schema 由调用方注入（params.assets），模块不再在加载期读盘。
 function resolvePacketSchema(params) {
@@ -111,13 +113,49 @@ function compileContext(db, principal, routing, params) {
   }
 
   const budgeted = applyBudget(sections, { budget, protections: profile.protections || DEFAULT_PROTECTIONS });
-  const tokens = budgeted.tokens;
+  let finalSections = budgeted.sections;
+  let tokens = budgeted.tokens;
+  let compression = null;
+
+  // M10：自动压缩。触发条件只看预算使用率，规则确定、可解释。
+  // 压缩失败（NO_GAIN / L0_MODIFIED）不回写 packet，只在返回值里报告。
+  const budgetInfo = contextBudget.compute({ model: params.model, estimatedInputTokens: tokens });
+  if (params.autoCompress === true) {
+    const budgetRatio = budget > 0 ? tokens / budget : 0;
+    const shouldCompress = ['HIGH', 'CRITICAL', 'EXCEEDED'].includes(budgetInfo.budgetStatus)
+      || budgetInfo.utilizationRatio >= 0.85
+      || budgetRatio >= 0.85;
+    if (shouldCompress) {
+      const result = contextOps.compress(finalSections, { archive: true });
+      if (result.validationStatus === 'VALID') {
+        contextOps.save(db, { project_id, task_id: task.id || params.task_id, role_id }, result);
+        finalSections = result.compressed;
+        tokens = result.afterTokens;
+        compression = {
+          compression_id: result.compressionId,
+          validation_status: result.validationStatus,
+          before_tokens: result.beforeTokens,
+          after_tokens: result.afterTokens,
+          actions: result.actions,
+        };
+      } else {
+        compression = {
+          compression_id: null,
+          validation_status: result.validationStatus,
+          before_tokens: result.beforeTokens,
+          after_tokens: result.afterTokens,
+          actions: result.actions,
+        };
+      }
+    }
+  }
+
   const manifest = buildManifest(db, {
     project_id, task_id: task.id || params.task_id || 'UNKNOWN', role_id,
     run_id: params.run_id, session_id: params.session_id,
     token_budget: budget, tokens_estimated: tokens,
     assets: params.assets
-  }, budgeted.sections.map(s => ({
+  }, finalSections.map(s => ({
     ...s,
     visibility: s.visibility || 'project',
     source_version: s.source_version || params.source_version || 'current'
@@ -133,7 +171,7 @@ function compileContext(db, principal, routing, params) {
     token_budget: budget,
     tokens_estimated: tokens,
     estimate_label: '[ESTIMATE]',
-    sections: budgeted.sections.map(s => ({
+    sections: finalSections.map(s => ({
       id: s.id, title: s.title, kind: s.kind,
       content: s.content, token_estimate: s.token_estimate,
       source_refs: s.source_refs || [], truncated: Boolean(s.truncated) || budgeted.truncated.includes(s.id)
@@ -152,7 +190,28 @@ function compileContext(db, principal, routing, params) {
     action: 'context.compile', target: packet.packet_id,
     result: `tokens=${tokens}/${budget} missing=${missing.length}`
   });
-  return { packet, manifest, budget: budgeted };
+
+  // M9：每次编译都留一条监控记录（只存分节元数据，不存正文）。
+  const runId = newId('ctx_');
+  contextOps.recordRun(db, {
+    run_id: runId,
+    project_id,
+    task_id: packet.task_id,
+    role_id,
+    agent_id: params.agent_id,
+    model: params.model,
+    estimated_input_tokens: tokens,
+    available_input_tokens: budgetInfo.availableInputTokens,
+    utilization_ratio: budgetInfo.utilizationRatio,
+    budget_status: budgetInfo.budgetStatus,
+    sections: finalSections.map(s => ({ id: s.id, kind: s.kind, title: s.title, tokens: s.token_estimate, layer: contextOps.layerOf(s.kind) })),
+    layers: contextOps.analyze(finalSections).layers,
+    compression_id: compression && compression.compression_id,
+    before_tokens: compression ? compression.before_tokens : tokens,
+    after_tokens: compression ? compression.after_tokens : tokens,
+  });
+
+  return { packet, manifest, budget: { ...budgeted, sections: finalSections, tokens }, compression, run_id: runId };
 }
 
 module.exports = { compileContext, resolvePacketSchema };

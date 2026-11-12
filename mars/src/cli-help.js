@@ -254,7 +254,8 @@ const TOPICS = {
     args: [
       ['--project <id>', 'register 必填'],
       ['--name <显示名>', 'register 必填'],
-      ['--policy <策略>', 'register 必填：共享策略名']
+      ['--policy <策略>', '共享策略名，默认 deny'],
+      ['--project-root <dir>', '项目根目录（create 必填；会 resolve + realpath，拒绝符号链接歧义）']
     ],
     examples: ['rds project register --project demo --name "Demo 项目" --policy default']
   },
@@ -311,6 +312,149 @@ const TOPICS = {
     examples: ['rds orchestrate plan --project demo --task T-001 --objective "实现登录"']
   },
 
+  budget: {
+    usage: 'rds budget <show|models> [--model <id>] [--tokens <n>] [--context-window <n>]',
+    summary:
+      '按模型配置计算可用输入预算与使用率。估算是字符启发式（util.estimateTokens），' +
+      '输出里带 estimationMethod；不要把它当成 Provider 实际用量。',
+    subcommands: [
+      ['show', '计算一次预算（默认）'],
+      ['models', '列出内置模型配置']
+    ],
+    args: [
+      ['--model <id>', '模型 ID，默认 generic-128k'],
+      ['--tokens <n>', '待注入上下文的估算 token 数'],
+      ['--context-window <n>', '覆盖模型上下文窗口（用于试验）']
+    ],
+    examples: ['rds budget show --model generic-128k --tokens 90000']
+  },
+
+  context: {
+    usage: 'rds context <list|show|restore|analyze|compress> [选项]',
+    summary:
+      '上下文运行记录、压缩与恢复。compress 默认只做去重与重复行折叠；--archive 才把 L3 原文归档。' +
+      'L0（任务/禁止事项）不会被改动；压缩无收益或校验失败时自动回退原文。',
+    subcommands: [
+      ['list', '列出编译记录（--project 过滤）'],
+      ['show', '查看一次编译的分节与预算（--run）'],
+      ['restore', '按压缩 ID 恢复原文并校验 SHA-256（--compression）'],
+      ['analyze', '分析一个 packet.json 的重复与分层（--file）'],
+      ['compress', '对 packet.json 执行压缩（--file，可 --out）']
+    ],
+    args: [
+      ['--project <id>', '项目 ID'],
+      ['--run <id>', '编译记录 ID'],
+      ['--compression <id>', '压缩记录 ID'],
+      ['--file <path>', 'packet.json 路径'],
+      ['--out <path>', '压缩后的 packet 写出路径'],
+      ['--archive', '归档 L3 原文（可恢复）'],
+      ['--limit <n>', 'list 返回条数，默认 20']
+    ],
+    examples: [
+      'rds context list --project demo',
+      'rds context restore --compression cmp_0123456789ab'
+    ]
+  },
+
+  role: {
+    usage: 'rds role <list|show> [--role <R0-R7>]',
+    summary:
+      '角色与权限表。权限是**代码校验**（新命令都走 assertPermission），不是进程级沙箱；' +
+      'R7 只有本地 git.commit，没有 push。',
+    subcommands: [
+      ['list', '列出 8 个角色与权限'],
+      ['show', '查看单个角色（--role）']
+    ],
+    args: [['--role <R0-R7>', '角色 ID']],
+    examples: ['rds role show --role R7']
+  },
+
+  task: {
+    usage: 'rds task <plan|create|list|show|events|assign|start|block|submit|verify|complete|fail> [选项]',
+    summary:
+      '任务状态机。合法迁移才允许；每次迁移写 task_events。' +
+      'complete 必须给 --evidence，否则拒绝。plan 是确定性规则：实现+测试会拆成两个任务。',
+    subcommands: [
+      ['plan', '按目标拆任务（--objective，可 --to-role 覆盖）'],
+      ['create', '建单任务（--title）'],
+      ['list', '按项目列任务（--project，可 --status）'],
+      ['show', '任务详情与事件（--task）'],
+      ['events', '只看事件（--task）'],
+      ['assign', '指派（--task --to-role，可 --agent）'],
+      ['start', 'ASSIGNED → RUNNING'],
+      ['block', '→ BLOCKED（--reason）'],
+      ['submit', 'RUNNING → REVIEW_PENDING'],
+      ['verify', 'REVIEW_PENDING → VERIFICATION_PENDING'],
+      ['complete', '→ COMPLETED（必须 --evidence a,b）'],
+      ['fail', '→ FAILED（必须 --reason）']
+    ],
+    args: [
+      ['--project <id>', '项目 ID'],
+      ['--task <id>', '任务 ID'],
+      ['--title <文本>', '任务标题'],
+      ['--description <文本>', '任务描述'],
+      ['--acceptance <文本>', '验收标准'],
+      ['--objective <文本>', 'plan 的目标描述'],
+      ['--role <R0-R7>', '当前执行角色（公共选项）'],
+      ['--to-role <R0-R7>', '指派/派发的目标角色'],
+      ['--agent <id>', '执行者标识'],
+      ['--evidence <a,b>', '完成证据引用'],
+      ['--reason <文本>', '阻塞/失败原因'],
+      ['--note <文本>', '迁移备注']
+    ],
+    examples: [
+      'rds task plan --project demo --objective "实现导出功能并补测试"',
+      'rds task complete --task tsk_0123456789ab --evidence test:unit'
+    ]
+  },
+
+  handoff: {
+    usage: 'rds handoff <create|list> --task <id> [--to-role <R0-R7>]',
+    summary:
+      '交接包。只为下一角色编译最小上下文，不复制整段会话；' +
+      '摘要只来自已记录的任务事实，没有记录的字段留空数组，不自动编造。',
+    subcommands: [
+      ['create', '生成交接包（--task --to-role，可 --from-role）'],
+      ['list', '列出某任务的交接（--task）']
+    ],
+    args: [
+      ['--task <id>', '任务 ID'],
+      ['--to-role <R0-R7>', '下一角色'],
+      ['--from-role <R0-R7>', '上一角色（默认当前身份角色）'],
+      ['--budget <n>', '上下文预算']
+    ],
+    examples: ['rds handoff create --task tsk_0123456789ab --to-role R3']
+  },
+
+  cost: {
+    usage: 'rds cost <record|report> [选项]',
+    summary:
+      '成本账本。usage_source 必须是 estimated 或 provider；只有 provider 才允许记 actual_cost。' +
+      '没有价格数据时不会编造成本。',
+    subcommands: [
+      ['record', '记一条用量（--project --model --input --output ...）'],
+      ['report', '按项目汇总（--project）']
+    ],
+    args: [
+      ['--project <id>', '项目 ID'],
+      ['--task <id>', '任务 ID'],
+      ['--agent <id>', 'Agent 标识'],
+      ['--model <id>', '模型'],
+      ['--provider <name>', '供应商'],
+      ['--input <n>', '输入 token'],
+      ['--output <n>', '输出 token'],
+      ['--cached <n>', '缓存命中 token'],
+      ['--tools <n>', '工具调用次数'],
+      ['--source <estimated|provider>', '用量来源'],
+      ['--estimated-cost <n>', '估算成本'],
+      ['--actual-cost <n>', '实际成本（仅 provider）']
+    ],
+    examples: [
+      'rds cost record --project demo --model generic-128k --input 1200 --output 300 --source estimated',
+      'rds cost report --project demo'
+    ]
+  },
+
   help: {
     usage: 'rds help [命令]',
     summary: '不带参数打印顶层用法；带命令名打印该命令的详细说明。等价于 rds <命令> --help。',
@@ -345,10 +489,20 @@ MARS 记忆引擎
   stats                   项目统计
   audit                   查看审计记录
 
+项目与上下文
+  project                 create | register | list | show | use | current | remove
+  budget                 模型上下文预算（show | models）
+  context                 list | show | restore | analyze | compress
+
+协作与成本
+  role                    list | show（R0-R7 权限表）
+  task                    plan | create | list | show | assign | start | block | submit | verify | complete | fail
+  handoff                 create | list（为下一角色编译最小上下文）
+  cost                    record | report（估算与实际分开）
+
 集成与运维
   ledger                  解析会话 usage，生成 Token 账本
   mcp                     MCP 网关（默认禁用，需 --enable）
-  project                 register | list
   share                   create | approve | revoke | list
   orchestrate             plan | start | approve | feedback | status | suggest
 

@@ -2,7 +2,7 @@
 // 数据库结构与增量迁移（M3 / B5 从 db.js 拆出）。
 //
 // 只增不改：既有行的含义不变，不删数据、不重写数据。每一步都幂等，可在每次 open 时安全执行。
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 function initSchema(db) {
   db.exec(`
@@ -128,6 +128,110 @@ function initSchema(db) {
       updated_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_orch_project_status ON orchestrator_runs (project_id, status);
+
+    -- M9：上下文运行记录（每次 compile 一行，只记元数据与分节大小，不默认存正文）
+    CREATE TABLE IF NOT EXISTS context_runs (
+      run_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      task_id TEXT,
+      role_id TEXT,
+      agent_id TEXT,
+      model TEXT,
+      estimated_input_tokens INTEGER NOT NULL,
+      available_input_tokens INTEGER,
+      utilization_ratio REAL,
+      budget_status TEXT,
+      sections_json TEXT NOT NULL,
+      layers_json TEXT NOT NULL,
+      compression_id TEXT,
+      before_tokens INTEGER,
+      after_tokens INTEGER,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_ctx_runs_project ON context_runs (project_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_ctx_runs_task ON context_runs (task_id);
+
+    -- M10：压缩记录。原文必须留在这里，才能恢复与校验。
+    CREATE TABLE IF NOT EXISTS compressions (
+      compression_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      task_id TEXT,
+      role_id TEXT,
+      strategy TEXT NOT NULL,
+      original_hash TEXT NOT NULL,
+      compressed_hash TEXT NOT NULL,
+      before_tokens INTEGER NOT NULL,
+      after_tokens INTEGER NOT NULL,
+      original_json TEXT NOT NULL,
+      compressed_json TEXT NOT NULL,
+      validation_status TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_compressions_project ON compressions (project_id, created_at);
+
+    -- M11：任务状态机与事件
+    CREATE TABLE IF NOT EXISTS tasks (
+      task_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      parent_task_id TEXT,
+      title TEXT NOT NULL,
+      description TEXT,
+      acceptance_criteria TEXT,
+      assigned_role TEXT,
+      assigned_agent TEXT,
+      status TEXT NOT NULL,
+      priority INTEGER NOT NULL DEFAULT 3,
+      input_context_json TEXT,
+      output_refs_json TEXT,
+      failure_reason TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      completed_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_tasks_project_status ON tasks (project_id, status);
+    CREATE INDEX IF NOT EXISTS idx_tasks_parent ON tasks (parent_task_id);
+
+    CREATE TABLE IF NOT EXISTS task_events (
+      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id TEXT NOT NULL,
+      from_status TEXT,
+      to_status TEXT NOT NULL,
+      actor TEXT NOT NULL,
+      note TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_task_events_task ON task_events (task_id, event_id);
+
+    CREATE TABLE IF NOT EXISTS handoffs (
+      handoff_id TEXT PRIMARY KEY,
+      task_id TEXT NOT NULL,
+      from_role TEXT,
+      to_role TEXT NOT NULL,
+      packet_id TEXT,
+      summary_json TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_handoffs_task ON handoffs (task_id);
+
+    -- M11：成本账本。usage_source 必须区分 estimated / provider。
+    CREATE TABLE IF NOT EXISTS costs (
+      cost_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id TEXT NOT NULL,
+      task_id TEXT,
+      agent_id TEXT,
+      model TEXT,
+      provider TEXT,
+      input_tokens INTEGER,
+      output_tokens INTEGER,
+      cached_tokens INTEGER,
+      tool_calls INTEGER,
+      estimated_cost REAL,
+      actual_cost REAL,
+      usage_source TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_costs_project ON costs (project_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_costs_task ON costs (task_id);
   `);
   migrate(db);
   db.exec("CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(memory_id UNINDEXED, content, tokenize='unicode61')");
@@ -141,6 +245,18 @@ function migrate(db) {
   const cols = db.prepare("PRAGMA table_info('memories')").all().map((c) => c.name);
   if (!cols.includes('expires_at')) {
     db.exec('ALTER TABLE memories ADD COLUMN expires_at TEXT');
+  }
+  // M9：项目注册从「只有名字与策略」扩到「根目录 / 状态 / 配置 / 更新时间」。
+  // 只加列，不改既有行；老库升级后 root_path 为 NULL，读取时按未设置处理。
+  const projectCols = db.prepare("PRAGMA table_info('projects')").all().map((c) => c.name);
+  const additions = [
+    ['root_path', 'TEXT'],
+    ['status', "TEXT NOT NULL DEFAULT 'active'"],
+    ['config_json', 'TEXT'],
+    ['updated_at', 'TEXT']
+  ];
+  for (const [name, type] of additions) {
+    if (!projectCols.includes(name)) db.exec(`ALTER TABLE projects ADD COLUMN ${name} ${type}`);
   }
 }
 
