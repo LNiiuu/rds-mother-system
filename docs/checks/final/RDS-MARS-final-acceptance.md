@@ -254,6 +254,7 @@ ERROR rea 的代码根请用 --path <dir>；--root 是安装根（会改变安�
 | 分支 | `main` |
 | 本轮起点 | `61590c7` |
 | 本轮提交 | 6 个（见下表） |
+| 相对 origin/main | **领先 11，落后 0**（含 M7–M11 的 5 个未推送提交） |
 | 远程写操作 | **未执行** |
 | 历史 Tag | 20 个，未动 |
 
@@ -294,7 +295,7 @@ ERROR rea 的代码根请用 --path <dir>；--root 是安装根（会改变安�
 ### L.1 推送前检查（已做）
 
 ```bash
-git rev-list --left-right --count origin/main...main   # 0  6（本地领先 6，无落后）
+git rev-list --left-right --count origin/main...main   # 0  11（本地领先 11，无落后）
 git status --porcelain -uall                            # 仅 49 项受保护工作
 ```
 
