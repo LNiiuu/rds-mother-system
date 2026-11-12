@@ -8,6 +8,7 @@ const { loadPrincipals, authenticate, authorize } = require('./authz');
 const store = require('./store');
 const { retrieve } = require('./retrieval');
 const { compileContext } = require('./compiler');
+const { renderPacketMarkdown } = require('./render-md');
 const { restoreFragment } = require('./manifest');
 const sharing = require('./sharing');
 const { sha256, writeJsonAtomic } = require('./util');
@@ -145,20 +146,58 @@ function run(args) {
   }
 
   if (cmd === 'init-dev') {
-    const token = crypto.randomBytes(24).toString('hex');
     const out = path.resolve(args.out || p.principals);
-    const value = {
-      version: '0.1.0',
-      principals: [{
-        token_sha256: sha256(token),
-        principal_id: args.principal || 'dev-r0',
-        project_ids: (args.projects || 'demo').split(','),
-        roles: (args.roles || 'R0').split(','),
-        note: 'dev 本地身份；token 仅在创建时显示一次'
-      }]
-    };
-    writeJsonAtomic(out, value);
-    console.log('已创建 ' + out);
+    const add = args.add === true || args.add === '1';
+    const replace = args.replace === true || args.replace === '1';
+
+    // M8 / B1 数据安全：此前这里无条件 writeJsonAtomic，重复执行会把整个身份文件
+    // 换成「只有新 principal」的一份，既有 token 立即失效（M7-0 实测 6 → 1）。
+    // 现在的规则：
+    //   目标不存在 / principals 为空  → 创建（没有可丢的数据）
+    //   已有身份                      → 默认拒绝；--add 追加；--replace 显式重建
+    //   已存在但不是合法身份文档      → 默认拒绝；--replace 显式重建（不静默吞掉坏文件）
+    let document = { version: '0.1.0', principals: [] };
+    let existed = 0;
+    if (fs.existsSync(out)) {
+      let raw = null;
+      let readable = true;
+      try {
+        raw = JSON.parse(fs.readFileSync(out, 'utf8').replace(/^\uFEFF/, ''));
+      } catch (err) {
+        readable = false;
+      }
+      if (!readable || !raw || typeof raw !== 'object' || Array.isArray(raw) || !Array.isArray(raw.principals)) {
+        if (!replace) {
+          die(`拒绝覆盖身份文件（IDENTITY_EXISTS）：${out} 不是合法的 principals 文档。确认重建请加 --replace`, 1);
+        }
+      } else {
+        existed = raw.principals.length;
+        if (existed > 0 && !add && !replace) {
+          die(`拒绝覆盖身份文件（IDENTITY_EXISTS）：${out} 已有 ${existed} 个身份。追加请加 --add，重建请加 --replace`, 1);
+        }
+        if (!replace) document = { ...raw, principals: raw.principals.slice() };
+      }
+    }
+
+    const principal_id = args.principal || 'dev-r0';
+    if (!/^[A-Za-z0-9._-]+$/.test(principal_id)) {
+      die('principal_id 只允许字母、数字与 . _ -', 2);
+    }
+    if (document.principals.some((item) => item && item.principal_id === principal_id)) {
+      die(`身份已存在（IDENTITY_EXISTS）：${principal_id}。换一个 --principal，或先手动删除该条`, 1);
+    }
+
+    const token = crypto.randomBytes(24).toString('hex');
+    document.version = document.version || '0.1.0';
+    document.principals.push({
+      token_sha256: sha256(token),
+      principal_id,
+      project_ids: (args.projects || 'demo').split(','),
+      roles: (args.roles || 'R0').split(','),
+      note: 'dev 本地身份；token 仅在创建时显示一次'
+    });
+    writeJsonAtomic(out, document);
+    console.log(`已${existed > 0 ? '追加到' : '写入'} ${out}（共 ${document.principals.length} 个身份）`);
     console.log('DEV_TOKEN=' + token);
     console.log('提示：token 仅在本机命令中使用，不写入仓库；如泄漏删除该文件并重建。');
     return;
@@ -289,9 +328,26 @@ function run(args) {
       return;
     }
     if (cmd === 'compile') {
-      const task = args.task ? (fs.existsSync(args.task) && args.task.endsWith('.json')
-        ? JSON.parse(fs.readFileSync(path.resolve(args.task), 'utf8').replace(/^\uFEFF/, ''))
-        : { id: args.task, objective: args.objective || '', acceptance: args.acceptance ? String(args.acceptance).split('|') : [] }) : { id: 'T-UNKNOWN' };
+      // M8 / B2：--task-file 把任务正文带进包里；--task 仍兼容（ID 或 JSON 文件）。
+      let task;
+      const taskFile = args['task-file'] ? path.resolve(String(args['task-file'])) : null;
+      if (taskFile) {
+        if (!fs.existsSync(taskFile)) die('任务文件不存在: ' + taskFile + '（--task-file 指向 md/txt）', 2);
+        task = {
+          id: args.task || 'T-UNKNOWN',
+          objective: args.objective || '',
+          text: fs.readFileSync(taskFile, 'utf8'),
+          acceptance: args.acceptance ? String(args.acceptance).split('|') : []
+        };
+      } else if (args.task) {
+        task = fs.existsSync(args.task) && args.task.endsWith('.json')
+          ? JSON.parse(fs.readFileSync(path.resolve(args.task), 'utf8').replace(/^\uFEFF/, ''))
+          : { id: args.task, objective: args.objective || '', acceptance: args.acceptance ? String(args.acceptance).split('|') : [] };
+      } else {
+        task = { id: 'T-UNKNOWN' };
+      }
+      const format = args.format || 'json';
+      if (format !== 'json' && format !== 'md') die('--format 只支持 json 或 md', 2);
       const evidence = args.evidence ? String(args.evidence).split(',').map(ref => ({ ref, kind: 'file' })) : [];
       const result = compileContext(db, auth.principal, auth.routing, {
         project_id: args.project, task_id: task.id, role_id: role,
@@ -299,11 +355,34 @@ function run(args) {
         query: args.query, state: args.state, task, evidence,
         assets
       });
+      // M8 / B2：budget 只留摘要。此前这里把 budget.sections（与 packet.sections 同内容）
+      // 再序列化一遍，是文件体积翻倍的主因之一。需要分节内容请看 packet.sections。
+      const budgetSummary = {
+        tokens: result.budget.tokens,
+        truncated: result.budget.truncated,
+        protected_kept: result.budget.protected_kept,
+        over_budget: result.budget.over_budget
+      };
+      if (format === 'md') {
+        const body = renderPacketMarkdown(result.packet);
+        if (args.out) {
+          const out = path.resolve(args.out);
+          fs.mkdirSync(path.dirname(out), { recursive: true });
+          fs.writeFileSync(out, body);
+          console.log('已写出 ' + out + ' format=md tokens=' + result.packet.tokens_estimated + '/' + result.packet.token_budget + ' bytes=' + Buffer.byteLength(body));
+        } else {
+          process.stdout.write(body.endsWith('\n') ? body : body + '\n');
+        }
+        return;
+      }
       if (args.out) {
         const out = path.resolve(args.out);
         fs.mkdirSync(path.dirname(out), { recursive: true });
-        fs.writeFileSync(out, JSON.stringify({ packet: result.packet, manifest: result.manifest, budget: result.budget }, null, 2));
-        console.log('已写出 ' + out + ' tokens=' + result.packet.tokens_estimated + '/' + result.packet.token_budget);
+        const bundle = args['no-manifest'] === true
+          ? { packet: result.packet, budget: budgetSummary }
+          : { packet: result.packet, manifest: result.manifest, budget: budgetSummary };
+        fs.writeFileSync(out, JSON.stringify(bundle, null, 2));
+        console.log('已写出 ' + out + ' format=json tokens=' + result.packet.tokens_estimated + '/' + result.packet.token_budget);
       } else {
         console.log(JSON.stringify(result.packet, null, 2));
       }

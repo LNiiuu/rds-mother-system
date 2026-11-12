@@ -55,17 +55,23 @@ const TOPICS = {
   },
 
   'init-dev': {
-    usage: 'rds init-dev [--principal <id>] [--projects <a,b>] [--roles <R0,R4>] [--out <path>]',
+    usage: 'rds init-dev [--principal <id>] [--projects <a,b>] [--roles <R0,R4>] [--out <path>] [--add | --replace]',
     summary:
       '生成一个开发身份，token 只显示一次。文件里只写 token 的 SHA-256，不写明文。' +
-      '注意：本命令会**整个覆盖**目标身份文件；已有其他身份时不要直接重复执行。',
+      '默认**不会覆盖**已有身份：目标已存在且有 principal 时直接拒绝；' +
+      '追加用 --add（原有 token 继续有效），重建用 --replace（原有 token 全部失效）。',
     args: [
       ['--principal <id>', 'principal_id，默认 dev-r0'],
       ['--projects <a,b>', '可访问的项目 ID，逗号分隔，默认 demo'],
       ['--roles <R0,R4>', '角色，逗号分隔，默认 R0。审批需要 R4 或 R0'],
-      ['--out <path>', '写出路径，默认 <安装根>/mars/config/principals.json']
+      ['--out <path>', '写出路径，默认 <安装根>/mars/config/principals.json'],
+      ['--add', '追加一个身份，保留文件里已有身份与 token'],
+      ['--replace', '显式重建整个文件；已有 token 会全部失效（破坏性，需明确使用）']
     ],
-    examples: ['rds init-dev --principal dev-r0 --projects demo --roles R0,R4']
+    examples: [
+      'rds init-dev --principal dev-r0 --projects demo --roles R0',
+      'rds init-dev --principal dev-r4 --projects demo --roles R4 --add'
+    ]
   },
 
   put: {
@@ -158,23 +164,28 @@ const TOPICS = {
   },
 
   compile: {
-    usage: 'rds compile --project <id> --task <id|文件> [--role <R0-R7>] [--budget <n>] [--out <文件>]',
+    usage: 'rds compile --project <id> --task <id> [--task-file <md|txt>] [--role <R0-R7>] [--budget <n>] [--format json|md] [--out <文件>]',
     summary:
-      '按角色与预算编译上下文包。产物含 packet（分节内容）、manifest（片段来源与哈希）、budget（裁剪记录）。' +
+      '按角色与预算编译上下文包。--task-file 会把任务正文原样放进包内（M8 起推荐用法）；' +
+      '--format md 输出易读的精简格式，--format json（默认）保持原有 packet 结构。' +
       '受保护小节在预算不足时不会被裁掉，只会标记 over_budget。',
     args: [
       ['--project <id>', '项目 ID（必填）'],
       ['--task <id|文件>', '任务 ID；传 .json 文件路径时读取任务卡'],
+      ['--task-file <路径>', '任务正文（md/txt），原样写入 sec_task；解决「包不含任务正文」'],
       ['--objective <文本>', '任务目标（--task 传 ID 时可用）'],
       ['--acceptance <a|b>', '验收标准，竖线分隔'],
       ['--evidence <a,b>', '证据引用，逗号分隔'],
       ['--budget <n>', 'Token 预算上限'],
       ['--query <文本>', '附加检索词'],
       ['--state <s>', '任务状态'],
-      ['--out <文件>', '写出 JSON；省略则打印到 stdout'],
+      ['--format <json|md>', '输出格式，默认 json'],
+      ['--no-manifest', 'JSON 写出时省略 manifest（manifest_id 仍在 packet 中，DB 可追溯）'],
+      ['--out <文件>', '写出文件；省略则打印到 stdout'],
       ['--role <R0-R7>', '以哪个角色编译']
     ],
     examples: [
+      'rds compile --project demo --task T-001 --task-file ./TASK.md --role R0 --budget 4000 --format md --out ./packet.md',
       'rds compile --project demo --task T-001 --role R0 --budget 4000 --out ./packet.json'
     ]
   },

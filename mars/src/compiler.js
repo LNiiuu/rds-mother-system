@@ -44,6 +44,10 @@ function compileContext(db, principal, routing, params) {
   const sections = [];
   const missing = [];
 
+  // M8 / B2：任务正文是「包能不能自足」的关键。M7 实测 sec_task 只有「任务: ID」，
+  // 执行者仍必须去读原始任务书，包的价值被抵消。这里接受 task.text / task.body /
+  // task.content 三种写法（--task-file 会填到 text），并原样放进 sec_task。
+  const taskText = String(task.text || task.body || task.content || '').trim();
   sections.push({
     id: 'sec_task',
     title: '任务要求',
@@ -51,12 +55,20 @@ function compileContext(db, principal, routing, params) {
     content: [
       `任务: ${task.id || params.task_id || 'UNKNOWN'}`,
       task.objective ? `目标: ${task.objective}` : null,
+      taskText ? '任务正文:\n' + taskText : null,
       Array.isArray(task.acceptance) && task.acceptance.length ? '验收标准:\n' + task.acceptance.map(a => '- ' + a).join('\n') : null,
       Array.isArray(task.scope) && task.scope.length ? '范围: ' + task.scope.join(', ') : null
     ].filter(Boolean).join('\n'),
     token_estimate: 0,
     source_refs: [task.source_ref || 'task-card:' + (task.id || 'unknown')]
   });
+  if (!taskText) {
+    missing.push({
+      kind: 'task_text',
+      description: '未提供任务正文（可用 --task-file <路径>）；包内只有任务标识与目标',
+      blocking: false
+    });
+  }
 
   if (params.state) {
     sections.push({ id: 'sec_state', title: '当前状态', kind: 'state', content: String(params.state), token_estimate: 0, source_refs: ['state:current'] });

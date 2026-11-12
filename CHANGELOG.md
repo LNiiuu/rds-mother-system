@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## Unreleased — M8 最小可用
+
+目标：按 M7 的实测发现，修掉数据安全问题与上下文包的三个结构缺陷，使核心流程可独立使用。
+不新增 AI 接入、不引入向量库、不做大规模重构。
+
+数据安全（**行为变更，默认更安全**）
+- `rds init-dev` **默认拒绝覆盖已有身份**：目标已有 principal 时直接失败（`IDENTITY_EXISTS`），
+  文件逐字节不变，旧 token 继续有效
+- 新增 `--add`：追加一个身份，保留原有 token；新增 `--replace`：显式重建，旧 token 全部失效
+- 坏文件（非 JSON / 非 principals 文档）同样默认拒绝，只有 `--replace` 才重建
+- 兼容性影响：依赖「重复执行 init-dev 来重置身份」的脚本会失败，需改用 `--replace`。
+  首次初始化（文件不存在或 principals 为空）行为不变
+
+上下文包（**对外输出变更**）
+- 新增 `rds compile --task-file <md|txt>`：任务正文原样写入 `sec_task`，
+  包不再只有「任务: ID」；缺正文时给出非阻塞的 `task_text` 缺失项
+- 新增 `--format md`：输出精简 Markdown（元信息表 + 分节正文 + 缺失项），
+  内容不改写、不截断；`--format json` 仍是默认
+- 新增 `--no-manifest`：JSON 写出时省略 manifest；`manifest_id` 仍在 packet 中，DB 可追溯
+- **`--out` 的 `budget` 不再包含 `sections`**（此前与 `packet.sections` 完全重复），
+  只保留 `tokens / truncated / protected_kept / over_budget`
+- 兼容性影响：读取 `<out>.budget.sections` 的调用方需改用 `packet.sections`。
+  默认 stdout 输出仍是 packet 本体，未变
+- 新增 `mars/src/render-md.js`，已登记进 `approved-additions.packFiles`
+- 实测（M7 项目同一份记忆）：同内容 JSON 11 101 B → 8 074 B（−27.3%）；
+  带任务正文的 Markdown 6 589 B，替代「旧包 + 任务书」的 15 332 B（−57.0%）
+- 编译耗时不退化：中位 368 ms → 374 ms（JSON）/ 369 ms（Markdown），差异在 Node 启动抖动内
+
+测试
+- 196 → **210**（新增 7 例身份数据保护、7 例上下文包格式）
+
 ## Unreleased — M5 可发现性
 
 目标：让一个没参与过 M1–M4 的人，仅凭仓库里的正式文档就能理解、安装、启动、使用、排查和维护。

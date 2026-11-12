@@ -25,7 +25,8 @@
     "mars/src/ports/session-source.js",
     "mars/src/session-registry.js",
     "mars/src/version.js",
-    "mars/src/cli-help.js"
+    "mars/src/cli-help.js",
+    "mars/src/render-md.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -48,7 +49,8 @@
     "mars/src/db/schema.js": "B5：建表与增量迁移，从 db.js 拆出（DDL 逐字节一致）",
     "mars/src/db/stats.js": "B5：统计查询，从 db.js 拆出",
     "mars/src/version.js": "M4 / B4：产品版本的单一读取点（serverInfo.version 不再硬编码 0.2.0）",
-    "mars/src/cli-help.js": "M5 / B3：CLI 帮助文本的唯一真相。此前 bin/rds.mjs 与 cli.js 各写一份且已分叉（简版漏了 orchestrate）"
+    "mars/src/cli-help.js": "M5 / B3：CLI 帮助文本的唯一真相。此前 bin/rds.mjs 与 cli.js 各写一份且已分叉（简版漏了 orchestrate）",
+    "mars/src/render-md.js": "M8 / B2：上下文包的 Markdown 渲染器。与 compiler 分离，便于单独测试与替换；不进任何数据契约"
   },
   "helpText": {
     "sha256": "66142b59518484581a8de443d60d91a055e3b05e2e0f63027b7c4198c591d234",
