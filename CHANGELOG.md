@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## Unreleased — M9–M11 上下文基础设施与协作
+
+新增
+- `rds project create|show|use|current|remove`：项目根 resolve + realpath；删除是软删除
+  （只改 status，不删源码与记忆），必须 `--confirm <project_id>`
+- `rds budget show|models`：模型窗口/输出/系统/工具/安全余量/可用输入/使用率/5 档状态
+- `rds context list|show|restore|analyze|compress`：编译监控、压缩与原文恢复（SHA-256）
+- `rds role list|show`：R0–R7 权限表（代码校验，不是进程沙箱；R7 无 push）
+- `rds task plan|create|list|show|events|assign|start|block|submit|verify|complete|fail`：
+  11 态状态机、事件表、complete 必须 `--evidence`
+- `rds handoff create|list`：为下一角色编译最小上下文
+- `rds cost record|report`：estimated / provider 分离，只有 provider 可记 actual_cost
+- `npm run demo:m9-m11`：双项目 + 模拟角色演示（`simulated=true`）
+
+变更（需要知道）
+- **Schema 4 → 5**：只加表（context_runs / compressions / tasks / task_events / handoffs / costs）
+  与 projects 的 4 个列；`migrate()` 幂等，旧数据不改写
+- `rds compile` 新增 `--auto-compress` / `--model`；每次编译写一条 `context_runs`
+- 项目根参数是 `--project-root`；`--root` 仍是安装根（避免语义冲突）
+- `--role` 仍是当前执行角色；`task assign/plan/create` 的目标角色用 `--to-role`
+
+未实现（不提供空壳）
+- 语义摘要（模型生成）、摘要过期判断、重试/超时/心跳、真实多 Agent 执行、
+  进程级隔离、项目级 ACL、`project use` 自动生效
+
 ## Unreleased — M8 最小可用
 
 目标：按 M7 的实测发现，修掉数据安全问题与上下文包的三个结构缺陷，使核心流程可独立使用。

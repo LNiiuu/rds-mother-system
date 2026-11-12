@@ -1,0 +1,65 @@
+{
+  "simulated": true,
+  "note": "角色由同一进程顺序模拟，不是真实多模型协作",
+  "steps": [
+    {
+      "step": "project.create",
+      "a": "proj-a",
+      "b": "proj-b"
+    },
+    {
+      "step": "context.compile.isolation",
+      "a_tokens": 245,
+      "b_tokens": 245,
+      "a_has_a": true,
+      "a_has_b": false,
+      "b_has_b": true,
+      "b_has_a": false
+    },
+    {
+      "step": "context.compress",
+      "before_tokens": 806,
+      "after_tokens": 264,
+      "validation": "VALID",
+      "restored_sections": 4,
+      "restored_hash_ok": true
+    },
+    {
+      "step": "task.plan",
+      "parent": "tsk_a14b09f1b0f9",
+      "roles": [
+        "R2",
+        "R3"
+      ],
+      "needs_review": false
+    },
+    {
+      "step": "task.state_machine",
+      "status": "COMPLETED",
+      "events": 6
+    },
+    {
+      "step": "handoff",
+      "to_role": "R3",
+      "packet": "pkt_869efa2c01a7",
+      "tokens": 184
+    },
+    {
+      "step": "cost.report",
+      "rows": 2,
+      "input": 1800,
+      "top_task": "tsk_2f787654264b"
+    },
+    {
+      "step": "audit",
+      "entries": 20
+    },
+    {
+      "step": "isolation.final",
+      "a_memories": 1,
+      "b_memories": 1,
+      "tasks_in_b": 0
+    }
+  ],
+  "ok": true
+}

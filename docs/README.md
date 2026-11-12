@@ -28,7 +28,7 @@
 ### 我想核对它是否可信
 
 1. [docs/checks/README.md](checks/README.md) —— 全部验收证据的索引（按里程碑分组，标注结论与生效范围）
-2. [docs/checks/productization/](checks/productization/) —— M1–M8 各阶段的验收报告
+2. [docs/checks/productization/](checks/productization/) —— M1–M11 各阶段的验收报告
 3. [docs/architecture/m3/baseline/](architecture/m3/baseline/) —— 7 个对外面的行为基线快照，`npm run baseline` 每次都会比对
 
 ---
@@ -94,6 +94,7 @@
 
 | 范围 | 位置 |
 |---|---|
+| M9–M11 验收 | [checks/productization/M9-M11-final-acceptance.md](checks/productization/M9-M11-final-acceptance.md)（三个里程碑封版见同目录 M9/M10/M11-closure） |
 | M8 验收 | [checks/productization/M8-final-acceptance.md](checks/productization/M8-final-acceptance.md)（实施/对比/端到端见同目录 M8-*） |
 | M7 结论 | [checks/productization/M7-final-report.md](checks/productization/M7-final-report.md)（实验记录与方案为 M7-1/M7-2/M7-3） |
 | M6 收尾 | [checks/productization/M6-closure.md](checks/productization/M6-closure.md)（验收报告为 [M6-macos-acceptance.md](checks/productization/M6-macos-acceptance.md)） |

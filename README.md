@@ -109,7 +109,10 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **210 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2；M8 起工作区与干净克隆各跑一遍） | E1 |
+| 测试 | **228 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2；工作区与干净克隆各跑一遍） | E1 |
+| 多项目与上下文预算 | `project create|show|remove`、`budget show`、`context list|restore`；项目隔离 5 例、回退/恢复 7 例 | E1 |
+| 上下文压缩 | 确定性去重/折叠/L3 归档；演示样本 806 → 264 tokens（67.2%），L0 100% 保留，原文可恢复 | E1 |
+| 多 Agent 协作基础 | `role` / `task`（11 态）/ `handoff` / `cost`；调度把「实现+测试」拆成 R2/R3 | E1 |
 | CI（Windows + Ubuntu × Node 22/24 + macOS） | **7 个 job 全绿**：[run 43051690255](https://github.com/LNiiuu/rds-mother-system/actions/runs/43051690255)，1m06s（2026-11-11）。M8 改动尚未推送，暂无对应 CI | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）。Intel Mac 与其他 macOS 版本未覆盖 | E1 |
@@ -121,7 +124,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 
 未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。
 
-测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 210/210**。
+测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 228/228**。
 `npm test` 走门禁 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0`；
 缺 fixture 或静默 skip 会让门禁失败，而不是显示绿灯。分类与运行方式见 [docs/testing.md](docs/testing.md)。
 

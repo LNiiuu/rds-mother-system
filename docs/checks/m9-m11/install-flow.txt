@@ -1,0 +1,12 @@
+version=0.1.0
+status: ok  (fail=0 warn=0 checks=11)
+init=0
+init-dev=0
+project=0
+budget=CRITICAL
+role_r7=NO_PUSH
+plan=0
+roles=R2,R3
+compile=0
+packet_bytes=933
+runs=1

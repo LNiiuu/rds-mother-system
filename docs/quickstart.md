@@ -266,7 +266,47 @@ rds compile --project demo --task T-001 --role R0 --budget 4000 --out ./packet.j
 
 ---
 
-## 11. 下一步
+## 11. 多项目、压缩与协作（M9–M11）
+
+这些命令都已在 Windows 实机跑通；`--role` 是**当前执行角色**，指派目标用 `--to-role`。
+
+```bash
+# 项目：根目录会 resolve + realpath；删除是软删除，必须 --confirm
+rds project create --project demo --name "Demo" --project-root ./demo
+rds project show --project demo
+rds project use --project demo          # 只写指针，命令仍要 --project
+rds project remove --project demo --confirm demo
+
+# 预算：估算方法会写在输出里，不是 provider 实际用量
+rds budget show --model generic-32k --tokens 20000
+
+# 编译 + 超预算自动压缩（≥85% 触发；L0 不改，原文可恢复）
+rds compile --project demo --task T-1 --task-file ./TASK.md --role R0 \
+  --budget 1200 --auto-compress --model generic-32k --out ./packet.json
+rds context list --project demo
+rds context restore --compression <cmp_id>
+
+# 任务：确定性拆分（实现+测试 → R2 + R3）
+rds task plan --project demo --objective "实现导出功能并补测试"
+rds task assign --task <tsk_id> --to-role R2 --agent agent-r2
+rds task start --task <tsk_id>
+rds task submit --task <tsk_id>
+rds task verify --task <tsk_id>
+rds task complete --task <tsk_id> --evidence test:unit,file:report.md
+rds task events --task <tsk_id>
+
+# 交接：只为下一角色编译最小上下文
+rds handoff create --task <tsk_id> --to-role R3
+
+# 成本：estimated 与 provider 必须分开；只有 provider 能记 actual_cost
+rds cost record --project demo --model generic-32k --input 1200 --output 300 --source estimated
+rds cost report --project demo
+```
+
+> **能力边界**：R0–R7 是代码校验，不是进程沙箱；R7 没有 push 权限。
+> `npm run demo:m9-m11` 是同进程模拟演示（`simulated=true`），不是真实多模型协作。
+
+## 12. 下一步
 
 | 想做什么 | 去哪 |
 |---|---|

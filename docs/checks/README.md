@@ -141,6 +141,20 @@
 > 唯一未闭环的验收项是 **CI**——M8 改动未推送，CI 无法运行，不得记为通过。
 > 原始数据在 [m8/](m8/)。
 
+### M9–M11：上下文基础设施、压缩与多 Agent 协作（2026-11-12）
+
+| 文档 | 内容 |
+|---|---|
+| [../m9/M9-0-baseline.md](m9/M9-0-baseline.md) | M9 开工前的 Git/测试/架构/风险基线 |
+| [productization/M9-closure.md](productization/M9-closure.md) | 多项目、路径安全、预算、监控、分层；5 项隔离测试 |
+| [productization/M10-closure.md](productization/M10-closure.md) | 确定性压缩（去重/折叠/归档）、恢复与哈希校验；语义摘要未做 |
+| [productization/M11-closure.md](productization/M11-closure.md) | R0–R7、11 态任务机、调度拆分、交接、成本账本；多 Agent 为模拟 |
+| [productization/M9-M11-final-acceptance.md](productization/M9-M11-final-acceptance.md) | **总验收**：A–H 八节，含 Git 状态与 GitHub 提交准备 |
+| [m9-m11/demo.json](m9-m11/demo.json) | 双项目 + 模拟角色演示的原始 JSON（`simulated: true`） |
+
+> 总判定 **COMPLETED WITH WARNINGS**：CI 未运行；Linux/macOS 未跑本轮；
+> 真实模型对照 NOT RUN；语义摘要未实现。不得把这些写成通过。
+
 ---
 
 ## 2. 旧遗留清单的现状
