@@ -1,0 +1,6 @@
+﻿id,date,amount,currency,category,merchant
+t1,2026-01-03,100.00,CNY,food,shopA
+t2,2026-01-05,50.50,CNY,transport,metro
+t1,2026-01-09,999.00,CNY,food,dup-should-be-ignored
+t3,2026-01-15,-20.00,USD,food,shopB
+t4,2026-01-31,30.00,EUR,books,storeC

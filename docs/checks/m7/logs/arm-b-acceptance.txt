@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: A1 默认聚合：rows 与 stats 精确
+ok 1 - A1 默认聚合：rows 与 stats 精确
+  ---
+  duration_ms: 87.0338
+  type: 'test'
+  ...
+# Subtest: A2 行级错误：三类错误、按 file/line 升序
+ok 2 - A2 行级错误：三类错误、按 file/line 升序
+  ---
+  duration_ms: 83.6248
+  type: 'test'
+  ...
+# Subtest: A3 去重：同 id 保留第一条，其余只计数
+ok 3 - A3 去重：同 id 保留第一条，其余只计数
+  ---
+  duration_ms: 84.0925
+  type: 'test'
+  ...
+# Subtest: A4 排序：month 升序、再按分组键码点升序
+ok 4 - A4 排序：month 升序、再按分组键码点升序
+  ---
+  duration_ms: 86.3235
+  type: 'test'
+  ...
+# Subtest: A5 过滤：since/until 闭区间，stats 不受过滤影响
+ok 5 - A5 过滤：since/until 闭区间，stats 不受过滤影响
+  ---
+  duration_ms: 84.9988
+  type: 'test'
+  ...
+# Subtest: A6 --top：每月按 abs(total) 取前 N
+ok 6 - A6 --top：每月按 abs(total) 取前 N
+  ---
+  duration_ms: 82.0352
+  type: 'test'
+  ...
+# Subtest: A7 CSV：表头、整数分、末尾换行
+ok 7 - A7 CSV：表头、整数分、末尾换行
+  ---
+  duration_ms: 87.6489
+  type: 'test'
+  ...
+# Subtest: A8 --out：写文件、stdout 不输出、内容与 stdout 模式一致
+ok 8 - A8 --out：写文件、stdout 不输出、内容与 stdout 模式一致
+  ---
+  duration_ms: 163.6715
+  type: 'test'
+  ...
+# Subtest: A9 幂等：重复运行逐字节一致
+ok 9 - A9 幂等：重复运行逐字节一致
+  ---
+  duration_ms: 170.8934
+  type: 'test'
+  ...
+# Subtest: A10 --dry-run：只输出计数，不写文件
+ok 10 - A10 --dry-run：只输出计数，不写文件
+  ---
+  duration_ms: 84.4879
+  type: 'test'
+  ...
+# Subtest: A11 参数错误：--top 0 / --since 非法 / 无输入文件
+ok 11 - A11 参数错误：--top 0 / --since 非法 / 无输入文件
+  ---
+  duration_ms: 240.7418
+  type: 'test'
+  ...
+# Subtest: A12 未知扩展名 → E_FORMAT；文件缺失 → E_FILE
+ok 12 - A12 未知扩展名 → E_FORMAT；文件缺失 → E_FILE
+  ---
+  duration_ms: 160.2599
+  type: 'test'
+  ...
+# Subtest: C1 CR1：--group-by currency 的 JSON 与 CSV 表头
+ok 13 - C1 CR1：--group-by currency 的 JSON 与 CSV 表头
+  ---
+  duration_ms: 160.1017
+  type: 'test'
+  ...
+# Subtest: C2 CR1：--group-by 非法值 → E_ARGS
+ok 14 - C2 CR1：--group-by 非法值 → E_ARGS
+  ---
+  duration_ms: 81.6067
+  type: 'test'
+  ...
+# Subtest: C3 CR2：带基准汇率 + 非 CNY 目标
+ok 15 - C3 CR2：带基准汇率 + 非 CNY 目标
+  ---
+  duration_ms: 82.0948
+  type: 'test'
+  ...
+# Subtest: C4 CR2：扁平格式下非 CNY 目标仍被拒
+ok 16 - C4 CR2：扁平格式下非 CNY 目标仍被拒
+  ---
+  duration_ms: 77.7853
+  type: 'test'
+  ...
+# Subtest: C5 CR2：rates[base] != 1 → E_RATES
+ok 17 - C5 CR2：rates[base] != 1 → E_RATES
+  ---
+  duration_ms: 77.16
+  type: 'test'
+  ...
+# Subtest: C6 CR2：S == T 走同一路径；base 文件 target CNY 与扁平格式结果一致
+ok 18 - C6 CR2：S == T 走同一路径；base 文件 target CNY 与扁平格式结果一致
+  ---
+  duration_ms: 166.5041
+  type: 'test'
+  ...
+# Subtest: C7 CR2：舍入为四舍五入、负数远离零
+ok 19 - C7 CR2：舍入为四舍五入、负数远离零
+  ---
+  duration_ms: 83.6542
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2247.6292

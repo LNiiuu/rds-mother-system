@@ -1,0 +1,65 @@
+{
+  "A": {
+    "wall_seconds": 557,
+    "model_calls": 17,
+    "tokens": {
+      "prompt": 3617741,
+      "completion": 14220,
+      "total": 3631961,
+      "cache_hit": 3357696,
+      "cache_miss": 260045,
+      "incremental_prompt": 20556
+    },
+    "by_tool": {
+      "Read": 3,
+      "Write": 6,
+      "Bash": 6,
+      "Edit": 2
+    },
+    "reads": {
+      "total": 3,
+      "distinct": 3,
+      "repeated": 0,
+      "repeat_rate": 0,
+      "files": [
+        "spec/TASK.md",
+        "spec/CR1.md",
+        "spec/CR2.md"
+      ]
+    },
+    "output_bytes": 14267,
+    "failed_commands": 0,
+    "failures": []
+  },
+  "B": {
+    "wall_seconds": 134,
+    "model_calls": 20,
+    "tokens": {
+      "prompt": 5450557,
+      "completion": 12452,
+      "total": 5463009,
+      "cache_hit": 5437312,
+      "cache_miss": 13245,
+      "incremental_prompt": 22055
+    },
+    "by_tool": {
+      "Bash": 11,
+      "Read": 2,
+      "Write": 4,
+      "Edit": 3
+    },
+    "reads": {
+      "total": 2,
+      "distinct": 2,
+      "repeated": 0,
+      "repeat_rate": 0,
+      "files": [
+        "mars-data/packet-v1.json",
+        "spec/TASK.md"
+      ]
+    },
+    "output_bytes": 31164,
+    "failed_commands": 0,
+    "failures": []
+  }
+}

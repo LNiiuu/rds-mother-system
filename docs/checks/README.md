@@ -115,6 +115,19 @@
 
 > M6 与 M5 并列，不是 M5 的一部分。M5 的验收范围明确不含 macOS（见 [M5-closure.md](productization/M5-closure.md) §4.2）。
 
+### M7：真实长任务验证与价值评估（2026-11-12）
+
+| 文档 | 内容 |
+|---|---|
+| [productization/M7-0-baseline.md](productization/M7-0-baseline.md) | M7-0 基线：Git/工作区/测试/封版核实，真实能力与设计设想的划分，探针发现的 4 个问题 |
+| [productization/M7-1-protocol.md](productization/M7-1-protocol.md) | M7-1 预注册方案：假设、A/B 定义、9 项指标口径、验收阈值、7 条混杂因素 |
+| [productization/M7-2-experiment-record.md](productization/M7-2-experiment-record.md) | M7-2 原始记录：两组时间线、MARS 拓扑、真实 token/字节/读取数据、V1–V5 合规检查 |
+| [productization/M7-3-analysis.md](productization/M7-3-analysis.md) | M7-3 分析：逐指标对比、协调成本拆解、7 个问题逐条回答、判定 H0 |
+| [productization/M7-final-report.md](productization/M7-final-report.md) | **M7 最终报告**：阶段 COMPLETED / 假设 NOT SUPPORTED，六个问题的回答与 P0–P2 建议 |
+
+> M7 的结论是**负向**的（未证明 MARS 有可测价值），不是「未完成」。
+> 实验按预注册完成，四个预注册哈希执行前后一致；结论的局限写在最终报告 §3。
+
 ---
 
 ## 2. 旧遗留清单的现状
