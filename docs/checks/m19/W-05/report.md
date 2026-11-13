@@ -33,6 +33,28 @@
 
 ClientHello 0 个；只识别握手类型；未解析 SNI，也未解密任何内容
 
+## TShark 交叉核验
+
+- 版本：TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+- 退出码：0；包数：4
+
+```text
+
+===================================================================
+Protocol Hierarchy Statistics
+Filter: 
+
+frame                                    frames:4 bytes:428
+  eth                                    frames:4 bytes:428
+    ip                                   frames:4 bytes:428
+      udp                                frames:2 bytes:240
+        dns                              frames:2 bytes:240
+      tcp                                frames:2 bytes:188
+        http                             frames:1 bytes:134
+===================================================================
+
+```
+
 ## 启发式
 
 - **dns-long-label**（medium，2 条）：DNS 标签 > 40 字符或全名 > 50 字符，是 DNS 隧道/数据外带的常见特征（也可能只是 CDN 或反病毒域名）

@@ -16,6 +16,7 @@ samples/
 # 日志、缓存、临时
 *.log
 !docs/checks/m19/*/execution.log
+!docs/checks/m21/download-failure.log
 *.tmp
 .cache/
 tmp/

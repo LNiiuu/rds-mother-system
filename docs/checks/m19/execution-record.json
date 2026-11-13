@@ -1,6 +1,6 @@
 {
   "demo": "m19",
-  "generated_at": "2026-11-13T14:49:02.031Z",
+  "generated_at": "2026-11-13T16:16:56.073Z",
   "environment": {
     "platform": "win32",
     "arch": "x64",
@@ -118,9 +118,9 @@
     {
       "name": "tshark",
       "label": "Wireshark tshark",
-      "present": false,
-      "path": null,
-      "version": null,
+      "present": true,
+      "path": "<TOOL_HOME>/tshark.exe",
+      "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
       "capabilities": [
         "pcap read",
         "protocol hierarchy",
@@ -128,14 +128,8 @@
         "dns/http fields"
       ],
       "safety": "read-only capture; no live interface by default",
-      "bins": [
-        {
-          "name": "tshark",
-          "present": false,
-          "path": null,
-          "version": null
-        }
-      ]
+      "source": "MARS_TSHARK_PATH",
+      "probe_ok": true
     },
     {
       "name": "frida",
@@ -189,7 +183,7 @@
     {
       "workflow_id": "W-01",
       "status": "PARTIAL",
-      "rea_run_id": "rea1b2731851d33",
+      "rea_run_id": "rea7ebda3274521",
       "evidence_dir": "docs/checks/m19/W-01",
       "sample": null,
       "tool_versions": [
@@ -230,10 +224,10 @@
     {
       "workflow_id": "W-02",
       "status": "PARTIAL",
-      "rea_run_id": "rea4709ca794e69",
+      "rea_run_id": "rea69f1a7fe004f",
       "evidence_dir": "docs/checks/m19/W-02",
       "sample": {
-        "path": "C:\\Windows\\System32\\where.exe",
+        "path": "C:\\WINDOWS\\System32\\where.exe",
         "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
         "bytes": 65536,
         "kind": "authorized-local-file"
@@ -272,7 +266,7 @@
           {
             "check": "sample 存在且是文件",
             "ok": true,
-            "detail": "C:\\Windows\\System32\\where.exe"
+            "detail": "C:\\WINDOWS\\System32\\where.exe"
           }
         ],
         "blocked_reason": null,
@@ -313,7 +307,7 @@
     {
       "workflow_id": "W-03",
       "status": "BLOCKED",
-      "rea_run_id": "reae9f51f0e3cb4",
+      "rea_run_id": "rea0b92eae5f863",
       "evidence_dir": "docs/checks/m19/W-03",
       "sample": {
         "path": "<TEMP>\\synthetic.apk",
@@ -387,10 +381,10 @@
     {
       "workflow_id": "W-04",
       "status": "PARTIAL",
-      "rea_run_id": "reaab81a124cfa9",
+      "rea_run_id": "rea70a56916b7d8",
       "evidence_dir": "docs/checks/m19/W-04",
       "sample": {
-        "path": "C:\\Windows\\System32\\where.exe",
+        "path": "C:\\WINDOWS\\System32\\where.exe",
         "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
         "bytes": 65536
       },
@@ -417,7 +411,7 @@
           {
             "check": "sample 存在",
             "ok": true,
-            "detail": "C:\\Windows\\System32\\where.exe"
+            "detail": "C:\\WINDOWS\\System32\\where.exe"
           }
         ],
         "blocked_reason": null,
@@ -435,7 +429,7 @@
     {
       "workflow_id": "W-05",
       "status": "PARTIAL",
-      "rea_run_id": "rea2c90977a7fe0",
+      "rea_run_id": "reabe0ec91b71ff",
       "evidence_dir": "docs/checks/m19/W-05",
       "sample": {
         "path": "<TEMP>\\synthetic.pcap",
@@ -448,6 +442,11 @@
           "name": "rea-pcap-parser",
           "version": "1.0.0",
           "kind": "builtin"
+        },
+        {
+          "name": "tshark",
+          "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
+          "kind": "external"
         }
       ],
       "limitations": [
@@ -475,17 +474,17 @@
           },
           {
             "check": "tshark 可用（可选，用于交叉核验）",
-            "ok": false,
-            "detail": "未安装；使用内置纯 JS libpcap 解析"
+            "ok": true,
+            "detail": "<TOOL_HOME>/tshark.exe (TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).)"
           }
         ],
         "tools": {
           "tshark": {
             "name": "tshark",
             "label": "Wireshark tshark",
-            "present": false,
-            "path": null,
-            "version": null,
+            "present": true,
+            "path": "<TOOL_HOME>/tshark.exe",
+            "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
             "capabilities": [
               "pcap read",
               "protocol hierarchy",
@@ -493,14 +492,8 @@
               "dns/http fields"
             ],
             "safety": "read-only capture; no live interface by default",
-            "bins": [
-              {
-                "name": "tshark",
-                "present": false,
-                "path": null,
-                "version": null
-              }
-            ]
+            "source": "MARS_TSHARK_PATH",
+            "probe_ok": true
           }
         },
         "blocked_reason": null
@@ -509,7 +502,7 @@
     {
       "workflow_id": "W-06",
       "status": "BLOCKED",
-      "rea_run_id": "rea419f862acc3e",
+      "rea_run_id": "reacb5cbece39c7",
       "evidence_dir": "docs/checks/m19/W-06",
       "sample": null,
       "tool_versions": [],

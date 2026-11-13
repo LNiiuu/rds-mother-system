@@ -1,26 +1,26 @@
 # W-01 代码库理解：<REPO>
 
-扫描文件 **584** 个，合计 41988.5 KB。
+扫描文件 **611** 个，合计 42127.5 KB。
 
 ## 语言分布（推断）
 
 | 语言 | 文件数 | 字节 |
 |---|---:|---:|
-| Markdown | 233 | 1361287 |
-| JavaScript | 146 | 992383 |
-| JSON | 95 | 540958 |
+| Markdown | 246 | 1418635 |
+| JavaScript | 160 | 1072724 |
+| JSON | 95 | 545121 |
 | PowerShell | 18 | 85561 |
 | YAML | 3 | 2251 |
 | Shell | 1 | 4427 |
 
 ## 顶层目录
 
-- `docs` — 233 个文件
-- `mars` — 229 个文件
+- `docs` — 247 个文件
+- `mars` — 240 个文件
 - `core` — 46 个文件
-- `tooling` — 42 个文件
+- `tooling` — 45 个文件
 - `rea` — 17 个文件
-- `(root)` — 8 个文件
+- `(root)` — 7 个文件
 - `tests` — 4 个文件
 - `bin` — 3 个文件
 - `stacks` — 2 个文件
@@ -36,14 +36,14 @@
 
 ## 测试
 
-测试文件 54 个；识别到的框架：node:test
+测试文件 56 个；识别到的框架：node:test
 
 ## 静态依赖图（推断）
 
-节点 146 个，边 376 条；方法：static import/require regex; no AST, no dynamic import, no type resolution
+节点 160 个，边 406 条；方法：static import/require regex; no AST, no dynamic import, no type resolution
 
-- 关键模块 `mars/src/util.js` — 入度 28
-- 关键模块 `mars/src/db.js` — 入度 26
+- 关键模块 `mars/src/util.js` — 入度 29
+- 关键模块 `mars/src/db.js` — 入度 27
 - 关键模块 `mars/src/store.js` — 入度 19
 - 关键模块 `mars/src/authz.js` — 入度 18
 - 关键模块 `mars/tests/phase1/helpers.js` — 入度 16

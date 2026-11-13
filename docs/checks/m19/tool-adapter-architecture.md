@@ -29,7 +29,7 @@
 | `jadx` | APK manifest、dex decompile、resources | **missing** |
 | `java` | jadx 运行时 | **missing** |
 | `apktool` | APK decode、manifest、resources | **missing** |
-| `tshark` | pcap read、protocol hierarchy、conversations | **missing** |
+| `tshark` | pcap read、protocol hierarchy、conversations | present（4.6.9，`MARS_TSHARK_PATH`） |
 | `frida` | attach、script load、runtime hooks | **missing** |
 | `adb` | device list、forward | **missing** |
 

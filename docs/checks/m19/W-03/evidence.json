@@ -1,5 +1,5 @@
 {
-  "rea_run_id": "reae9f51f0e3cb4",
+  "rea_run_id": "rea0b92eae5f863",
   "workflow_id": "W-03",
   "sample": {
     "path": "<TEMP>\\synthetic.apk",
@@ -24,5 +24,5 @@
     "2. 按 commands 里的 argv 重新执行（不经过 shell）",
     "3. 对比 result.json 的字段；不一致说明环境或样本变了"
   ],
-  "created_at": "2026-11-13T14:49:00.826Z"
+  "created_at": "2026-11-13T16:16:52.193Z"
 }

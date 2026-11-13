@@ -1,6 +1,6 @@
 # W-02 原生二进制静态分析
 
-样本：`C:\Windows\System32\where.exe`
+样本：`C:\WINDOWS\System32\where.exe`
 
 - 大小：65536 B
 - SHA-256：`f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29`

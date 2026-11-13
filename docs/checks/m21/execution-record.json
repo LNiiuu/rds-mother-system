@@ -1,0 +1,94 @@
+{
+  "demo": "m21-ollama",
+  "generated_at": "2026-11-13T16:25:18.869Z",
+  "simulated": false,
+  "provider": "ollama",
+  "model": "qwen2.5:3b",
+  "base_url": "http://127.0.0.1:11434",
+  "health": {
+    "ok": true,
+    "detail": {
+      "baseUrl": "http://127.0.0.1:11434",
+      "models": []
+    },
+    "models": []
+  },
+  "tests": {
+    "basic": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 7
+    },
+    "structured": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 4
+    },
+    "multi_turn": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 3
+    },
+    "tool_calling": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 2
+    },
+    "long_context": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 4
+    },
+    "concurrent": {
+      "ok": false,
+      "error": {
+        "code": "PROVIDER_HTTP_404",
+        "message": "PROVIDER_HTTP_404 {\"error\":\"model 'qwen2.5:3b' not found\"}"
+      },
+      "ms": 5
+    },
+    "failure_path": {
+      "ok": true,
+      "value": {
+        "health": {
+          "ok": false,
+          "detail": {
+            "baseUrl": "http://127.0.0.1:11435",
+            "message": "fetch failed"
+          }
+        },
+        "send_error": {
+          "code": "PROVIDER_UNREACHABLE",
+          "message": "PROVIDER_UNREACHABLE fetch failed"
+        }
+      },
+      "ms": 6
+    }
+  },
+  "resources": {
+    "ollama_ps": "NAME    ID    SIZE    PROCESSOR    CONTEXT    RUNNER    UNTIL",
+    "total_tokens": 0
+  },
+  "notes": [
+    "模型未安装：qwen2.5:3b；所有推理请求返回 PROVIDER_HTTP_404，未产生有效输出",
+    "模型未产生 tool_calls；工具调用能力标 PARTIAL，不影响基础对话结论",
+    "并发请求未观察到明显时间重叠（本地模型可能串行排队）"
+  ],
+  "model_present": false,
+  "verdict": "BLOCKED"
+}

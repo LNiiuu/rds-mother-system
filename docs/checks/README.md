@@ -175,6 +175,25 @@
 > 总体 `COMPLETED WITH WARNINGS`：不允许把 mock 全链路写成「真实多 Agent 已验证」。
 > 当前状态与并发调度补齐情况见 [final/M18-M20-final-acceptance.md](final/M18-M20-final-acceptance.md)。
 
+### M21–M25：本地模型、平台适配与发布审核（2026-11-14）
+
+| 文档 | 内容 |
+|---|---|
+| [m21-m25/baseline-audit.md](m21-m25/baseline-audit.md) | 环境/硬件/平台/工具/凭据审计 |
+| [m21/final-acceptance.md](m21/final-acceptance.md) | Ollama Provider；真实推理 `BLOCKED`（模型下载损坏） |
+| [m21/download-failure.log](m21/download-failure.log) | 模型哈希不符与下载中断原始回显 |
+| [m22/architecture.md](m22/architecture.md) | 平台端口/注册表/四适配器/契约测试 |
+| [m23/toolchain-audit.md](m23/toolchain-audit.md) | TShark 4.6.9 真实执行；Ghidra/JADX/Frida 阻断 |
+| [m23/final-acceptance.md](m23/final-acceptance.md) | W-01..W-06 四值状态（`PARTIAL`） |
+| [m24/final-acceptance.md](m24/final-acceptance.md) | 真实模型多 Agent `BLOCKED`；编排/REA 真实 |
+| [m24/scenario.md](m24/scenario.md) | 平台→RDS 端到端 `NOT RUN` |
+| [m25/independent-review.md](m25/independent-review.md) | 第一轮独立审核（不可发布 → 整改项） |
+| [m25/second-review.md](m25/second-review.md) | 第二轮复核（待生成） |
+| [final/pre-push-release-audit.md](final/pre-push-release-audit.md) | 当前 HEAD 发布审计（待生成） |
+
+> M21/M22/M23/M24 判定均为 **`PARTIAL`**；M21 真实推理、M23 W-03/W-06、M24 真实模型多 Agent 为 `BLOCKED`。
+> 平台层是“库 + 契约测试”，尚未接入 runtime/scheduler。
+
 ### M18–M20：编排、REA 工具与联合场景（2026-11-13）
 
 | 文档 | 内容 |

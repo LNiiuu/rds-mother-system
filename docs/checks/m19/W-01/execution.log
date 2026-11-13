@@ -1,8 +1,8 @@
 workflow_id=W-01
 status=PARTIAL
-rea_run_id=rea1b2731851d33
-evidence_dir=<TEMP>\evidence\W-01\rea1b2731851d33
+rea_run_id=rea7ebda3274521
+evidence_dir=<TEMP>\evidence\W-01\rea7ebda3274521
 sample=null
 tool_versions=[{"name":"node","version":"v22.22.2","kind":"runtime"}]
 limitations=["依赖图来自 import/require 正则，不做 AST/类型解析；动态 import 可能漏","二进制文件不会被解析，只统计大小"]
-run_at=2026-11-13T14:48:59.389Z
+run_at=2026-11-13T16:16:49.326Z

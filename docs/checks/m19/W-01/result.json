@@ -25,19 +25,19 @@
   },
   "result": {
     "root": "D:\\M1",
-    "files_scanned": 584,
+    "files_scanned": 611,
     "truncated": false,
-    "total_bytes": 42996275,
+    "total_bytes": 43138515,
     "by_extension": {
-      ".md": 233,
-      ".js": 128,
+      ".md": 246,
+      ".js": 139,
       ".json": 95,
       ".txt": 37,
       ".ps1": 18,
       ".log": 15,
       ".mjs": 11,
       ".patch": 10,
-      ".cjs": 7,
+      ".cjs": 10,
       ".token": 6,
       "(none)": 5,
       ".db": 5,
@@ -53,18 +53,18 @@
     "languages": [
       {
         "name": "Markdown",
-        "files": 233,
-        "bytes": 1361287
+        "files": 246,
+        "bytes": 1418635
       },
       {
         "name": "JavaScript",
-        "files": 146,
-        "bytes": 992383
+        "files": 160,
+        "bytes": 1072724
       },
       {
         "name": "JSON",
         "files": 95,
-        "bytes": 540958
+        "bytes": 545121
       },
       {
         "name": "PowerShell",
@@ -85,11 +85,11 @@
     "top_dirs": [
       {
         "name": "docs",
-        "files": 233
+        "files": 247
       },
       {
         "name": "mars",
-        "files": 229
+        "files": 240
       },
       {
         "name": "core",
@@ -97,7 +97,7 @@
       },
       {
         "name": "tooling",
-        "files": 42
+        "files": 45
       },
       {
         "name": "rea",
@@ -105,7 +105,7 @@
       },
       {
         "name": "(root)",
-        "files": 8
+        "files": 7
       },
       {
         "name": "tests",
@@ -162,7 +162,7 @@
       }
     ],
     "tests": {
-      "files": 54,
+      "files": 56,
       "samples": [
         "docs/checks/m7/acceptance.test.js",
         "docs/checks/m7/spec/CR1.md",
@@ -183,8 +183,8 @@
       ]
     },
     "dependencies": {
-      "nodes": 146,
-      "edges": 376,
+      "nodes": 160,
+      "edges": 406,
       "local_edges": [
         {
           "from": "bin/rds.mjs",
@@ -344,6 +344,46 @@
         {
           "from": "mars/src/adapters/null-host-registry.js",
           "to": "mars/src/ports/host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-dsh.js",
+          "to": "mars/src/ports/platform-adapter.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-factory.js",
+          "to": "mars/src/adapters/platform-dsh.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-factory.js",
+          "to": "mars/src/adapters/platform-http.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-factory.js",
+          "to": "mars/src/adapters/platform-memory.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-factory.js",
+          "to": "mars/src/adapters/platform-workbuddy.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-http.js",
+          "to": "mars/src/ports/platform-adapter.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-memory.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/platform-workbuddy.js",
+          "to": "mars/src/ports/platform-adapter.js",
           "kind": "static-import"
         },
         {
@@ -524,16 +564,6 @@
         {
           "from": "mars/src/cli-rea.js",
           "to": "mars/src/util.js",
-          "kind": "static-import"
-        },
-        {
-          "from": "mars/src/cli.js",
-          "to": "mars/src/adapters/fs-workspaces.js",
-          "kind": "static-import"
-        },
-        {
-          "from": "mars/src/cli.js",
-          "to": "mars/src/adapters/rea/tool-registry.js",
           "kind": "static-import"
         },
         {
@@ -738,6 +768,16 @@
         },
         {
           "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/fs-workspaces.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/platform-factory.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
           "to": "mars/src/adapters/provider-anthropic.js",
           "kind": "static-import"
         },
@@ -748,12 +788,22 @@
         },
         {
           "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/provider-ollama.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
           "to": "mars/src/adapters/provider-openai-compat.js",
           "kind": "static-import"
         },
         {
           "from": "mars/src/composition.js",
           "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/rea/tool-registry.js",
           "kind": "static-import"
         },
         {
@@ -909,6 +959,16 @@
         {
           "from": "mars/src/paths.js",
           "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/platform-client.js",
+          "to": "mars/src/ports/platform-adapter.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/platform-registry.js",
+          "to": "mars/src/ports/platform-adapter.js",
           "kind": "static-import"
         },
         {
@@ -1352,6 +1412,41 @@
           "kind": "static-import"
         },
         {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/adapters/platform-dsh.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/adapters/platform-http.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/adapters/platform-memory.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/adapters/platform-workbuddy.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/platform-client.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/platform-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/platform-adapters.test.js",
+          "to": "mars/src/ports/platform-adapter.js",
+          "kind": "static-import"
+        },
+        {
           "from": "mars/tests/arch/projects.test.js",
           "to": "mars/src/adapters/fs-project-roots.js",
           "kind": "static-import"
@@ -1399,6 +1494,16 @@
         {
           "from": "mars/tests/arch/provider-adapters.test.js",
           "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-ollama.test.js",
+          "to": "mars/src/adapters/provider-ollama.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-ollama.test.js",
+          "to": "mars/src/ports/model-provider.js",
           "kind": "static-import"
         },
         {
@@ -2037,6 +2142,51 @@
           "kind": "static-import"
         },
         {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/adapters/fs-workspaces.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "mars/src/runtime/scheduler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m20-joint-demo.cjs",
+          "to": "tooling/make-apk-fixture.cjs",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m21-ollama-verify.cjs",
+          "to": "mars/src/adapters/provider-ollama.js",
+          "kind": "static-import"
+        },
+        {
           "from": "tooling/m9-m11-demo.cjs",
           "to": "mars/src/collab.js",
           "kind": "static-import"
@@ -2070,27 +2220,27 @@
       "external_dependencies": [
         {
           "name": "node:path",
-          "files": 86
+          "files": 90
         },
         {
           "name": "node:fs",
-          "files": 80
+          "files": 85
         },
         {
           "name": "node:test",
-          "files": 48
+          "files": 51
         },
         {
           "name": "node:os",
-          "files": 44
+          "files": 46
         },
         {
           "name": "node:assert/strict",
-          "files": 33
+          "files": 36
         },
         {
           "name": "node:child_process",
-          "files": 26
+          "files": 27
         },
         {
           "name": "node:assert",
@@ -2098,7 +2248,7 @@
         },
         {
           "name": "node:crypto",
-          "files": 14
+          "files": 15
         },
         {
           "name": "node:url",
@@ -2125,6 +2275,10 @@
           "files": 1
         },
         {
+          "name": "node:http",
+          "files": 1
+        },
+        {
           "name": "node:vm",
           "files": 1
         },
@@ -2138,6 +2292,10 @@
         },
         {
           "name": "../src/sum",
+          "files": 1
+        },
+        {
+          "name": "../src/command",
           "files": 1
         }
       ],
@@ -2567,6 +2725,62 @@
           "file": "mars/src/adapters/null-host-registry.js"
         },
         {
+          "name": "appendLine",
+          "file": "mars/src/adapters/platform-dsh.js"
+        },
+        {
+          "name": "createDshPlatform",
+          "file": "mars/src/adapters/platform-dsh.js"
+        },
+        {
+          "name": "readLines",
+          "file": "mars/src/adapters/platform-dsh.js"
+        },
+        {
+          "name": "createPlatform",
+          "file": "mars/src/adapters/platform-factory.js"
+        },
+        {
+          "name": "platformCatalog",
+          "file": "mars/src/adapters/platform-factory.js"
+        },
+        {
+          "name": "platformNames",
+          "file": "mars/src/adapters/platform-factory.js"
+        },
+        {
+          "name": "createHttpPlatform",
+          "file": "mars/src/adapters/platform-http.js"
+        },
+        {
+          "name": "mapStatus",
+          "file": "mars/src/adapters/platform-http.js"
+        },
+        {
+          "name": "request",
+          "file": "mars/src/adapters/platform-http.js"
+        },
+        {
+          "name": "createMemoryPlatform",
+          "file": "mars/src/adapters/platform-memory.js"
+        },
+        {
+          "name": "push",
+          "file": "mars/src/adapters/platform-memory.js"
+        },
+        {
+          "name": "createWorkbuddyPlatform",
+          "file": "mars/src/adapters/platform-workbuddy.js"
+        },
+        {
+          "name": "invoke",
+          "file": "mars/src/adapters/platform-workbuddy.js"
+        },
+        {
+          "name": "mapError",
+          "file": "mars/src/adapters/platform-workbuddy.js"
+        },
+        {
           "name": "cancel",
           "file": "mars/src/adapters/provider-anthropic.js"
         },
@@ -2629,6 +2843,30 @@
         {
           "name": "sessionOf",
           "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "api",
+          "file": "mars/src/adapters/provider-ollama.js"
+        },
+        {
+          "name": "createOllamaProvider",
+          "file": "mars/src/adapters/provider-ollama.js"
+        },
+        {
+          "name": "healthCheck",
+          "file": "mars/src/adapters/provider-ollama.js"
+        },
+        {
+          "name": "newSessionId",
+          "file": "mars/src/adapters/provider-ollama.js"
+        },
+        {
+          "name": "normalizeToolCalls",
+          "file": "mars/src/adapters/provider-ollama.js"
+        },
+        {
+          "name": "toOllamaMessages",
+          "file": "mars/src/adapters/provider-ollama.js"
         },
         {
           "name": "cancel",
@@ -3261,96 +3499,16 @@
         {
           "name": "norm",
           "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "recordRun",
-          "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "restore",
-          "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "save",
-          "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "sectionTokens",
-          "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "sha",
-          "file": "mars/src/context-ops.js"
-        },
-        {
-          "name": "consumeRateLimit",
-          "file": "mars/src/db/ratelimit.js"
-        },
-        {
-          "name": "initSchema",
-          "file": "mars/src/db/schema.js"
-        },
-        {
-          "name": "migrate",
-          "file": "mars/src/db/schema.js"
-        },
-        {
-          "name": "byStatus",
-          "file": "mars/src/db/stats.js"
-        },
-        {
-          "name": "dbStats",
-          "file": "mars/src/db/stats.js"
-        },
-        {
-          "name": "one",
-          "file": "mars/src/db/stats.js"
-        },
-        {
-          "name": "attachAuditSink",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "audit",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "auditStats",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "dbOpenError",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "openDb",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "readSchemaVersion",
-          "file": "mars/src/db.js"
-        },
-        {
-          "name": "AppError",
-          "file": "mars/src/errors.js"
-        },
-        {
-          "name": "isPublicCode",
-          "file": "mars/src/errors.js"
-        },
-        {
-          "name": "messageOf",
-          "file": "mars/src/errors.js"
         }
       ],
       "key_modules": [
         {
           "file": "mars/src/util.js",
-          "inbound": 28
+          "inbound": 29
         },
         {
           "file": "mars/src/db.js",
-          "inbound": 26
+          "inbound": 27
         },
         {
           "file": "mars/src/store.js",
@@ -3378,7 +3536,7 @@
         },
         {
           "file": "mars/src/runtime/agent-runtime.js",
-          "inbound": 10
+          "inbound": 11
         },
         {
           "file": "mars/tests/helpers/assets.js",
@@ -3837,7 +3995,7 @@
       },
       {
         "path": "docs/checks/m19/W-01/result.json",
-        "bytes": 104112,
+        "bytes": 109893,
         "ext": ".json"
       }
     ],

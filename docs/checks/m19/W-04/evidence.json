@@ -1,8 +1,8 @@
 {
-  "rea_run_id": "reaab81a124cfa9",
+  "rea_run_id": "rea70a56916b7d8",
   "workflow_id": "W-04",
   "sample": {
-    "path": "C:/Windows/System32/where.exe",
+    "path": "C:\\WINDOWS\\System32\\where.exe",
     "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
     "bytes": 65536
   },
@@ -18,23 +18,23 @@
       "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
       "argv": [
         "-f",
-        "C:\\Windows\\System32\\where.exe"
+        "C:\\WINDOWS\\System32\\where.exe"
       ],
       "ok": true,
       "code": 0,
       "timed_out": false,
-      "at": "2026-11-13T14:49:01.150Z"
+      "at": "2026-11-13T16:16:53.040Z"
     },
     {
       "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
       "argv": [
         "-d",
-        "C:\\Windows\\System32\\where.exe"
+        "C:\\WINDOWS\\System32\\where.exe"
       ],
       "ok": true,
       "code": 0,
       "timed_out": false,
-      "at": "2026-11-13T14:49:01.209Z"
+      "at": "2026-11-13T16:16:53.141Z"
     }
   ],
   "limitations": [
@@ -47,5 +47,5 @@
     "2. 按 commands 里的 argv 重新执行（不经过 shell）",
     "3. 对比 result.json 的字段；不一致说明环境或样本变了"
   ],
-  "created_at": "2026-11-13T14:49:01.367Z"
+  "created_at": "2026-11-13T16:16:53.485Z"
 }

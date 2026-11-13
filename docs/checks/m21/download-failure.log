@@ -1,0 +1,40 @@
+# M21 模型下载失败原始回显（2026-11-13，本机会话）
+# 说明：以下为事后整理的回显摘要（非逐字终端捕获）；损坏模型已删除。
+
+$ ollama --version
+ollama version is 0.40.16
+
+$ curl -s http://127.0.0.1:11434/api/tags
+{"models":[]}
+
+$ ollama pull qwen2.5:3b
+... downloading 5ee4f07cdb9b in 16 120 MB part(s)
+... part 12 attempt 0 failed: unexpected EOF, retrying in 1s
+... part 11 stalled; retrying.
+
+# 模型层大小达到清单值：
+size=1929903008
+
+$ sha256sum sha256-5ee4f07cdb9beadbbb293e85803c569b01bd37ed059d2715faa7bb405f31caa6
+f5960d1d3a1798926e6b471c16b75de85798b9cffb72fa11f5a61337357e6310
+# 期望（registry manifest）：
+# 5ee4f07cdb9beadbbb293e85803c569b01bd37ed059d2715faa7bb405f31caa6
+
+$ curl /api/chat model=qwen2.5:3b
+{"error":"llama-server process has terminated: exit status 0xc0000409 ... CUDA error\nCUDA error: device kernel image is invalid"}
+
+$ curl /api/chat model=qwen2.5:3b options.num_gpu=0 num_predict=32
+{"message":{"role":"assistant","content":"88888888888888888888888888888888"},"done_reason":"length"}
+
+$ ollama rm qwen2.5:3b
+deleted 'qwen2.5:3b'
+
+$ ollama pull qwen2.5:0.5b
+pulling c5396e06af29: 77% 304 MB/397 MB 20 KB/s
+# 已落盘 partial SHA-256：
+5a4b02dadc0bbbbdf0395eae6dc45dcf3bd6634535a2684a689595d3b4bb6716
+# 期望：
+c5396e06af294bd101b30dce59131a76d2b773e76950acc870eda801d3ab0515
+
+# 网络旁证：
+# curl GitHub 大文件 -> schannel: server closed abruptly / Empty reply from server

@@ -19,17 +19,17 @@
       },
       {
         "check": "tshark 可用（可选，用于交叉核验）",
-        "ok": false,
-        "detail": "未安装；使用内置纯 JS libpcap 解析"
+        "ok": true,
+        "detail": "<TOOL_HOME>/tshark.exe (TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).)"
       }
     ],
     "tools": {
       "tshark": {
         "name": "tshark",
         "label": "Wireshark tshark",
-        "present": false,
-        "path": null,
-        "version": null,
+        "present": true,
+        "path": "<TOOL_HOME>/tshark.exe",
+        "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
         "capabilities": [
           "pcap read",
           "protocol hierarchy",
@@ -37,14 +37,8 @@
           "dns/http fields"
         ],
         "safety": "read-only capture; no live interface by default",
-        "bins": [
-          {
-            "name": "tshark",
-            "present": false,
-            "path": null,
-            "version": null
-          }
-        ]
+        "source": "MARS_TSHARK_PATH",
+        "probe_ok": true
       }
     },
     "blocked_reason": null
@@ -151,8 +145,39 @@
       "verdict": "heuristics 是启发式，不是恶意判定"
     },
     "tshark": {
-      "present": false,
-      "version": null
+      "present": true,
+      "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
+      "run": {
+        "ok": true,
+        "error_code": null,
+        "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
+        "argv": [
+          "-r",
+          "<TEMP>\\synthetic.pcap",
+          "-q",
+          "-z",
+          "io,phs"
+        ],
+        "exit_code": 0,
+        "frame_count": 4,
+        "hierarchy": [
+          "",
+          "===================================================================",
+          "Protocol Hierarchy Statistics",
+          "Filter: ",
+          "",
+          "frame                                    frames:4 bytes:428",
+          "  eth                                    frames:4 bytes:428",
+          "    ip                                   frames:4 bytes:428",
+          "      udp                                frames:2 bytes:240",
+          "        dns                              frames:2 bytes:240",
+          "      tcp                                frames:2 bytes:188",
+          "        http                             frames:1 bytes:134",
+          "===================================================================",
+          ""
+        ],
+        "stderr": ""
+      }
     }
   },
   "error": null

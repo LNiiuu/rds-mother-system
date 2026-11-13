@@ -1,0 +1,23 @@
+{
+  "milestone": "M24",
+  "generated_at": "2026-11-14T00:30:00+08:00",
+  "status": "BLOCKED",
+  "artifact_kind": "handwritten-status-card",
+  "note": "本文件为复核时手工汇总的声明卡，不是脚本运行产物；真实执行记录引用 evidence_refs",
+  "real_model": false,
+  "platform_end_to_end": "NOT RUN",
+  "blocker": {
+    "milestone": "M21",
+    "reason": "no valid local model; download hash mismatch/stalled; no cloud credentials"
+  },
+  "evidence_refs": {
+    "scheduler": "docs/checks/m18/execution-record.json",
+    "joint_mock_models": "docs/checks/m20/execution-record.json",
+    "rea_tshark": "docs/checks/m19/W-05/result.json",
+    "platform_contract": "mars/tests/arch/platform-adapters.test.js"
+  },
+  "notes": [
+    "调度/隔离/冲突/恢复为真实执行；模型为 mock 或未执行",
+    "未生成真实多 Agent 成功记录，避免把 mock 写成真实协作"
+  ]
+}

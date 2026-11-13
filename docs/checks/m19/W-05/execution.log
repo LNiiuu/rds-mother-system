@@ -1,8 +1,8 @@
 workflow_id=W-05
 status=PARTIAL
-rea_run_id=rea2c90977a7fe0
-evidence_dir=<TEMP>\evidence\W-05\rea2c90977a7fe0
+rea_run_id=reabe0ec91b71ff
+evidence_dir=<TEMP>\evidence\W-05\reabe0ec91b71ff
 sample={"path":"<TEMP>\\synthetic.pcap","sha256":"088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8","bytes":516,"kind":"synthetic"}
-tool_versions=[{"name":"rea-pcap-parser","version":"1.0.0","kind":"builtin"}]
+tool_versions=[{"name":"rea-pcap-parser","version":"1.0.0","kind":"builtin"},{"name":"tshark","version":"TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).","kind":"external"}]
 limitations=["libpcap only（pcapng 报 UNSUPPORTED_FORMAT）","未做 TCP 流重组，HTTP 只取单包首行","不解密、不解析 SNI","heuristics 是启发式，不是恶意判定"]
-run_at=2026-11-13T14:49:01.722Z
+run_at=2026-11-13T16:16:55.390Z

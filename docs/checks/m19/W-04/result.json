@@ -11,7 +11,7 @@
       {
         "check": "sample 存在",
         "ok": true,
-        "detail": "C:\\Windows\\System32\\where.exe"
+        "detail": "C:\\WINDOWS\\System32\\where.exe"
       }
     ],
     "blocked_reason": null,
@@ -27,7 +27,7 @@
   },
   "result": {
     "sample": {
-      "path": "C:\\Windows\\System32\\where.exe",
+      "path": "C:\\WINDOWS\\System32\\where.exe",
       "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
       "bytes": 65536
     },

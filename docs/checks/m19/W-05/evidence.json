@@ -1,5 +1,5 @@
 {
-  "rea_run_id": "rea2c90977a7fe0",
+  "rea_run_id": "reabe0ec91b71ff",
   "workflow_id": "W-05",
   "sample": {
     "path": "<TEMP>\\synthetic.pcap",
@@ -12,9 +12,26 @@
       "name": "rea-pcap-parser",
       "version": "1.0.0",
       "kind": "builtin"
+    },
+    {
+      "name": "tshark",
+      "version": "TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).",
+      "kind": "external"
     }
   ],
-  "commands": [],
+  "commands": [
+    {
+      "tool": "tshark",
+      "argv": [
+        "-r",
+        "<TEMP>\\synthetic.pcap",
+        "-q",
+        "-z",
+        "io,phs"
+      ],
+      "exit_code": 0
+    }
+  ],
   "limitations": [
     "libpcap only（pcapng 报 UNSUPPORTED_FORMAT）",
     "未做 TCP 流重组，HTTP 只取单包首行",
@@ -26,5 +43,5 @@
     "2. 按 commands 里的 argv 重新执行（不经过 shell）",
     "3. 对比 result.json 的字段；不一致说明环境或样本变了"
   ],
-  "created_at": "2026-11-13T14:49:01.713Z"
+  "created_at": "2026-11-13T16:16:55.363Z"
 }

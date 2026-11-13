@@ -1,6 +1,6 @@
 # W-04 调用链分析（静态）
 
-样本：`C:\Windows\System32\where.exe`
+样本：`C:\WINDOWS\System32\where.exe`
 
 - SHA-256：`f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29`
 - 函数（推断边界）：92
