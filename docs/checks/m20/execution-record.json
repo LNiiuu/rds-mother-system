@@ -1,0 +1,187 @@
+{
+  "demo": "m20",
+  "generated_at": "2026-11-13T14:49:49.878Z",
+  "simulated_models": true,
+  "note": "REA W-01/W-02/W-04 为真实工具执行；Agent 模型为 mock；W-03 缺 jadx 为 BLOCKED",
+  "rea": {
+    "W01": {
+      "status": "PARTIAL",
+      "files": 2,
+      "deps_nodes": 2,
+      "deps_edges": 1
+    },
+    "W02": {
+      "status": "PARTIAL",
+      "sections": 7,
+      "imports": 7,
+      "strings": 206,
+      "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29"
+    },
+    "W04": {
+      "status": "PARTIAL",
+      "insn": 12795,
+      "functions": 92,
+      "direct_edges": 277,
+      "indirect": 23
+    },
+    "W03": {
+      "status": "BLOCKED",
+      "blocked": "TOOL_MISSING:jadx",
+      "zip_entries": 7
+    }
+  },
+  "plan": {
+    "plan_id": "plan18dc9c2820cb",
+    "mode": "hybrid",
+    "status": "SUCCEEDED",
+    "merge_status": "CLEAN",
+    "max_concurrency": 2
+  },
+  "jobs": [
+    {
+      "key": "design",
+      "role": "R1",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "run1f60cabf1588",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "write_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 40,
+            "path": "JOINT-PLAN.md",
+            "sha256": "09a7784ea722a2838d156224bb3e09e66d845961848f85f1cc393f24ad47db64"
+          }
+        }
+      ]
+    },
+    {
+      "key": "final",
+      "role": "R0",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "run64713ec73e82",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "read_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 565,
+            "path": "JOINT-REPORT.md",
+            "sha256": "256710bcd72d66eacd8bc798463381fcd34ec7e5be32418671af52a9432fc288"
+          }
+        }
+      ]
+    },
+    {
+      "key": "review",
+      "role": "R4",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "runc4ad500b1210",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "read_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 565,
+            "path": "JOINT-REPORT.md",
+            "sha256": "256710bcd72d66eacd8bc798463381fcd34ec7e5be32418671af52a9432fc288"
+          }
+        },
+        {
+          "tool": "read_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 820,
+            "path": "evidence\\SUMMARY.md",
+            "sha256": "a5ab33c0570d677ed4280854d1fb154f80364d331db9448e2e62730a0f47146c"
+          }
+        }
+      ]
+    },
+    {
+      "key": "report",
+      "role": "R2",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "run6ecceea8d1ed",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "write_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 565,
+            "path": "JOINT-REPORT.md",
+            "sha256": "256710bcd72d66eacd8bc798463381fcd34ec7e5be32418671af52a9432fc288"
+          }
+        }
+      ]
+    },
+    {
+      "key": "research",
+      "role": "R5",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "run5985b6478db6",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "read_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 820,
+            "path": "evidence\\SUMMARY.md",
+            "sha256": "a5ab33c0570d677ed4280854d1fb154f80364d331db9448e2e62730a0f47146c"
+          }
+        }
+      ]
+    },
+    {
+      "key": "security",
+      "role": "R6",
+      "status": "SUCCEEDED",
+      "error": null,
+      "run_id": "rund72d364c08de",
+      "attempt": 1,
+      "tool_events": [
+        {
+          "tool": "read_file",
+          "ok": true,
+          "error": null,
+          "meta": {
+            "bytes": 820,
+            "path": "evidence\\SUMMARY.md",
+            "sha256": "a5ab33c0570d677ed4280854d1fb154f80364d331db9448e2e62730a0f47146c"
+          }
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "runs": 6,
+    "input": 1166,
+    "output": 56,
+    "calls": 13
+  },
+  "files": {
+    "plan": true,
+    "report": true,
+    "summary": true
+  },
+  "artifacts": {
+    "evidence_summary": "docs/checks/m20/evidence/SUMMARY.md",
+    "report": "JOINT-REPORT.md"
+  }
+}
