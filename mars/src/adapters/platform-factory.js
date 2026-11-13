@@ -46,7 +46,11 @@ function platformCatalog() {
 
 function createPlatform(name, options = {}) {
   const entry = CATALOG[String(name)];
-  if (!entry) throw new Error('PLATFORM_UNKNOWN ' + name + '（可用：' + platformNames().join(',') + '）');
+  if (!entry) {
+    const e = new Error('未知平台 ' + name + '（可用：' + platformNames().join(',') + '）');
+    e.code = 'PLATFORM_UNKNOWN';
+    throw e;
+  }
   for (const key of entry.requires) {
     if (!options[key]) {
       const e = new Error(`缺少适配器选项 ${name}.${key}`);

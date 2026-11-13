@@ -138,7 +138,7 @@ test('M22 注册表：登记、按名取、重复拒绝、能力拒绝', () => {
   reg.register(dsh);
   assert.equal(dsh.describe().capabilities.tools, false);
   assert.equal(dsh.describe().capabilities.lifecycle, false);
-  assert.throws(() => reg.requireCapability('dsh', 'tools'), /不支持能力 tools/);
+  assert.throws(() => reg.requireCapability('dsh', 'tools'), (e) => e.code === 'PLATFORM_UNSUPPORTED' && /不支持能力 tools/.test(e.message));
   assert.equal(reg.requireCapability('dsh', 'submit'), dsh);
 });
 
