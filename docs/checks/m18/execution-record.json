@@ -1,0 +1,684 @@
+{
+  "demo": "m18",
+  "generated_at": "2026-11-13T14:44:17.638Z",
+  "simulated_models": true,
+  "note": "模型为 mock；文件、测试、会话、调度、锁、合并为真实执行",
+  "serial": {
+    "label": "serial",
+    "plan_id": "pland467b653e57a",
+    "mode": "serial",
+    "status": "SUCCEEDED",
+    "merge_status": "NOT_MERGED",
+    "max_concurrency": 1,
+    "jobs": [
+      {
+        "key": "design",
+        "role": "R1",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run925724b97b6f",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "impl",
+        "role": "R2",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "rune79ffb1416ca",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "verify",
+        "role": "R3",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run8ba44693fcbf",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      }
+    ],
+    "tool_events": [
+      {
+        "key": "design",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 25,
+              "path": "DESIGN.md",
+              "sha256": "d11faf15e80251daed860a883bdb210e4e1774fabdffabf4642eb392dea5b305"
+            }
+          }
+        ]
+      },
+      {
+        "key": "impl",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 43,
+              "path": "src\\sum.js",
+              "sha256": "281d41298b1e45345b43067ba70ae7c1938271bfd4c9a3cb87beb97a993ae3d6"
+            }
+          }
+        ]
+      },
+      {
+        "key": "verify",
+        "events": [
+          {
+            "tool": "run_test",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "exit_code": 0,
+              "fail": 0,
+              "files": 1,
+              "pass": 1,
+              "skipped": 0,
+              "tests": 1,
+              "timed_out": false
+            }
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "runs": 3,
+      "calls": 6,
+      "input_tokens": 141,
+      "output_tokens": 15,
+      "by_source": {
+        "provider": 0,
+        "estimated": 3,
+        "unknown": 0
+      }
+    },
+    "overlap": {
+      "runs": 3,
+      "overlapping_pairs": 0,
+      "times": [
+        {
+          "run_id": "run925724b97b6f",
+          "role": "R1",
+          "started_at": "2026-11-13T14:44:17.679Z",
+          "finished_at": "2026-11-13T14:44:17.716Z"
+        },
+        {
+          "run_id": "rune79ffb1416ca",
+          "role": "R2",
+          "started_at": "2026-11-13T14:44:17.749Z",
+          "finished_at": "2026-11-13T14:44:18.059Z"
+        },
+        {
+          "run_id": "run8ba44693fcbf",
+          "role": "R3",
+          "started_at": "2026-11-13T14:44:18.090Z",
+          "finished_at": "2026-11-13T14:44:18.393Z"
+        }
+      ]
+    }
+  },
+  "parallel": {
+    "label": "parallel",
+    "plan_id": "plan81ca2ae5f39b",
+    "mode": "parallel",
+    "status": "SUCCEEDED",
+    "merge_status": "CLEAN",
+    "max_concurrency": 3,
+    "jobs": [
+      {
+        "key": "research",
+        "role": "R5",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run2e786c337a6e",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\research-a1"
+      },
+      {
+        "key": "security",
+        "role": "R6",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "runcd4bb236d5ec",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\security-a1"
+      },
+      {
+        "key": "write",
+        "role": "R2",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "rund2b6f153b726",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\write-a1"
+      }
+    ],
+    "tool_events": [
+      {
+        "key": "research",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 5,
+              "path": "base.txt",
+              "sha256": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+            }
+          }
+        ]
+      },
+      {
+        "key": "security",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 5,
+              "path": "base.txt",
+              "sha256": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+            }
+          }
+        ]
+      },
+      {
+        "key": "write",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": false,
+            "error": "TOOL_PATH_DENIED",
+            "meta": {
+              "allowed": [
+                "parallel.txt"
+              ],
+              "path": "src/sum.js"
+            }
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "runs": 3,
+      "calls": 6,
+      "input_tokens": 102,
+      "output_tokens": 15,
+      "by_source": {
+        "provider": 0,
+        "estimated": 3,
+        "unknown": 0
+      }
+    },
+    "overlap": {
+      "runs": 3,
+      "overlapping_pairs": 3,
+      "times": [
+        {
+          "run_id": "run2e786c337a6e",
+          "role": "R5",
+          "started_at": "2026-11-13T14:44:18.720Z",
+          "finished_at": "2026-11-13T14:44:19.067Z"
+        },
+        {
+          "run_id": "runcd4bb236d5ec",
+          "role": "R6",
+          "started_at": "2026-11-13T14:44:18.741Z",
+          "finished_at": "2026-11-13T14:44:19.152Z"
+        },
+        {
+          "run_id": "rund2b6f153b726",
+          "role": "R2",
+          "started_at": "2026-11-13T14:44:18.762Z",
+          "finished_at": "2026-11-13T14:44:19.108Z"
+        }
+      ]
+    }
+  },
+  "hybrid": {
+    "label": "hybrid",
+    "plan_id": "planc8b6a870f86a",
+    "mode": "hybrid",
+    "status": "SUCCEEDED",
+    "merge_status": "CLEAN",
+    "max_concurrency": 3,
+    "jobs": [
+      {
+        "key": "arch",
+        "role": "R1",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run1234bfcebc03",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "summary",
+        "role": "R0",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "runcccb56c251fd",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "review",
+        "role": "R4",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "runcb2119bf637f",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "verify",
+        "role": "R3",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run19b119e8c171",
+        "attempt": 1,
+        "workspace": "<TEMP>"
+      },
+      {
+        "key": "impl",
+        "role": "R2",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run353a0babdfe7",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\impl-a1"
+      },
+      {
+        "key": "research",
+        "role": "R5",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "runfb2cfbaab596",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\research-a1"
+      },
+      {
+        "key": "security",
+        "role": "R6",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "runeafdcc2a3a91",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\security-a1"
+      }
+    ],
+    "tool_events": [
+      {
+        "key": "arch",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 25,
+              "path": "DESIGN.md",
+              "sha256": "d11faf15e80251daed860a883bdb210e4e1774fabdffabf4642eb392dea5b305"
+            }
+          }
+        ]
+      },
+      {
+        "key": "summary",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 25,
+              "path": "DESIGN.md",
+              "sha256": "d11faf15e80251daed860a883bdb210e4e1774fabdffabf4642eb392dea5b305"
+            }
+          },
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 43,
+              "path": "src\\sum.js",
+              "sha256": "281d41298b1e45345b43067ba70ae7c1938271bfd4c9a3cb87beb97a993ae3d6"
+            }
+          }
+        ]
+      },
+      {
+        "key": "review",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 43,
+              "path": "src\\sum.js",
+              "sha256": "281d41298b1e45345b43067ba70ae7c1938271bfd4c9a3cb87beb97a993ae3d6"
+            }
+          }
+        ]
+      },
+      {
+        "key": "verify",
+        "events": [
+          {
+            "tool": "run_test",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "exit_code": 0,
+              "fail": 0,
+              "files": 1,
+              "pass": 1,
+              "skipped": 0,
+              "tests": 1,
+              "timed_out": false
+            }
+          }
+        ]
+      },
+      {
+        "key": "impl",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 43,
+              "path": "src\\sum.js",
+              "sha256": "281d41298b1e45345b43067ba70ae7c1938271bfd4c9a3cb87beb97a993ae3d6"
+            }
+          }
+        ]
+      },
+      {
+        "key": "research",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 5,
+              "path": "base.txt",
+              "sha256": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+            }
+          }
+        ]
+      },
+      {
+        "key": "security",
+        "events": [
+          {
+            "tool": "read_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 5,
+              "path": "base.txt",
+              "sha256": "f34848ca92665c342abd5816c9e3eda0e82180671195362bcd0080544a3bc2ac"
+            }
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "runs": 7,
+      "calls": 15,
+      "input_tokens": 307,
+      "output_tokens": 48,
+      "by_source": {
+        "provider": 0,
+        "estimated": 7,
+        "unknown": 0
+      }
+    },
+    "overlap": {
+      "runs": 7,
+      "overlapping_pairs": 3,
+      "times": [
+        {
+          "run_id": "run1234bfcebc03",
+          "role": "R1",
+          "started_at": "2026-11-13T14:44:19.243Z",
+          "finished_at": "2026-11-13T14:44:19.286Z"
+        },
+        {
+          "run_id": "runcccb56c251fd",
+          "role": "R0",
+          "started_at": "2026-11-13T14:44:20.819Z",
+          "finished_at": "2026-11-13T14:44:20.876Z"
+        },
+        {
+          "run_id": "runcb2119bf637f",
+          "role": "R4",
+          "started_at": "2026-11-13T14:44:20.719Z",
+          "finished_at": "2026-11-13T14:44:20.769Z"
+        },
+        {
+          "run_id": "run19b119e8c171",
+          "role": "R3",
+          "started_at": "2026-11-13T14:44:20.067Z",
+          "finished_at": "2026-11-13T14:44:20.670Z"
+        },
+        {
+          "run_id": "run353a0babdfe7",
+          "role": "R2",
+          "started_at": "2026-11-13T14:44:19.590Z",
+          "finished_at": "2026-11-13T14:44:19.942Z"
+        },
+        {
+          "run_id": "runfb2cfbaab596",
+          "role": "R5",
+          "started_at": "2026-11-13T14:44:19.617Z",
+          "finished_at": "2026-11-13T14:44:19.980Z"
+        },
+        {
+          "run_id": "runeafdcc2a3a91",
+          "role": "R6",
+          "started_at": "2026-11-13T14:44:19.638Z",
+          "finished_at": "2026-11-13T14:44:20.032Z"
+        }
+      ]
+    }
+  },
+  "conflict": {
+    "label": "conflict",
+    "plan_id": "plan90ee6bc12485",
+    "mode": "parallel",
+    "status": "PARTIAL",
+    "merge_status": "CONFLICT",
+    "max_concurrency": 2,
+    "jobs": [
+      {
+        "key": "a",
+        "role": "R2",
+        "status": "SUCCEEDED",
+        "error": null,
+        "run_id": "run0bb949de05b3",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan90ee6bc12485\\a-a1"
+      },
+      {
+        "key": "b",
+        "role": "R2",
+        "status": "BLOCKED",
+        "error": "MERGE_CONFLICT",
+        "run_id": "run018de43435fb",
+        "attempt": 1,
+        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan90ee6bc12485\\b-a1"
+      }
+    ],
+    "tool_events": [
+      {
+        "key": "a",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 1,
+              "path": "conflict.txt",
+              "sha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+            }
+          }
+        ]
+      },
+      {
+        "key": "b",
+        "events": [
+          {
+            "tool": "write_file",
+            "allowed": true,
+            "ok": true,
+            "error": null,
+            "meta": {
+              "bytes": 1,
+              "path": "conflict.txt",
+              "sha256": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c"
+            }
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "runs": 2,
+      "calls": 4,
+      "input_tokens": 62,
+      "output_tokens": 8,
+      "by_source": {
+        "provider": 0,
+        "estimated": 2,
+        "unknown": 0
+      }
+    },
+    "overlap": {
+      "runs": 2,
+      "overlapping_pairs": 1,
+      "times": [
+        {
+          "run_id": "run0bb949de05b3",
+          "role": "R2",
+          "started_at": "2026-11-13T14:44:21.130Z",
+          "finished_at": "2026-11-13T14:44:21.204Z"
+        },
+        {
+          "run_id": "run018de43435fb",
+          "role": "R2",
+          "started_at": "2026-11-13T14:44:21.150Z",
+          "finished_at": "2026-11-13T14:44:21.216Z"
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "plan_id": "plan54b5bedbd4a9",
+    "recovered": [
+      {
+        "job_key": "recover",
+        "action": "REQUEUE",
+        "run_id": "run2d79a30f8349"
+      }
+    ],
+    "job": {
+      "job_id": "jobc0442088105d",
+      "plan_id": "plan54b5bedbd4a9",
+      "job_key": "recover",
+      "title": "recover",
+      "role_id": "R2",
+      "agent_id": "r2",
+      "deps_json": "[]",
+      "priority": 5,
+      "isolation": "shared",
+      "writable_paths_json": null,
+      "status": "READY",
+      "cancel_requested": 0,
+      "run_id": "run2d79a30f8349",
+      "attempt": 1,
+      "max_attempts": 2,
+      "timeout_ms": null,
+      "budget_tokens": null,
+      "workspace": null,
+      "result_json": null,
+      "error_code": "AGENT_LOST_RETRY",
+      "error_message": "Agent 心跳陈旧",
+      "created_at": "2026-11-13T14:44:21.239Z",
+      "started_at": null,
+      "finished_at": null,
+      "updated_at": "2026-11-13T14:44:21.256Z",
+      "deps": [],
+      "writable_paths": null,
+      "result": null
+    },
+    "run": {
+      "run_id": "run2d79a30f8349",
+      "project_id": "demo",
+      "agent_id": "r2",
+      "session_id": null,
+      "task_id": null,
+      "handoff_id": null,
+      "role_id": "R2",
+      "status": "FAILED",
+      "provider": "mock",
+      "model": "mock-1",
+      "idempotency_key": null,
+      "attempt": 1,
+      "max_attempts": 1,
+      "timeout_ms": 120000,
+      "budget_tokens": null,
+      "cancel_requested": 0,
+      "heartbeat_at": "2000-01-01T00:00:00.000Z",
+      "packet_id": null,
+      "objective": null,
+      "input_tokens_est": null,
+      "tool_rounds": 0,
+      "output": null,
+      "error_code": "AGENT_LOST",
+      "error_message": "心跳停止超过 1000 ms",
+      "started_at": null,
+      "finished_at": "2026-11-13T14:44:21.252Z",
+      "created_at": "2026-11-13T14:44:21.245Z",
+      "updated_at": "2026-11-13T14:44:21.252Z"
+    }
+  },
+  "files": {
+    "design": true,
+    "sum": "module.exports = { sum: (a, b) => a + b };",
+    "test": "test('sum adds', () => assert.equal(sum(1, 2), 3));"
+  },
+  "db": "<TEMP>",
+  "workspace": "<TEMP>"
+}
