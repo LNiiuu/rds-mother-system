@@ -417,13 +417,15 @@ async function executeRun(ctx) {
   // 只在真的会写东西（注入了执行器）时才拿，只读 run 不互斥。
   // M18：隔离工作区用 lockScope/lockTarget 区分；默认仍是项目级 '*'。
   let lockHeld = false;
+  const lockArgs = {
+    project_id: run.project_id,
+    run_id: run.run_id,
+    scope: ctx.lockScope || 'workspace',
+    target: ctx.lockTarget || '*',
+    ttl_ms: Number(run.timeout_ms || 120000) + 30000
+  };
   if (ctx.lockWorkspace !== false && executor) {
-    const got = locks.acquire(db, {
-      project_id: run.project_id, run_id: run.run_id,
-      scope: ctx.lockScope || 'workspace',
-      target: ctx.lockTarget || '*',
-      ttl_ms: Number(run.timeout_ms || 120000) + 30000
-    });
+    const got = locks.acquire(db, lockArgs);
     if (!got.ok) {
       const now = nowIso();
       db.prepare(`UPDATE agent_runs SET status = 'FAILED', error_code = 'WORKSPACE_LOCKED',
@@ -524,6 +526,18 @@ async function executeRun(ctx) {
         break;
       }
       heartbeat(db, run.run_id);
+      // 锁 TTL 不随心跳自动延长，长 run 会在 TTL 后失去锁。
+      // 每轮续期；续不上说明锁已被别人拿走，立即停止，避免双写。
+      if (lockHeld) {
+        const renewed = locks.acquire(db, lockArgs);
+        if (!renewed.ok) {
+          status = 'FAILED';
+          errorCode = 'WORKSPACE_LOCK_LOST';
+          errorMessage = '锁已被 run ' + (renewed.holder ? renewed.holder.run_id : 'unknown') + ' 占用';
+          emit(db, run.run_id, 'ERROR', { code: 'WORKSPACE_LOCK_LOST', holder: renewed.holder });
+          break;
+        }
+      }
 
       const reply = await callModel();
       const used = reply.usage

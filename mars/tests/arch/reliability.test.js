@@ -310,3 +310,14 @@ test('M13 部分失败：链在第二棒失败后停止，第一棒的交接仍�
   assert.equal(listHandoffsOfTask(e.db, 'T-CHAIN-FAIL').length, 1);
   assert.equal(result.sessions_distinct, true);
 });
+
+test('M18 锁续期：同一 run 再次 acquire 只延长 TTL，不新增锁行', () => {
+  const e = env('m18-renew-');
+  const first = locks.acquire(e.db, { project_id: 'p1', run_id: 'run-a', ttl_ms: 5000 });
+  assert.equal(first.ok, true);
+  e.db.prepare('UPDATE workspace_locks SET expires_at = ? WHERE run_id = ?').run('2000-01-01T00:00:00.000Z', 'run-a');
+  const renewed = locks.acquire(e.db, { project_id: 'p1', run_id: 'run-a', ttl_ms: 60000 });
+  assert.equal(renewed.ok, true);
+  assert.ok(Date.parse(renewed.lock.expires_at) > Date.now() + 30000, '续期后 TTL 应重新变长');
+  assert.equal(locks.listLocks(e.db, 'p1').filter((l) => l.run_id === 'run-a').length, 1);
+});
