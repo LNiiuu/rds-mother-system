@@ -1,0 +1,159 @@
+{
+  "status": "PARTIAL",
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "check": "sample 已提供",
+        "ok": true
+      },
+      {
+        "check": "sample 存在",
+        "ok": true,
+        "detail": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.pcap"
+      },
+      {
+        "check": "libpcap magic 匹配",
+        "ok": true,
+        "detail": "be/micro"
+      },
+      {
+        "check": "tshark 可用（可选，用于交叉核验）",
+        "ok": false,
+        "detail": "未安装；使用内置纯 JS libpcap 解析"
+      }
+    ],
+    "tools": {
+      "tshark": {
+        "name": "tshark",
+        "label": "Wireshark tshark",
+        "present": false,
+        "path": null,
+        "version": null,
+        "capabilities": [
+          "pcap read",
+          "protocol hierarchy",
+          "conversations",
+          "dns/http fields"
+        ],
+        "safety": "read-only capture; no live interface by default",
+        "bins": [
+          {
+            "name": "tshark",
+            "present": false,
+            "path": null,
+            "version": null
+          }
+        ]
+      }
+    },
+    "blocked_reason": null
+  },
+  "result": {
+    "sample": {
+      "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.pcap",
+      "sha256": "088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8",
+      "bytes": 516,
+      "kind": "synthetic"
+    },
+    "link_type": 1,
+    "link_type_name": "Ethernet",
+    "timestamp_precision": "microsecond",
+    "packets": 4,
+    "bytes": 428,
+    "by_protocol": {
+      "UDP": 2,
+      "TCP": 2
+    },
+    "conversations": [
+      {
+        "flow": "10.0.0.5:51515 -> 10.0.0.1:53/UDP",
+        "packets": 1
+      },
+      {
+        "flow": "10.0.0.1:53 -> 10.0.0.5:51515/UDP",
+        "packets": 1
+      },
+      {
+        "flow": "10.0.0.5:52000 -> 93.184.216.34:443/TCP",
+        "packets": 1
+      },
+      {
+        "flow": "10.0.0.5:52001 -> 10.0.0.9:8080/TCP",
+        "packets": 1
+      }
+    ],
+    "top_ports": [
+      {
+        "port": 53,
+        "packets": 1
+      },
+      {
+        "port": 51515,
+        "packets": 1
+      },
+      {
+        "port": 443,
+        "packets": 1
+      },
+      {
+        "port": 8080,
+        "packets": 1
+      }
+    ],
+    "dns_queries": [
+      {
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com",
+        "qtype": "A",
+        "dst": "10.0.0.1",
+        "direction": "query"
+      },
+      {
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com",
+        "qtype": "A",
+        "dst": "10.0.0.5",
+        "direction": "response"
+      }
+    ],
+    "http_requests": [
+      {
+        "method": "GET",
+        "path": "/api/v1/items",
+        "host": "api.internal.test",
+        "dst": "10.0.0.9",
+        "dport": 8080
+      }
+    ],
+    "tls": {
+      "client_hellos": 0,
+      "sni_parsed": false,
+      "note": "只识别握手类型；未解析 SNI，也未解密任何内容"
+    },
+    "arp_packets": 0,
+    "ipv6_packets": 0,
+    "unparsed_packets": 0,
+    "heuristics": [
+      {
+        "rule": "dns-long-label",
+        "severity": "medium",
+        "count": 2,
+        "samples": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com"
+        ],
+        "why": "DNS 标签 > 40 字符或全名 > 50 字符，是 DNS 隧道/数据外带的常见特征（也可能只是 CDN 或反病毒域名）"
+      }
+    ],
+    "limits": {
+      "format": "libpcap only（pcapng 报 UNSUPPORTED_FORMAT）",
+      "reassembly": "未做 TCP 流重组，HTTP 只取单包首行",
+      "tls": "不解密、不解析 SNI",
+      "verdict": "heuristics 是启发式，不是恶意判定"
+    },
+    "tshark": {
+      "present": false,
+      "version": null
+    }
+  },
+  "error": null
+}

@@ -1,0 +1,573 @@
+{
+  "demo": "m19",
+  "generated_at": "2026-11-13T14:49:02.031Z",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v22.22.2"
+  },
+  "tools": [
+    {
+      "name": "objdump",
+      "label": "GNU binutils objdump",
+      "present": true,
+      "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "version": "GNU objdump (GNU Binutils) 2.39",
+      "capabilities": [
+        "pe/elf header",
+        "sections",
+        "imports",
+        "symbols",
+        "disassembly"
+      ],
+      "safety": "read-only; sample is never executed",
+      "bins": [
+        {
+          "name": "objdump",
+          "present": true,
+          "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+          "version": "GNU objdump (GNU Binutils) 2.39",
+          "probe_ok": true
+        }
+      ]
+    },
+    {
+      "name": "ghidra",
+      "label": "Ghidra Headless",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "import",
+        "auto-analysis",
+        "functions",
+        "xrefs",
+        "decompile"
+      ],
+      "safety": "headless project in temp dir; sample read-only",
+      "bins": [
+        {
+          "name": "analyzeHeadless",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "jadx",
+      "label": "JADX",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "apk manifest",
+        "dex decompile",
+        "resources"
+      ],
+      "safety": "read-only APK; output to temp dir",
+      "bins": [
+        {
+          "name": "jadx",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "java",
+      "label": "Java runtime",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "jadx runtime"
+      ],
+      "safety": "runtime only",
+      "bins": [
+        {
+          "name": "java",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "apktool",
+      "label": "apktool",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "apk decode",
+        "manifest",
+        "resources"
+      ],
+      "safety": "read-only APK; output to temp dir",
+      "bins": [
+        {
+          "name": "apktool",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "tshark",
+      "label": "Wireshark tshark",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "pcap read",
+        "protocol hierarchy",
+        "conversations",
+        "dns/http fields"
+      ],
+      "safety": "read-only capture; no live interface by default",
+      "bins": [
+        {
+          "name": "tshark",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "frida",
+      "label": "Frida",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "attach",
+        "script load",
+        "runtime hooks"
+      ],
+      "safety": "authorized device/process only; no stealth/evasion",
+      "bins": [
+        {
+          "name": "frida",
+          "present": false,
+          "path": null,
+          "version": null
+        },
+        {
+          "name": "frida-ps",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    },
+    {
+      "name": "adb",
+      "label": "Android Debug Bridge",
+      "present": false,
+      "path": null,
+      "version": null,
+      "capabilities": [
+        "device list",
+        "forward"
+      ],
+      "safety": "authorized device only",
+      "bins": [
+        {
+          "name": "adb",
+          "present": false,
+          "path": null,
+          "version": null
+        }
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "workflow_id": "W-01",
+      "status": "PARTIAL",
+      "rea_run_id": "rea1b2731851d33",
+      "evidence_dir": "docs/checks/m19/W-01",
+      "sample": null,
+      "tool_versions": [
+        {
+          "name": "node",
+          "version": "v22.22.2",
+          "kind": "runtime"
+        }
+      ],
+      "limitations": [
+        "依赖图来自 import/require 正则，不做 AST/类型解析；动态 import 可能漏",
+        "二进制文件不会被解析，只统计大小"
+      ],
+      "preflight": {
+        "ok": true,
+        "checks": [
+          {
+            "check": "root 已提供",
+            "ok": true
+          },
+          {
+            "check": "root 存在",
+            "ok": true,
+            "detail": "<REPO>"
+          },
+          {
+            "check": "root 是目录",
+            "ok": true
+          },
+          {
+            "check": "root 可读",
+            "ok": true
+          }
+        ],
+        "blocked_reason": null
+      }
+    },
+    {
+      "workflow_id": "W-02",
+      "status": "PARTIAL",
+      "rea_run_id": "rea4709ca794e69",
+      "evidence_dir": "docs/checks/m19/W-02",
+      "sample": {
+        "path": "C:\\Windows\\System32\\where.exe",
+        "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+        "bytes": 65536,
+        "kind": "authorized-local-file"
+      },
+      "tool_versions": [
+        {
+          "name": "objdump",
+          "version": "GNU objdump (GNU Binutils) 2.39",
+          "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+          "kind": "external"
+        }
+      ],
+      "limitations": [
+        "反编译伪代码（需 Ghidra/IDA，本环境无）",
+        "类型恢复",
+        "完整 xref 图",
+        "动态行为"
+      ],
+      "preflight": {
+        "ok": true,
+        "checks": [
+          {
+            "check": "objdump 可用",
+            "ok": true,
+            "detail": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+          },
+          {
+            "check": "Ghidra Headless 可用（可选，用于反编译）",
+            "ok": false,
+            "detail": "未安装；仅 binutils 结构/符号级分析"
+          },
+          {
+            "check": "sample 已提供",
+            "ok": true
+          },
+          {
+            "check": "sample 存在且是文件",
+            "ok": true,
+            "detail": "C:\\Windows\\System32\\where.exe"
+          }
+        ],
+        "blocked_reason": null,
+        "tools": {
+          "objdump": {
+            "name": "objdump",
+            "present": true,
+            "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+            "version": "GNU objdump (GNU Binutils) 2.39",
+            "probe_ok": true
+          },
+          "ghidra": {
+            "name": "ghidra",
+            "label": "Ghidra Headless",
+            "present": false,
+            "path": null,
+            "version": null,
+            "capabilities": [
+              "import",
+              "auto-analysis",
+              "functions",
+              "xrefs",
+              "decompile"
+            ],
+            "safety": "headless project in temp dir; sample read-only",
+            "bins": [
+              {
+                "name": "analyzeHeadless",
+                "present": false,
+                "path": null,
+                "version": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "workflow_id": "W-03",
+      "status": "BLOCKED",
+      "rea_run_id": "reae9f51f0e3cb4",
+      "evidence_dir": "docs/checks/m19/W-03",
+      "sample": {
+        "path": "<TEMP>\\synthetic.apk",
+        "sha256": "7178079ae6f8b225c3747347a0dc81dc8ab1ebee956eed45690835002a5132b3",
+        "bytes": 836,
+        "kind": "authorized-local-file"
+      },
+      "tool_versions": [
+        {
+          "name": "rea-zip-reader",
+          "version": "1.0.0",
+          "kind": "builtin"
+        }
+      ],
+      "limitations": [
+        "完整 APK 静态分析不可达：缺 jadx/java",
+        "仅产出包结构事实"
+      ],
+      "preflight": {
+        "ok": false,
+        "checks": [
+          {
+            "check": "工具 jadx 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "工具 java 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "工具 apktool 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "sample 存在",
+            "ok": true,
+            "detail": "<TEMP>\\synthetic.apk"
+          },
+          {
+            "check": "sample 是 ZIP/APK",
+            "ok": true,
+            "detail": "PK 头匹配"
+          }
+        ],
+        "blocked_reason": "TOOL_MISSING:jadx",
+        "tools": [
+          {
+            "name": "jadx",
+            "present": false,
+            "path": null,
+            "version": null
+          },
+          {
+            "name": "java",
+            "present": false,
+            "path": null,
+            "version": null
+          },
+          {
+            "name": "apktool",
+            "present": false,
+            "path": null,
+            "version": null
+          }
+        ]
+      }
+    },
+    {
+      "workflow_id": "W-04",
+      "status": "PARTIAL",
+      "rea_run_id": "reaab81a124cfa9",
+      "evidence_dir": "docs/checks/m19/W-04",
+      "sample": {
+        "path": "C:\\Windows\\System32\\where.exe",
+        "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+        "bytes": 65536
+      },
+      "tool_versions": [
+        {
+          "name": "objdump",
+          "version": "GNU objdump (GNU Binutils) 2.39",
+          "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+        }
+      ],
+      "limitations": [
+        "只解析直接 call；间接调用只计数",
+        "剥离二进制用启发式划分函数边界",
+        "未做跨模块（DLL）解析"
+      ],
+      "preflight": {
+        "ok": true,
+        "checks": [
+          {
+            "check": "objdump 可用",
+            "ok": true,
+            "detail": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+          },
+          {
+            "check": "sample 存在",
+            "ok": true,
+            "detail": "C:\\Windows\\System32\\where.exe"
+          }
+        ],
+        "blocked_reason": null,
+        "tools": [
+          {
+            "name": "objdump",
+            "present": true,
+            "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+            "version": "GNU objdump (GNU Binutils) 2.39",
+            "probe_ok": true
+          }
+        ]
+      }
+    },
+    {
+      "workflow_id": "W-05",
+      "status": "PARTIAL",
+      "rea_run_id": "rea2c90977a7fe0",
+      "evidence_dir": "docs/checks/m19/W-05",
+      "sample": {
+        "path": "<TEMP>\\synthetic.pcap",
+        "sha256": "088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8",
+        "bytes": 516,
+        "kind": "synthetic"
+      },
+      "tool_versions": [
+        {
+          "name": "rea-pcap-parser",
+          "version": "1.0.0",
+          "kind": "builtin"
+        }
+      ],
+      "limitations": [
+        "libpcap only（pcapng 报 UNSUPPORTED_FORMAT）",
+        "未做 TCP 流重组，HTTP 只取单包首行",
+        "不解密、不解析 SNI",
+        "heuristics 是启发式，不是恶意判定"
+      ],
+      "preflight": {
+        "ok": true,
+        "checks": [
+          {
+            "check": "sample 已提供",
+            "ok": true
+          },
+          {
+            "check": "sample 存在",
+            "ok": true,
+            "detail": "<TEMP>\\synthetic.pcap"
+          },
+          {
+            "check": "libpcap magic 匹配",
+            "ok": true,
+            "detail": "be/micro"
+          },
+          {
+            "check": "tshark 可用（可选，用于交叉核验）",
+            "ok": false,
+            "detail": "未安装；使用内置纯 JS libpcap 解析"
+          }
+        ],
+        "tools": {
+          "tshark": {
+            "name": "tshark",
+            "label": "Wireshark tshark",
+            "present": false,
+            "path": null,
+            "version": null,
+            "capabilities": [
+              "pcap read",
+              "protocol hierarchy",
+              "conversations",
+              "dns/http fields"
+            ],
+            "safety": "read-only capture; no live interface by default",
+            "bins": [
+              {
+                "name": "tshark",
+                "present": false,
+                "path": null,
+                "version": null
+              }
+            ]
+          }
+        },
+        "blocked_reason": null
+      }
+    },
+    {
+      "workflow_id": "W-06",
+      "status": "BLOCKED",
+      "rea_run_id": "rea419f862acc3e",
+      "evidence_dir": "docs/checks/m19/W-06",
+      "sample": null,
+      "tool_versions": [],
+      "limitations": [
+        "未执行"
+      ],
+      "preflight": {
+        "ok": false,
+        "checks": [
+          {
+            "check": "工具 frida 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "工具 frida-ps 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "工具 adb 可用",
+            "ok": false,
+            "detail": "未在 PATH 中找到"
+          },
+          {
+            "check": "授权声明有效",
+            "ok": true,
+            "detail": "own-device"
+          },
+          {
+            "check": "目标已声明",
+            "ok": true,
+            "detail": "com.example"
+          }
+        ],
+        "blocked_reason": "TOOL_MISSING:frida",
+        "tools": [
+          {
+            "name": "frida",
+            "present": false,
+            "path": null,
+            "version": null
+          },
+          {
+            "name": "frida-ps",
+            "present": false,
+            "path": null,
+            "version": null
+          },
+          {
+            "name": "adb",
+            "present": false,
+            "path": null,
+            "version": null
+          }
+        ]
+      }
+    }
+  ],
+  "note": "W-01/W-04 为真实本地分析；W-02/W-03/W-05/W-06 缺专业工具，按 BLOCKED/PARTIAL 记录；未发起网络请求"
+}

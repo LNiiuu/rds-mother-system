@@ -1,0 +1,25 @@
+{
+  "rea_run_id": "rea1b2731851d33",
+  "workflow_id": "W-01",
+  "sample": {
+    "path": "D:\\M1"
+  },
+  "tool_versions": [
+    {
+      "name": "node",
+      "version": "v22.22.2",
+      "kind": "runtime"
+    }
+  ],
+  "commands": [],
+  "limitations": [
+    "依赖图来自 import/require 正则，不做 AST/类型解析；动态 import 可能漏",
+    "二进制文件不会被解析，只统计大小"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-13T14:48:59.376Z"
+}

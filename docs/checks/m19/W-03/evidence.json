@@ -1,0 +1,28 @@
+{
+  "rea_run_id": "reae9f51f0e3cb4",
+  "workflow_id": "W-03",
+  "sample": {
+    "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.apk",
+    "sha256": "7178079ae6f8b225c3747347a0dc81dc8ab1ebee956eed45690835002a5132b3",
+    "bytes": 836,
+    "kind": "authorized-local-file"
+  },
+  "tool_versions": [
+    {
+      "name": "rea-zip-reader",
+      "version": "1.0.0",
+      "kind": "builtin"
+    }
+  ],
+  "commands": [],
+  "limitations": [
+    "完整 APK 静态分析不可达：缺 jadx/java",
+    "仅产出包结构事实"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-13T14:49:00.826Z"
+}

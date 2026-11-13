@@ -1,0 +1,8 @@
+workflow_id=W-06
+status=BLOCKED
+rea_run_id=rea419f862acc3e
+evidence_dir=<TEMP>\evidence\W-06\rea419f862acc3e
+sample=null
+tool_versions=[]
+limitations=["未执行"]
+run_at=2026-11-13T14:49:02.030Z

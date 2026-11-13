@@ -1,0 +1,51 @@
+{
+  "rea_run_id": "reaab81a124cfa9",
+  "workflow_id": "W-04",
+  "sample": {
+    "path": "C:/Windows/System32/where.exe",
+    "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+    "bytes": 65536
+  },
+  "tool_versions": [
+    {
+      "name": "objdump",
+      "version": "GNU objdump (GNU Binutils) 2.39",
+      "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"
+    }
+  ],
+  "commands": [
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-f",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:49:01.150Z"
+    },
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-d",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:49:01.209Z"
+    }
+  ],
+  "limitations": [
+    "只解析直接 call；间接调用只计数",
+    "剥离二进制用启发式划分函数边界",
+    "未做跨模块（DLL）解析"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-13T14:49:01.367Z"
+}

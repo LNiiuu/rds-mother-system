@@ -1,0 +1,8 @@
+workflow_id=W-03
+status=BLOCKED
+rea_run_id=reae9f51f0e3cb4
+evidence_dir=<TEMP>\evidence\W-03\reae9f51f0e3cb4
+sample={"path":"<TEMP>\\synthetic.apk","sha256":"7178079ae6f8b225c3747347a0dc81dc8ab1ebee956eed45690835002a5132b3","bytes":836,"kind":"authorized-local-file"}
+tool_versions=[{"name":"rea-zip-reader","version":"1.0.0","kind":"builtin"}]
+limitations=["完整 APK 静态分析不可达：缺 jadx/java","仅产出包结构事实"]
+run_at=2026-11-13T14:49:00.835Z

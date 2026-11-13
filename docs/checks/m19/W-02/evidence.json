@@ -1,0 +1,76 @@
+{
+  "rea_run_id": "rea4709ca794e69",
+  "workflow_id": "W-02",
+  "sample": {
+    "path": "C:/Windows/System32/where.exe",
+    "sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
+    "bytes": 65536,
+    "kind": "authorized-local-file"
+  },
+  "tool_versions": [
+    {
+      "name": "objdump",
+      "version": "GNU objdump (GNU Binutils) 2.39",
+      "path": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "kind": "external"
+    }
+  ],
+  "commands": [
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-f",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:48:59.984Z"
+    },
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-h",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:49:00.067Z"
+    },
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-p",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:49:00.112Z"
+    },
+    {
+      "bin": "D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe",
+      "argv": [
+        "-t",
+        "C:\\Windows\\System32\\where.exe"
+      ],
+      "ok": true,
+      "code": 0,
+      "timed_out": false,
+      "at": "2026-11-13T14:49:00.164Z"
+    }
+  ],
+  "limitations": [
+    "反编译伪代码（需 Ghidra/IDA，本环境无）",
+    "类型恢复",
+    "完整 xref 图",
+    "动态行为"
+  ],
+  "reproduce": [
+    "1. 对 sample.path 重新计算 SHA-256，与 sample.sha256 比对",
+    "2. 按 commands 里的 argv 重新执行（不经过 shell）",
+    "3. 对比 result.json 的字段；不一致说明环境或样本变了"
+  ],
+  "created_at": "2026-11-13T14:49:00.311Z"
+}

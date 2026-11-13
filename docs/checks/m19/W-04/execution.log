@@ -1,0 +1,8 @@
+workflow_id=W-04
+status=PARTIAL
+rea_run_id=reaab81a124cfa9
+evidence_dir=<TEMP>\evidence\W-04\reaab81a124cfa9
+sample={"path":"C:\\Windows\\System32\\where.exe","sha256":"f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29","bytes":65536}
+tool_versions=[{"name":"objdump","version":"GNU objdump (GNU Binutils) 2.39","path":"D:\\MinGw\\Mingw\\mingw64\\bin\\objdump.exe"}]
+limitations=["只解析直接 call；间接调用只计数","剥离二进制用启发式划分函数边界","未做跨模块（DLL）解析"]
+run_at=2026-11-13T14:49:01.376Z

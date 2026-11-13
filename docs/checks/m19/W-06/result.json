@@ -1,0 +1,86 @@
+{
+  "status": "BLOCKED",
+  "preflight": {
+    "ok": false,
+    "checks": [
+      {
+        "check": "工具 frida 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 frida-ps 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 adb 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "授权声明有效",
+        "ok": true,
+        "detail": "own-device"
+      },
+      {
+        "check": "目标已声明",
+        "ok": true,
+        "detail": "com.example"
+      }
+    ],
+    "blocked_reason": "TOOL_MISSING:frida",
+    "tools": [
+      {
+        "name": "frida",
+        "present": false,
+        "path": null,
+        "version": null
+      },
+      {
+        "name": "frida-ps",
+        "present": false,
+        "path": null,
+        "version": null
+      },
+      {
+        "name": "adb",
+        "present": false,
+        "path": null,
+        "version": null
+      }
+    ]
+  },
+  "result": {
+    "blocked_reason": "TOOL_MISSING:frida",
+    "checks": [
+      {
+        "check": "工具 frida 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 frida-ps 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "工具 adb 可用",
+        "ok": false,
+        "detail": "未在 PATH 中找到"
+      },
+      {
+        "check": "授权声明有效",
+        "ok": true,
+        "detail": "own-device"
+      },
+      {
+        "check": "目标已声明",
+        "ok": true,
+        "detail": "com.example"
+      }
+    ],
+    "message": "前置条件不满足，未执行分析"
+  },
+  "error": null
+}

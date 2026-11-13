@@ -1,0 +1,3861 @@
+{
+  "status": "PARTIAL",
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "check": "root 已提供",
+        "ok": true
+      },
+      {
+        "check": "root 存在",
+        "ok": true,
+        "detail": "D:\\M1"
+      },
+      {
+        "check": "root 是目录",
+        "ok": true
+      },
+      {
+        "check": "root 可读",
+        "ok": true
+      }
+    ],
+    "blocked_reason": null
+  },
+  "result": {
+    "root": "D:\\M1",
+    "files_scanned": 584,
+    "truncated": false,
+    "total_bytes": 42996275,
+    "by_extension": {
+      ".md": 233,
+      ".js": 128,
+      ".json": 95,
+      ".txt": 37,
+      ".ps1": 18,
+      ".log": 15,
+      ".mjs": 11,
+      ".patch": 10,
+      ".cjs": 7,
+      ".token": 6,
+      "(none)": 5,
+      ".db": 5,
+      ".yaml": 3,
+      ".jsonl": 3,
+      ".db-shm": 2,
+      ".db-wal": 2,
+      ".orig": 1,
+      ".csv": 1,
+      ".backup": 1,
+      ".sh": 1
+    },
+    "languages": [
+      {
+        "name": "Markdown",
+        "files": 233,
+        "bytes": 1361287
+      },
+      {
+        "name": "JavaScript",
+        "files": 146,
+        "bytes": 992383
+      },
+      {
+        "name": "JSON",
+        "files": 95,
+        "bytes": 540958
+      },
+      {
+        "name": "PowerShell",
+        "files": 18,
+        "bytes": 85561
+      },
+      {
+        "name": "YAML",
+        "files": 3,
+        "bytes": 2251
+      },
+      {
+        "name": "Shell",
+        "files": 1,
+        "bytes": 4427
+      }
+    ],
+    "top_dirs": [
+      {
+        "name": "docs",
+        "files": 233
+      },
+      {
+        "name": "mars",
+        "files": 229
+      },
+      {
+        "name": "core",
+        "files": 46
+      },
+      {
+        "name": "tooling",
+        "files": 42
+      },
+      {
+        "name": "rea",
+        "files": 17
+      },
+      {
+        "name": "(root)",
+        "files": 8
+      },
+      {
+        "name": "tests",
+        "files": 4
+      },
+      {
+        "name": "bin",
+        "files": 3
+      },
+      {
+        "name": "stacks",
+        "files": 2
+      }
+    ],
+    "manifests": [
+      {
+        "file": "package.json",
+        "type": "npm",
+        "name": "rds-mother-system",
+        "version": "0.1.0",
+        "main": null,
+        "bin": [
+          "rds"
+        ],
+        "scripts": [
+          "doctor",
+          "config",
+          "layers",
+          "baseline",
+          "docs:check",
+          "test",
+          "test:raw",
+          "test:external",
+          "test:gate-selfcheck",
+          "smoke",
+          "verify",
+          "pack:check",
+          "demo:m9-m11",
+          "demo:m12",
+          "demo:m15"
+        ],
+        "dependencies": 0,
+        "dev_dependencies": 0
+      }
+    ],
+    "entries": [
+      {
+        "path": "bin:rds",
+        "reason": "package.json bin"
+      },
+      {
+        "path": "bin/rds.mjs",
+        "reason": "cli entry"
+      }
+    ],
+    "tests": {
+      "files": 54,
+      "samples": [
+        "docs/checks/m7/acceptance.test.js",
+        "docs/checks/m7/spec/CR1.md",
+        "docs/checks/m7/spec/CR2.md",
+        "docs/checks/m7/spec/TASK.md",
+        "mars/tests/arch/agent-runtime.test.js",
+        "mars/tests/arch/assets.test.js",
+        "mars/tests/arch/audit.test.js",
+        "mars/tests/arch/cli-help.test.js",
+        "mars/tests/arch/collab.test.js",
+        "mars/tests/arch/config.test.js"
+      ],
+      "frameworks": [
+        {
+          "name": "node:test",
+          "evidence": "docs/checks/m7/acceptance.test.js"
+        }
+      ]
+    },
+    "dependencies": {
+      "nodes": 146,
+      "edges": 376,
+      "local_edges": [
+        {
+          "from": "bin/rds.mjs",
+          "to": "mars/src/cli-help.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/mars-issue-mcp-identity.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/mars-mcp-disable.js",
+          "to": "mars/src/adapters/dsh-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/mars-mcp-disable.js",
+          "to": "mars/src/adapters/null-host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/sharing.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase3-sharing-smoke.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-build.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-build.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-build.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-build.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-build.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/phase4-usage.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/wp5-stress.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/wp5-stress.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/wp5-stress.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/wp5-stress.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/scripts/wp5-stress.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/cli-identity.js",
+          "to": "mars/src/ports/identity-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/db-audit-sink.js",
+          "to": "mars/src/ports/audit-sink.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/dsh-registry.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/dsh-registry.js",
+          "to": "mars/src/ports/host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/dsh-session-source.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/dsh-session-source.js",
+          "to": "mars/src/ports/session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/fs-asset-resolver.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/fs-asset-resolver.js",
+          "to": "mars/src/ports/asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/null-host-registry.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/null-host-registry.js",
+          "to": "mars/src/ports/host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/provider-anthropic.js",
+          "to": "mars/src/ports/model-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/provider-mock.js",
+          "to": "mars/src/ports/model-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/provider-mock.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/provider-openai-compat.js",
+          "to": "mars/src/ports/model-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/evidence.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w01-code.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w02-binary.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w03-apk.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w04-callchain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w05-pcap.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/adapters/rea/w06-frida.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/registry.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/tool-registry.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w02-binary.js",
+          "to": "mars/src/adapters/rea/evidence.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w02-binary.js",
+          "to": "mars/src/adapters/rea/tool-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w02-binary.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w03-apk.js",
+          "to": "mars/src/adapters/rea/evidence.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w03-apk.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w04-callchain.js",
+          "to": "mars/src/adapters/rea/evidence.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w04-callchain.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w05-pcap.js",
+          "to": "mars/src/adapters/rea/evidence.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w05-pcap.js",
+          "to": "mars/src/adapters/rea/tool-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/rea/w06-frida.js",
+          "to": "mars/src/adapters/rea/tools.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/adapters/token-file-identity.js",
+          "to": "mars/src/ports/identity-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/authz.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/budget.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/runtime/chain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/runtime/locks.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/runtime/policy.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-agent.js",
+          "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-rea.js",
+          "to": "mars/src/runtime/task-types.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli-rea.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/adapters/fs-workspaces.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/adapters/rea/tool-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/cli-agent.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/cli-help.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/cli-rea.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/context-budget.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/context-ops.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/manifest.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/mcp.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/orchestrator.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/render-md.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/runtime/scheduler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/runtime/task-types.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/sharing.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/cli.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/collab.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/budget.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/context-budget.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/context-ops.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/manifest.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/compiler.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/cli-identity.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/db-audit-sink.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/fs-asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/fs-project-roots.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/provider-anthropic.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/provider-openai-compat.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/adapters/token-file-identity.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/paths.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/ports/asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/composition.js",
+          "to": "mars/src/session-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/context-budget.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/context-ops.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/db/ratelimit.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/db/schema.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/db/stats.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/db.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/manifest.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/manifest.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/manifest.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/manifest.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp-stdio.js",
+          "to": "mars/src/version.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/mcp.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/orchestrator.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/paths.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/projects.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/retrieval.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/retrieval.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/retrieval.js",
+          "to": "mars/src/sharing.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/retrieval.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/agent-runtime.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/agent-runtime.js",
+          "to": "mars/src/runtime/locks.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/agent-runtime.js",
+          "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/agent-runtime.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/chain.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/chain.js",
+          "to": "mars/src/runtime/handoff.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/handoff.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/locks.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/policy.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/policy.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/reliability.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/scheduler.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/scheduler.js",
+          "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/scheduler.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/runtime/task-types.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/session-registry.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/session-registry.js",
+          "to": "mars/src/ports/session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/sharing.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/sharing.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/sharing.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/store.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/store.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/store.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/store.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/store.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/src/version.js",
+          "to": "package.json",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/adapters/fs-project-roots.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/ports/model-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/agent-runtime.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/adapters/fs-asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/ports/asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/assets.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/adapters/db-audit-sink.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/adapters/null-audit-sink.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/ports/audit-sink.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/audit.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/collab.test.js",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/collab.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/config.test.js",
+          "to": "mars/src/paths.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/context-ops.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/context-ops.test.js",
+          "to": "mars/src/context-budget.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/context-ops.test.js",
+          "to": "mars/src/context-ops.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/context-ops.test.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/context-ops.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/src/ports/asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/src/session-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/tests/fixtures/ledger/make-session.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/contracts.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/db-lifecycle.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/db-lifecycle.test.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/host-registry.test.js",
+          "to": "mars/src/adapters/dsh-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/host-registry.test.js",
+          "to": "mars/src/adapters/null-host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/host-registry.test.js",
+          "to": "mars/src/ports/host-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/identity.test.js",
+          "to": "mars/src/adapters/cli-identity.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/identity.test.js",
+          "to": "mars/src/adapters/token-file-identity.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/identity.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/identity.test.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/identity.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/adapters/fs-project-roots.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/runtime/chain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/src/runtime/task-types.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/m15-joint.test.js",
+          "to": "tooling/make-pcap-fixture.cjs",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/projects.test.js",
+          "to": "mars/src/adapters/fs-project-roots.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/projects.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/projects.test.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/projects.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/projects.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-adapters.test.js",
+          "to": "mars/src/adapters/provider-anthropic.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-adapters.test.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-adapters.test.js",
+          "to": "mars/src/adapters/provider-openai-compat.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-adapters.test.js",
+          "to": "mars/src/ports/model-provider.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/provider-adapters.test.js",
+          "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea-tools.test.js",
+          "to": "mars/src/adapters/rea/tool-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "mars/src/adapters/rea/w02-binary.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "mars/src/adapters/rea/w04-callchain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "mars/src/adapters/rea/w05-pcap.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/rea.test.js",
+          "to": "tooling/make-pcap-fixture.cjs",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/adapters/fs-project-roots.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/chain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/handoff.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/locks.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/policy.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/src/runtime/reliability.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/reliability.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/src/adapters/fs-workspaces.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/src/runtime/scheduler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/scheduler.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/sessions.test.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/sessions.test.js",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/sessions.test.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/sessions.test.js",
+          "to": "mars/src/ports/session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/sessions.test.js",
+          "to": "mars/src/session-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/version.test.js",
+          "to": "mars/src/version.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/arch/version.test.js",
+          "to": "package.json",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/external/dsh-real-session.external.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/external/dsh-real-session.external.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/helpers/assets.js",
+          "to": "mars/src/adapters/fs-asset-resolver.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/helpers/assets.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/ledger/ledger.test.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/ledger/ledger.test.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/ledger/ledger.test.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/errors.test.js",
+          "to": "mars/src/errors.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/errors.test.js",
+          "to": "mars/src/mcp.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/errors.test.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/errors.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/mcp.test.js",
+          "to": "mars/src/mcp.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/mcp.test.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/mcp/mcp.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/authz.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/authz.test.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/authz.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/authz.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/budget.test.js",
+          "to": "mars/src/budget.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/budget.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/budget.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/budget.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/helpers.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/helpers.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/helpers.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/helpers.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/helpers.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/ledger-reconcile.test.js",
+          "to": "mars/src/adapters/dsh-session-source.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/ledger-reconcile.test.js",
+          "to": "mars/src/ledger.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/ledger-reconcile.test.js",
+          "to": "mars/tests/fixtures/ledger/make-session.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/lifecycle.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/lifecycle.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/lifecycle.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/manifest.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/manifest.test.js",
+          "to": "mars/src/manifest.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/manifest.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/manifest.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/mcp-server.test.js",
+          "to": "mars/src/mcp.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/mcp-server.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/mcp-server.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/src/manifest.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/src/mcp-stdio.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/src/validate.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/remediation.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/retrieval.test.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/retrieval.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/retrieval.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase1/rollback-offline.test.js",
+          "to": "mars/tests/phase1/helpers.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/src/mcp-stdio.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/mcp-stdio.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/mcp-stdio.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/src/util.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase2/wp1.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/src/authz.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/src/retrieval.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/src/sharing.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase3/sharing.test.js",
+          "to": "mars/tests/helpers/assets.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase4/orchestrator.test.js",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "mars/tests/phase4/orchestrator.test.js",
+          "to": "mars/src/orchestrator.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/runtime/chain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m12-multi-agent-demo.cjs",
+          "to": "mars/src/runtime/handoff.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/runtime/chain.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m15-joint-demo.cjs",
+          "to": "mars/src/runtime/task-types.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/adapters/fs-tool-executor.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/adapters/fs-workspaces.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/adapters/provider-mock.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/runtime/agent-runtime.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m18-orchestration-demo.cjs",
+          "to": "mars/src/runtime/scheduler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m19-rea-evidence.cjs",
+          "to": "mars/src/adapters/rea/registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m19-rea-evidence.cjs",
+          "to": "mars/src/adapters/rea/tool-registry.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m19-rea-evidence.cjs",
+          "to": "mars/src/db.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m19-rea-evidence.cjs",
+          "to": "tooling/make-apk-fixture.cjs",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m19-rea-evidence.cjs",
+          "to": "tooling/make-pcap-fixture.cjs",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/collab.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/compiler.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/composition.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/context-ops.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/projects.js",
+          "kind": "static-import"
+        },
+        {
+          "from": "tooling/m9-m11-demo.cjs",
+          "to": "mars/src/store.js",
+          "kind": "static-import"
+        }
+      ],
+      "external_dependencies": [
+        {
+          "name": "node:path",
+          "files": 86
+        },
+        {
+          "name": "node:fs",
+          "files": 80
+        },
+        {
+          "name": "node:test",
+          "files": 48
+        },
+        {
+          "name": "node:os",
+          "files": 44
+        },
+        {
+          "name": "node:assert/strict",
+          "files": 33
+        },
+        {
+          "name": "node:child_process",
+          "files": 26
+        },
+        {
+          "name": "node:assert",
+          "files": 17
+        },
+        {
+          "name": "node:crypto",
+          "files": 14
+        },
+        {
+          "name": "node:url",
+          "files": 10
+        },
+        {
+          "name": "node:zlib",
+          "files": 7
+        },
+        {
+          "name": "node:sqlite",
+          "files": 6
+        },
+        {
+          "name": "node:module",
+          "files": 3
+        },
+        {
+          "name": "node:readline",
+          "files": 2
+        },
+        {
+          "name": "../src/m.js",
+          "files": 1
+        },
+        {
+          "name": "node:vm",
+          "files": 1
+        },
+        {
+          "name": "../src/sum.js",
+          "files": 1
+        },
+        {
+          "name": "../src/cmd.js",
+          "files": 1
+        },
+        {
+          "name": "../src/sum",
+          "files": 1
+        }
+      ],
+      "symbols": [
+        {
+          "name": "add",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "machinePatterns",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "readJson",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "render",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "scanPaths",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "walk",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "walkMarkdown",
+          "file": "bin/doctor.mjs"
+        },
+        {
+          "name": "cmpVersion",
+          "file": "bin/rds.mjs"
+        },
+        {
+          "name": "fail",
+          "file": "bin/rds.mjs"
+        },
+        {
+          "name": "readVersion",
+          "file": "bin/rds.mjs"
+        },
+        {
+          "name": "add",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "isAbsolute",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "parseTopLevel",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "render",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "stripComment",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "unquote",
+          "file": "bin/validate.mjs"
+        },
+        {
+          "name": "json",
+          "file": "docs/checks/m7/acceptance.test.js"
+        },
+        {
+          "name": "run",
+          "file": "docs/checks/m7/acceptance.test.js"
+        },
+        {
+          "name": "tmpdir",
+          "file": "docs/checks/m7/acceptance.test.js"
+        },
+        {
+          "name": "convert",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "fmt",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "load",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "main",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "parseAmount",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "parseCsv",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "parseDate",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "parseJsonl",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "roundHalfAway",
+          "file": "docs/checks/m7/oracle.js"
+        },
+        {
+          "name": "arg",
+          "file": "mars/scripts/mars-db-backup.js"
+        },
+        {
+          "name": "counts",
+          "file": "mars/scripts/mars-db-backup.js"
+        },
+        {
+          "name": "knownRoles",
+          "file": "mars/scripts/mars-issue-mcp-identity.js"
+        },
+        {
+          "name": "parseArgs",
+          "file": "mars/scripts/mars-issue-mcp-identity.js"
+        },
+        {
+          "name": "main",
+          "file": "mars/scripts/mars-mcp-disable.js"
+        },
+        {
+          "name": "parseArgs",
+          "file": "mars/scripts/mars-mcp-disable.js"
+        },
+        {
+          "name": "assertInside",
+          "file": "mars/scripts/mars-rollback.js"
+        },
+        {
+          "name": "collectTargets",
+          "file": "mars/scripts/mars-rollback.js"
+        },
+        {
+          "name": "isRuntimeArtifact",
+          "file": "mars/scripts/mars-rollback.js"
+        },
+        {
+          "name": "main",
+          "file": "mars/scripts/mars-rollback.js"
+        },
+        {
+          "name": "parseArgs",
+          "file": "mars/scripts/mars-rollback.js"
+        },
+        {
+          "name": "callServer",
+          "file": "mars/scripts/phase2-g1-verify.js"
+        },
+        {
+          "name": "toolText",
+          "file": "mars/scripts/phase2-g1-verify.js"
+        },
+        {
+          "name": "principal",
+          "file": "mars/scripts/phase3-sharing-smoke.js"
+        },
+        {
+          "name": "principal",
+          "file": "mars/scripts/phase4-build.js"
+        },
+        {
+          "name": "agg",
+          "file": "mars/scripts/phase4-score.js"
+        },
+        {
+          "name": "norm",
+          "file": "mars/scripts/phase4-score.js"
+        },
+        {
+          "name": "agg",
+          "file": "mars/scripts/phase4-usage.js"
+        },
+        {
+          "name": "dedupe",
+          "file": "mars/scripts/phase4-usage.js"
+        },
+        {
+          "name": "parseSession",
+          "file": "mars/scripts/phase4-usage.js"
+        },
+        {
+          "name": "sum",
+          "file": "mars/scripts/phase4-usage.js"
+        },
+        {
+          "name": "walk",
+          "file": "mars/scripts/phase4-usage.js"
+        },
+        {
+          "name": "forbiddenFor",
+          "file": "mars/scripts/wp5-stress.js"
+        },
+        {
+          "name": "pct",
+          "file": "mars/scripts/wp5-stress.js"
+        },
+        {
+          "name": "createCliIdentity",
+          "file": "mars/src/adapters/cli-identity.js"
+        },
+        {
+          "name": "pick",
+          "file": "mars/src/adapters/cli-identity.js"
+        },
+        {
+          "name": "createDbAuditSink",
+          "file": "mars/src/adapters/db-audit-sink.js"
+        },
+        {
+          "name": "createDshHostRegistry",
+          "file": "mars/src/adapters/dsh-registry.js"
+        },
+        {
+          "name": "readDoc",
+          "file": "mars/src/adapters/dsh-registry.js"
+        },
+        {
+          "name": "sha256",
+          "file": "mars/src/adapters/dsh-registry.js"
+        },
+        {
+          "name": "createDshSessionSource",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "decodeSessionBytes",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "emptyUsage",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "isZstd",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "normalizeDshUsage",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "parseDshSession",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "parseEvents",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "parseSessionFile",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "sessionText",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "toInt",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "zstdFrames",
+          "file": "mars/src/adapters/dsh-session-source.js"
+        },
+        {
+          "name": "createFsAssetResolver",
+          "file": "mars/src/adapters/fs-asset-resolver.js"
+        },
+        {
+          "name": "readJson",
+          "file": "mars/src/adapters/fs-asset-resolver.js"
+        },
+        {
+          "name": "sha256",
+          "file": "mars/src/adapters/fs-asset-resolver.js"
+        },
+        {
+          "name": "pointerPath",
+          "file": "mars/src/adapters/fs-project-roots.js"
+        },
+        {
+          "name": "readCurrent",
+          "file": "mars/src/adapters/fs-project-roots.js"
+        },
+        {
+          "name": "resolveRoot",
+          "file": "mars/src/adapters/fs-project-roots.js"
+        },
+        {
+          "name": "writeCurrent",
+          "file": "mars/src/adapters/fs-project-roots.js"
+        },
+        {
+          "name": "createFsToolExecutor",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "discoverTests",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "fail",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "isProbablyBinary",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "listDir",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "pick",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "readFile",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "resolveInside",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "runTest",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "sha256Hex",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "walk",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "writeAllowed",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "writeFile",
+          "file": "mars/src/adapters/fs-tool-executor.js"
+        },
+        {
+          "name": "changes",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "cleanup",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "copyFile",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "copyTracked",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "createWorkspaceManager",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "merge",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "normalizeRel",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "prepare",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "sha256File",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "skipped",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "snapshot",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "visit",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "walk",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "walkCopy",
+          "file": "mars/src/adapters/fs-workspaces.js"
+        },
+        {
+          "name": "createNullAuditSink",
+          "file": "mars/src/adapters/null-audit-sink.js"
+        },
+        {
+          "name": "createNullHostRegistry",
+          "file": "mars/src/adapters/null-host-registry.js"
+        },
+        {
+          "name": "fail",
+          "file": "mars/src/adapters/null-host-registry.js"
+        },
+        {
+          "name": "cancel",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "configured",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "createAnthropicProvider",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "createSession",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "getUsage",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "healthCheck",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "sendMessage",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "toWire",
+          "file": "mars/src/adapters/provider-anthropic.js"
+        },
+        {
+          "name": "buildReply",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "cancel",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "createMockProvider",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "createSession",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "getUsage",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "healthCheck",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "sendMessage",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "sessionOf",
+          "file": "mars/src/adapters/provider-mock.js"
+        },
+        {
+          "name": "cancel",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "configured",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "createOpenAiCompatProvider",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "createSession",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "getUsage",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "healthCheck",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "nowIsoLocal",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "sendMessage",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "toWireMessages",
+          "file": "mars/src/adapters/provider-openai-compat.js"
+        },
+        {
+          "name": "commandRecord",
+          "file": "mars/src/adapters/rea/evidence.js"
+        },
+        {
+          "name": "makeEvidenceDir",
+          "file": "mars/src/adapters/rea/evidence.js"
+        },
+        {
+          "name": "persist",
+          "file": "mars/src/adapters/rea/evidence.js"
+        },
+        {
+          "name": "sha256File",
+          "file": "mars/src/adapters/rea/evidence.js"
+        },
+        {
+          "name": "writeJson",
+          "file": "mars/src/adapters/rea/evidence.js"
+        },
+        {
+          "name": "all",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "get",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "getRun",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "listRuns",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "markdown",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "preflight",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "run",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "status",
+          "file": "mars/src/adapters/rea/registry.js"
+        },
+        {
+          "name": "buildFridaArgs",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "buildGhidraArgs",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "buildJadxArgs",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "buildTsharkArgs",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "detect",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "execute",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "ghidraHome",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "installHint",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "preflight",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "status",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "toolNames",
+          "file": "mars/src/adapters/rea/tool-registry.js"
+        },
+        {
+          "name": "locate",
+          "file": "mars/src/adapters/rea/tools.js"
+        },
+        {
+          "name": "probe",
+          "file": "mars/src/adapters/rea/tools.js"
+        },
+        {
+          "name": "run",
+          "file": "mars/src/adapters/rea/tools.js"
+        },
+        {
+          "name": "analyzeDependencies",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "analyzeJsFile",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "detectEntries",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "detectTests",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "readManifest",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "walk",
+          "file": "mars/src/adapters/rea/w01-code.js"
+        },
+        {
+          "name": "classifyString",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "extractStrings",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "parseFileHeader",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "parseImports",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "parseSections",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "parseSymbols",
+          "file": "mars/src/adapters/rea/w02-binary.js"
+        },
+        {
+          "name": "listZipEntries",
+          "file": "mars/src/adapters/rea/w03-apk.js"
+        },
+        {
+          "name": "buildGraph",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "cmpAddr",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "nameOf",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "normAddr",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "ownerOf",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "parseDisassembly",
+          "file": "mars/src/adapters/rea/w04-callchain.js"
+        },
+        {
+          "name": "analyzePcap",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "bump",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "detectMagic",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "ipToString",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "parseDnsQname",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "parseTcp",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "parseUdp",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "rd16",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "rd32",
+          "file": "mars/src/adapters/rea/w05-pcap.js"
+        },
+        {
+          "name": "createTokenFileIdentity",
+          "file": "mars/src/adapters/token-file-identity.js"
+        },
+        {
+          "name": "readToken",
+          "file": "mars/src/adapters/token-file-identity.js"
+        },
+        {
+          "name": "role",
+          "file": "mars/src/adapters/token-file-identity.js"
+        },
+        {
+          "name": "authenticate",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "authorize",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "isApprover",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "loadPrincipals",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "loadRouting",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "roleProfile",
+          "file": "mars/src/authz.js"
+        },
+        {
+          "name": "applyBudget",
+          "file": "mars/src/budget.js"
+        },
+        {
+          "name": "isProtected",
+          "file": "mars/src/budget.js"
+        },
+        {
+          "name": "actorOf",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentCancel",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentChain",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentCreate",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentList",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentProviders",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentReap",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentShow",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentStart",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentStatus",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "agentStop",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "assertCanManage",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "assertCanStart",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "budgetGateShow",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "json",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "lockList",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "policyCheck",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "policyList",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "projectBudget",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "requireProject",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "runInspect",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "runList",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "traceInspect",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "usageShow",
+          "file": "mars/src/cli-agent.js"
+        },
+        {
+          "name": "displayWidth",
+          "file": "mars/src/cli-help.js"
+        },
+        {
+          "name": "render",
+          "file": "mars/src/cli-help.js"
+        },
+        {
+          "name": "renderArgs",
+          "file": "mars/src/cli-help.js"
+        },
+        {
+          "name": "assertNotInstallRoot",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "json",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaInspect",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaList",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaPreflight",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaRun",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaRuns",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "reaStatus",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "summarize",
+          "file": "mars/src/cli-rea.js"
+        },
+        {
+          "name": "compilePacket",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "describeError",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "die",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "exitCodeFor",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "loadAuth",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "main",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "parseArgs",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "readJson",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "run",
+          "file": "mars/src/cli.js"
+        },
+        {
+          "name": "addEvent",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "assertPermission",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "assign",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "buildHandoffSummary",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "complete",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "costReport",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "createTask",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "dispatch",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "events",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "fail",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "getTask",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "listHandoffs",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "listRoles",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "listTasks",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "parseTask",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "planTasks",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "recordCost",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "role",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "saveHandoff",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "transition",
+          "file": "mars/src/collab.js"
+        },
+        {
+          "name": "compileContext",
+          "file": "mars/src/compiler.js"
+        },
+        {
+          "name": "resolvePacketSchema",
+          "file": "mars/src/compiler.js"
+        },
+        {
+          "name": "sectionFromMemories",
+          "file": "mars/src/compiler.js"
+        },
+        {
+          "name": "createRuntime",
+          "file": "mars/src/composition.js"
+        },
+        {
+          "name": "openAuditedDb",
+          "file": "mars/src/composition.js"
+        },
+        {
+          "name": "compute",
+          "file": "mars/src/context-budget.js"
+        },
+        {
+          "name": "estimateText",
+          "file": "mars/src/context-budget.js"
+        },
+        {
+          "name": "listModels",
+          "file": "mars/src/context-budget.js"
+        },
+        {
+          "name": "profileFor",
+          "file": "mars/src/context-budget.js"
+        },
+        {
+          "name": "statusFor",
+          "file": "mars/src/context-budget.js"
+        },
+        {
+          "name": "analyze",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "apply",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "compress",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "foldRepeatedLines",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "getRun",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "layerOf",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "listRuns",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "norm",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "recordRun",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "restore",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "save",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "sectionTokens",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "sha",
+          "file": "mars/src/context-ops.js"
+        },
+        {
+          "name": "consumeRateLimit",
+          "file": "mars/src/db/ratelimit.js"
+        },
+        {
+          "name": "initSchema",
+          "file": "mars/src/db/schema.js"
+        },
+        {
+          "name": "migrate",
+          "file": "mars/src/db/schema.js"
+        },
+        {
+          "name": "byStatus",
+          "file": "mars/src/db/stats.js"
+        },
+        {
+          "name": "dbStats",
+          "file": "mars/src/db/stats.js"
+        },
+        {
+          "name": "one",
+          "file": "mars/src/db/stats.js"
+        },
+        {
+          "name": "attachAuditSink",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "audit",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "auditStats",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "dbOpenError",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "openDb",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "readSchemaVersion",
+          "file": "mars/src/db.js"
+        },
+        {
+          "name": "AppError",
+          "file": "mars/src/errors.js"
+        },
+        {
+          "name": "isPublicCode",
+          "file": "mars/src/errors.js"
+        },
+        {
+          "name": "messageOf",
+          "file": "mars/src/errors.js"
+        }
+      ],
+      "key_modules": [
+        {
+          "file": "mars/src/util.js",
+          "inbound": 28
+        },
+        {
+          "file": "mars/src/db.js",
+          "inbound": 26
+        },
+        {
+          "file": "mars/src/store.js",
+          "inbound": 19
+        },
+        {
+          "file": "mars/src/authz.js",
+          "inbound": 18
+        },
+        {
+          "file": "mars/tests/phase1/helpers.js",
+          "inbound": 16
+        },
+        {
+          "file": "mars/src/errors.js",
+          "inbound": 15
+        },
+        {
+          "file": "mars/src/compiler.js",
+          "inbound": 14
+        },
+        {
+          "file": "mars/src/composition.js",
+          "inbound": 12
+        },
+        {
+          "file": "mars/src/runtime/agent-runtime.js",
+          "inbound": 10
+        },
+        {
+          "file": "mars/tests/helpers/assets.js",
+          "inbound": 10
+        }
+      ],
+      "method": "static import/require regex; no AST, no dynamic import, no type resolution"
+    },
+    "symbols": [
+      {
+        "name": "add",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "machinePatterns",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "readJson",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "render",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "scanPaths",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "walk",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "walkMarkdown",
+        "file": "bin/doctor.mjs"
+      },
+      {
+        "name": "cmpVersion",
+        "file": "bin/rds.mjs"
+      },
+      {
+        "name": "fail",
+        "file": "bin/rds.mjs"
+      },
+      {
+        "name": "readVersion",
+        "file": "bin/rds.mjs"
+      },
+      {
+        "name": "add",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "isAbsolute",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "parseTopLevel",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "render",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "stripComment",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "unquote",
+        "file": "bin/validate.mjs"
+      },
+      {
+        "name": "json",
+        "file": "docs/checks/m7/acceptance.test.js"
+      },
+      {
+        "name": "run",
+        "file": "docs/checks/m7/acceptance.test.js"
+      },
+      {
+        "name": "tmpdir",
+        "file": "docs/checks/m7/acceptance.test.js"
+      },
+      {
+        "name": "convert",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "fmt",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "load",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "main",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "parseAmount",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "parseCsv",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "parseDate",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "parseJsonl",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "roundHalfAway",
+        "file": "docs/checks/m7/oracle.js"
+      },
+      {
+        "name": "arg",
+        "file": "mars/scripts/mars-db-backup.js"
+      },
+      {
+        "name": "counts",
+        "file": "mars/scripts/mars-db-backup.js"
+      },
+      {
+        "name": "knownRoles",
+        "file": "mars/scripts/mars-issue-mcp-identity.js"
+      },
+      {
+        "name": "parseArgs",
+        "file": "mars/scripts/mars-issue-mcp-identity.js"
+      },
+      {
+        "name": "main",
+        "file": "mars/scripts/mars-mcp-disable.js"
+      },
+      {
+        "name": "parseArgs",
+        "file": "mars/scripts/mars-mcp-disable.js"
+      },
+      {
+        "name": "assertInside",
+        "file": "mars/scripts/mars-rollback.js"
+      },
+      {
+        "name": "collectTargets",
+        "file": "mars/scripts/mars-rollback.js"
+      },
+      {
+        "name": "isRuntimeArtifact",
+        "file": "mars/scripts/mars-rollback.js"
+      },
+      {
+        "name": "main",
+        "file": "mars/scripts/mars-rollback.js"
+      },
+      {
+        "name": "parseArgs",
+        "file": "mars/scripts/mars-rollback.js"
+      },
+      {
+        "name": "callServer",
+        "file": "mars/scripts/phase2-g1-verify.js"
+      },
+      {
+        "name": "toolText",
+        "file": "mars/scripts/phase2-g1-verify.js"
+      },
+      {
+        "name": "principal",
+        "file": "mars/scripts/phase3-sharing-smoke.js"
+      },
+      {
+        "name": "principal",
+        "file": "mars/scripts/phase4-build.js"
+      },
+      {
+        "name": "agg",
+        "file": "mars/scripts/phase4-score.js"
+      },
+      {
+        "name": "norm",
+        "file": "mars/scripts/phase4-score.js"
+      },
+      {
+        "name": "agg",
+        "file": "mars/scripts/phase4-usage.js"
+      },
+      {
+        "name": "dedupe",
+        "file": "mars/scripts/phase4-usage.js"
+      },
+      {
+        "name": "parseSession",
+        "file": "mars/scripts/phase4-usage.js"
+      },
+      {
+        "name": "sum",
+        "file": "mars/scripts/phase4-usage.js"
+      },
+      {
+        "name": "walk",
+        "file": "mars/scripts/phase4-usage.js"
+      },
+      {
+        "name": "forbiddenFor",
+        "file": "mars/scripts/wp5-stress.js"
+      },
+      {
+        "name": "pct",
+        "file": "mars/scripts/wp5-stress.js"
+      },
+      {
+        "name": "createCliIdentity",
+        "file": "mars/src/adapters/cli-identity.js"
+      },
+      {
+        "name": "pick",
+        "file": "mars/src/adapters/cli-identity.js"
+      },
+      {
+        "name": "createDbAuditSink",
+        "file": "mars/src/adapters/db-audit-sink.js"
+      },
+      {
+        "name": "createDshHostRegistry",
+        "file": "mars/src/adapters/dsh-registry.js"
+      },
+      {
+        "name": "readDoc",
+        "file": "mars/src/adapters/dsh-registry.js"
+      },
+      {
+        "name": "sha256",
+        "file": "mars/src/adapters/dsh-registry.js"
+      },
+      {
+        "name": "createDshSessionSource",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "decodeSessionBytes",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "emptyUsage",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "isZstd",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "normalizeDshUsage",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "parseDshSession",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "parseEvents",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "parseSessionFile",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "sessionText",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "toInt",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "zstdFrames",
+        "file": "mars/src/adapters/dsh-session-source.js"
+      },
+      {
+        "name": "createFsAssetResolver",
+        "file": "mars/src/adapters/fs-asset-resolver.js"
+      },
+      {
+        "name": "readJson",
+        "file": "mars/src/adapters/fs-asset-resolver.js"
+      },
+      {
+        "name": "sha256",
+        "file": "mars/src/adapters/fs-asset-resolver.js"
+      },
+      {
+        "name": "pointerPath",
+        "file": "mars/src/adapters/fs-project-roots.js"
+      },
+      {
+        "name": "readCurrent",
+        "file": "mars/src/adapters/fs-project-roots.js"
+      },
+      {
+        "name": "resolveRoot",
+        "file": "mars/src/adapters/fs-project-roots.js"
+      },
+      {
+        "name": "writeCurrent",
+        "file": "mars/src/adapters/fs-project-roots.js"
+      },
+      {
+        "name": "createFsToolExecutor",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "discoverTests",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "fail",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "isProbablyBinary",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "listDir",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "pick",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "readFile",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "resolveInside",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "runTest",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "sha256Hex",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "walk",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "writeAllowed",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "writeFile",
+        "file": "mars/src/adapters/fs-tool-executor.js"
+      },
+      {
+        "name": "changes",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "cleanup",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "copyFile",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "copyTracked",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "createWorkspaceManager",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "merge",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "normalizeRel",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "prepare",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "sha256File",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "skipped",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      },
+      {
+        "name": "snapshot",
+        "file": "mars/src/adapters/fs-workspaces.js"
+      }
+    ],
+    "largest": [
+      {
+        "path": "docs/history/initial-deployment/source/continuation-session.jsonl",
+        "bytes": 18564659,
+        "ext": ".jsonl"
+      },
+      {
+        "path": "docs/history/initial-deployment/source/original-session.jsonl",
+        "bytes": 18564571,
+        "ext": ".jsonl"
+      },
+      {
+        "path": "mars/var/mars.db",
+        "bytes": 589824,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T15-20-10-160Z.db",
+        "bytes": 360448,
+        "ext": ".db"
+      },
+      {
+        "path": "docs/checks/git-review/run-20261101-225350/diff.patch",
+        "bytes": 359291,
+        "ext": ".patch"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T13-20-52-532Z.db",
+        "bytes": 245760,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/var/backups/mars-2026-11-03T13-06-51-559Z.db",
+        "bytes": 229376,
+        "ext": ".db"
+      },
+      {
+        "path": "mars/experiments/p4/var/bench.db",
+        "bytes": 196608,
+        "ext": ".db"
+      },
+      {
+        "path": "docs/checks/git-review/run-20261101-225233/diff.patch",
+        "bytes": 170804,
+        "ext": ".patch"
+      },
+      {
+        "path": "docs/checks/m19/W-01/result.json",
+        "bytes": 104112,
+        "ext": ".json"
+      }
+    ],
+    "readme": {
+      "path": "README.md",
+      "title": "RDS 母体系（Reusable Development System）",
+      "bytes": 6266
+    },
+    "not_done": [
+      "完整 AST/类型解析",
+      "动态 import 与运行时依赖",
+      "运行时行为"
+    ],
+    "inference_notes": [
+      "languages 由扩展名映射得出，是推断，不是编译/解析结果",
+      "entries 来自 manifest 字段与常见文件名约定，是候选而非确认",
+      "tests.frameworks 来自测试文件内容的关键字匹配，可能漏判"
+    ]
+  },
+  "error": null
+}
