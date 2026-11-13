@@ -62,13 +62,15 @@ Job：`CREATED → READY | WAITING → RUNNING → SUCCEEDED | FAILED | CANCELLE
 - 每个 job 的写权限通过 `writable_paths` 收窄；越界返回 `TOOL_PATH_DENIED`。
 - 变更 = job 启动快照 vs 结束快照；记录 added/modified/deleted + SHA-256。
 - 合并前校验 base 当前哈希与 job 启动时一致；同一路径被两个 job 修改 → `DUPLICATE_PATH`；删除 → `DELETE_NOT_AUTO_MERGED`。
-- 有冲突时不写任何文件，plan `merge_status=CONFLICT`。
-- 工作区锁：默认项目级；M18 隔离 job 用 `lockScope='workspace'` + `lockTarget=<workspace path>`，避免同一项目并行 job 被项目锁串行化。共享工作区仍用 `*`。
+- 单个 job 的合并在写前做完整校验；有冲突的 job 一个文件都不写。
+  但**已成功合并的其他 job 不会回滚**：plan 标 `merge_status=CONFLICT` 并保留已合并内容，需人工处理。
+- 工作区锁：默认项目级；M18 隔离 job 用 `lockScope='workspace'` + `lockTarget=<workspace path>`，避免同一项目并行 job 被项目锁串行化。共享工作区仍用 `*`。每轮心跳后按同一 `run_id` 续期；续不上则 `FAILED / WORKSPACE_LOCK_LOST`。
 
 ## 6. 明确边界
 
 - 单进程事件循环并发，不是分布式调度器；没有跨机器队列。
 - 没有数据库级 job 抢占/租约；多进程同时 dispatch 同一 plan 未实现。
 - `worktree` 基于 HEAD，不包含用户未提交修改；需要未提交文件时用 `copy` 或 `shared`。
+- copy/worktree 工作区不自动清理：scheduler 保留它们以便事后 `merge` 与审计，临时目录需人工清理。
 - 合并只处理新增/修改；删除一律冲突，不自动删除。
 - Agent 角色权限仍以 `collab.js` 代码表为准；“角色分工”不是进程沙箱。

@@ -28,6 +28,8 @@ W-01+ W-02+ W-03- W-04+ W-05+ W-06-
 exit=0
 status=PARTIAL files=1
 == rea 用 --root 应被拒 ==
-ERROR ASSET_MISSING contract:memory 不存在或不可读: C:\Users\liuch\AppData\Local\Temp\m12-user\ws\mars\contracts\memory.schema.json（ENOENT）
+# 修复前复现：--root 指向无 contracts 的临时工作区，先被 contract 预检拦截（ASSET_MISSING），
+# 还没有走到 --root 的白名单判断。修复后的行为见 docs/checks/final/M18-M20-final-acceptance.md。
+ERROR ASSET_MISSING contract:memory 不存在或不可读: <TEMP>\m12-user\ws\mars\contracts\memory.schema.json（ENOENT）
 == task types ==
 types=8

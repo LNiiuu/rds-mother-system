@@ -43,7 +43,7 @@ W-03：
 `evidence.json` 的 `reproduce` 三步：重算哈希 → 按 argv 重跑 → 对比字段。
 - W-02/W-04 的 `where.exe` 可复算；
 - W-05 合成 pcap 可由 `tooling/make-pcap-fixture.cjs` 复算；
-- W-01 的 551 文件包含未跟踪/被忽略文件，不是干净克隆；
+- W-01 的 584 文件（随工作区文件变化的大盘扫描）包含未跟踪/被忽略文件，不是干净克隆；
 - W-03 的合成 APK 由 `tooling/make-apk-fixture.cjs` 生成，样本本身不入库（`.apk` 被 gitignore）。
 
 ## 4. 限制

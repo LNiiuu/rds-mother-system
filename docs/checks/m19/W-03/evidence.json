@@ -2,7 +2,7 @@
   "rea_run_id": "reae9f51f0e3cb4",
   "workflow_id": "W-03",
   "sample": {
-    "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.apk",
+    "path": "<TEMP>\\synthetic.apk",
     "sha256": "7178079ae6f8b225c3747347a0dc81dc8ab1ebee956eed45690835002a5132b3",
     "bytes": 836,
     "kind": "authorized-local-file"

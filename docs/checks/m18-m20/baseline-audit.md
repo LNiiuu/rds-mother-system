@@ -26,7 +26,7 @@
 
 - 49 项未跟踪受保护文件：`docs/checks/git-review/` 30、`docs/history/` 14、`docs/runs/` 4、`docs/analysis/` 1、`tooling/agent-runtime/` 1。
 - 1 项已跟踪格式化修改：`docs/checks/productization/M9-M11-final-acceptance.md`（103 增 / 101 删，归一化后内容相同）。
-- 50/50 与 `D:/M1-migration/m12-protected-baseline.txt` 的 SHA-256 前 16 位 + 字节数一致。
+- 50/50 与 `<LOCAL_BASELINE>` 的 SHA-256 前 16 位 + 字节数一致。
 - 49 项中含两个约 18.5 MB 的会话转录；本任务禁止 `git add -A`。
 
 **保护规则**：本轮只 `git add` 明确列出的 M18–M20 文件；不 stage 上述 50 项，不 stage 上一轮审计报告。
@@ -148,7 +148,7 @@
 | `M9-M11-final-acceptance.md` | 1 | 保持工作区格式化版本，不 stage |
 | `pre-push-independent-audit.md` | 1 | 上一轮审计产物；本轮不 stage（除非用户要求） |
 
-基线哈希文件：`D:/M1-migration/m12-protected-baseline.txt`。每批提交前后复核 50/50。
+基线哈希文件：`<LOCAL_BASELINE>`。每批提交前后复核 50/50。
 
 ---
 

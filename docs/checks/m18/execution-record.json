@@ -144,7 +144,7 @@
         "error": null,
         "run_id": "run2e786c337a6e",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\research-a1"
+        "workspace": "<TEMP>\\work\\plan81ca2ae5f39b\\research-a1"
       },
       {
         "key": "security",
@@ -153,7 +153,7 @@
         "error": null,
         "run_id": "runcd4bb236d5ec",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\security-a1"
+        "workspace": "<TEMP>\\work\\plan81ca2ae5f39b\\security-a1"
       },
       {
         "key": "write",
@@ -162,7 +162,7 @@
         "error": null,
         "run_id": "rund2b6f153b726",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan81ca2ae5f39b\\write-a1"
+        "workspace": "<TEMP>\\work\\plan81ca2ae5f39b\\write-a1"
       }
     ],
     "tool_events": [
@@ -303,7 +303,7 @@
         "error": null,
         "run_id": "run353a0babdfe7",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\impl-a1"
+        "workspace": "<TEMP>\\work\\planc8b6a870f86a\\impl-a1"
       },
       {
         "key": "research",
@@ -312,7 +312,7 @@
         "error": null,
         "run_id": "runfb2cfbaab596",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\research-a1"
+        "workspace": "<TEMP>\\work\\planc8b6a870f86a\\research-a1"
       },
       {
         "key": "security",
@@ -321,7 +321,7 @@
         "error": null,
         "run_id": "runeafdcc2a3a91",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\planc8b6a870f86a\\security-a1"
+        "workspace": "<TEMP>\\work\\planc8b6a870f86a\\security-a1"
       }
     ],
     "tool_events": [
@@ -528,7 +528,7 @@
         "error": null,
         "run_id": "run0bb949de05b3",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan90ee6bc12485\\a-a1"
+        "workspace": "<TEMP>\\work\\plan90ee6bc12485\\a-a1"
       },
       {
         "key": "b",
@@ -537,7 +537,7 @@
         "error": "MERGE_CONFLICT",
         "run_id": "run018de43435fb",
         "attempt": 1,
-        "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m18-demo-drzElX\\work\\plan90ee6bc12485\\b-a1"
+        "workspace": "<TEMP>\\work\\plan90ee6bc12485\\b-a1"
       }
     ],
     "tool_events": [

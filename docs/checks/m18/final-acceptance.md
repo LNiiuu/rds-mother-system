@@ -18,7 +18,7 @@
 | T18-07 | 冲突保护 | **PASS** | 同文件第二个 job `BLOCKED/MERGE_CONFLICT` |
 | T18-08 | 故障恢复 | **PASS** | recover REQUEUE + AGENT_LOST；重试/锁/取消测试 |
 | T18-09 | 成本治理 | **PARTIAL** | 估算用量可追踪；真实 Provider 用量/费用 NOT RUN |
-| T18-10 | 回归 | **PASS** | 全量 301/301（见最终报告；本轮新增 6 个调度测试 + 2 个 Provider 多轮测试 + 3 个工具测试） |
+| T18-10 | 回归 | **PASS** | 全量 302/302（见最终报告；本轮新增 6 个调度测试 + 1 个锁续期测试 + 2 个 Provider 多轮测试 + 3 个工具测试） |
 
 ## 2. 交付物
 

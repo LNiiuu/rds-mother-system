@@ -122,12 +122,12 @@ export MARS_ANTHROPIC_MODEL=claude-...
 
 | 机制 | 行为 |
 |---|---|
-| 工作区锁 | 执行前按项目拿写锁；拿不到 → `FAILED / WORKSPACE_LOCKED`，不排队、不覆盖 |
+| 工作区锁 | 执行前按项目拿写锁；拿不到 → `FAILED / WORKSPACE_LOCKED`，不排队、不覆盖。M18 隔离 job 按工作区路径加锁（`lockTarget`），共享工作区仍用 `*` |
 | 重试 | 只对 5xx / 不可达 / 超时；退避 250→500→1000→上限 4000 ms；`--max-attempts` |
 | 心跳 | 每次循环刷新；`rds agent reap --stale 120000` 把心跳停止的 run 标 `FAILED / AGENT_LOST` |
 | 取消 | `rds agent cancel --run <id>`，在下一个检查点收敛 |
 | 幂等 | `--idempotency-key` 同项目内唯一，重复提交返回同一 run |
-| 敏感操作 | `rds policy list` 看全矩阵；`file.delete` / `git.push` / `release` / `network` **任何角色都没有** |
+| 敏感操作 | `file.delete` / `git.push` / `release` / `network` 任何角色都没有，且工具面无法表达。`rds policy list` 是角色矩阵查询，**不是运行时拦截器** |
 
 ---
 
@@ -138,6 +138,6 @@ export MARS_ANTHROPIC_MODEL=claude-...
 | 真实模型调用 | **NOT RUN** | 本机无任何 provider 凭据，全部验证基于 mock |
 | 流式输出 | 未实现 | 能力清单里 `stream: false`，不谎称 |
 | 会话恢复 | 未实现 | `resume: false` |
-| 并发执行 | 未实现 | 有锁防止互相覆盖，但不做并行调度 |
+| 并发执行 | M18 已实现 | `rds orchestrate` 单进程事件循环内并发（受 `max_concurrency` 限制）；**没有**跨进程/分布式调度、没有抢占 |
 | 进程级隔离 | **不做** | 与本地优先冲突；明确声明不是沙箱 |
 | Windows 以外 | 未跑 M12–M17 | M6 的 macOS 结论不覆盖本轮新增代码 |

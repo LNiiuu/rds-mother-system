@@ -7,7 +7,7 @@
 | 输入 | 来源 | 合法性 |
 |---|---|---|
 | 测试代码仓库 | 本轮生成的临时仓库（`src/command.js`、`test/command.test.js`） | 自建，可复现 |
-| `where.exe` | `C:/Windows/System32/where.exe` | 本机系统程序，只读；SHA-256 与历史证据一致 |
+| `where.exe` | `%SystemRoot%\System32\where.exe` | 本机系统程序，只读；SHA-256 与历史证据一致 |
 | 合成 APK | `tooling/make-apk-fixture.cjs` 生成的 ZIP 容器 | 自建，非可安装应用；只做 ZIP 事实层 |
 | 合成 PCAP（可选） | `tooling/make-pcap-fixture.cjs` | 自建；本轮 M20 不依赖 |
 

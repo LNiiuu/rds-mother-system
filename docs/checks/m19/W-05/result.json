@@ -10,7 +10,7 @@
       {
         "check": "sample 存在",
         "ok": true,
-        "detail": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.pcap"
+        "detail": "<TEMP>\\synthetic.pcap"
       },
       {
         "check": "libpcap magic 匹配",
@@ -51,7 +51,7 @@
   },
   "result": {
     "sample": {
-      "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m19-rea-0n2Dni\\synthetic.pcap",
+      "path": "<TEMP>\\synthetic.pcap",
       "sha256": "088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8",
       "bytes": 516,
       "kind": "synthetic"

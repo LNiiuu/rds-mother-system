@@ -169,9 +169,36 @@
 | [m14/](m14/) | REA 六套工作流的真实 result.json / report.md / evidence.json |
 | [m14/joint-demo.json](m14/joint-demo.json) | M15 联合演示原始输出（逆向 → 审核 → 重构） |
 
-> 本轮判定：M12/M13/M14/M15/M17 `COMPLETED`（有明确边界），M16 `COMPLETED WITH WARNINGS`
-> （两个真实协议适配器已实现并契约测试，但**真实网络调用 NOT RUN**，无凭据）。
+> 本轮判定（已按 2026-11-13 审计修正）：M12/M13 为 `COMPLETED WITH WARNINGS` / `PARTIAL`
+> （真实模型未跑、M13 当时无并发调度），M14/M15/M17 `COMPLETED`（有明确边界），M16 `COMPLETED WITH WARNINGS`
+> （两个 Provider 协议已实现并契约测试，但**真实网络调用 NOT RUN**，无凭据）。
 > 总体 `COMPLETED WITH WARNINGS`：不允许把 mock 全链路写成「真实多 Agent 已验证」。
+> 当前状态与并发调度补齐情况见 [final/M18-M20-final-acceptance.md](final/M18-M20-final-acceptance.md)。
+
+### M18–M20：编排、REA 工具与联合场景（2026-11-13）
+
+| 文档 | 内容 |
+|---|---|
+| [m18-m20/baseline-audit.md](m18-m20/baseline-audit.md) | M18–M20 基线：Git/角色/环境/阻塞项/保护清单 |
+| [m18/architecture.md](m18/architecture.md) | M18 调度器、Schema v8、工作区隔离与冲突合并 |
+| [m18/provider-verification.md](m18/provider-verification.md) | Provider 真实路径与 T18-01 BLOCKED；多轮历史修复 |
+| [m18/agent-isolation.md](m18/agent-isolation.md) | 独立 Agent/Session/Run/上下文/写路径 |
+| [m18/scheduling-verification.md](m18/scheduling-verification.md) | DAG、优先级、并发上限、取消、重试 |
+| [m18/concurrency-verification.md](m18/concurrency-verification.md) | 3 个 job 的真实时间重叠与冲突保护 |
+| [m18/recovery-verification.md](m18/recovery-verification.md) | 心跳陈旧、重试、AGENT_LOST、合并冲突 |
+| [m18/cost-verification.md](m18/cost-verification.md) | 估算用量、预算、无真实 Provider 费用 |
+| [m18/final-acceptance.md](m18/final-acceptance.md) | M18 T18-01..10：`PARTIAL`（真实模型 BLOCKED） |
+| [m19/tool-adapter-architecture.md](m19/tool-adapter-architecture.md) | 统一工具适配层与能力清单 |
+| [m19/security-verification.md](m19/security-verification.md) | 样本只读/临时目录/超时；无容器隔离 |
+| [m19/evidence-model.md](m19/evidence-model.md) | 事实/推断/未验证分层与证据文件 |
+| [m19/final-acceptance.md](m19/final-acceptance.md) | W-01..W-06 四值状态：`PARTIAL`（W-02/03/05/06 BLOCKED） |
+| [m20/scenario.md](m20/scenario.md) | Development + REA 联合场景 |
+| [m20/final-report.md](m20/final-report.md) | 联合执行报告（真实 REA + mock Agent） |
+| [m20/final-acceptance.md](m20/final-acceptance.md) | M20 T20-01..10：`PARTIAL`（真实 Agent BLOCKED） |
+| [final/M18-M20-final-acceptance.md](final/M18-M20-final-acceptance.md) | M18–M20 最终验收 A–H 与 Git 状态 |
+
+> M18/M19/M20 判定：均为 **`PARTIAL`**。原因是真实模型凭据、Ghidra/JADX/TShark/Frida 工具缺失；
+> 调度、工作区隔离、并发、冲突、恢复、W-01/W-02/W-04 证据为真实执行。
 
 ## 2. 旧遗留清单的现状
 

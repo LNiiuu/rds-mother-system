@@ -9,7 +9,7 @@
 
 | ID | 名称 | 引擎 | 本机状态 | 原因 |
 |---|---|---|---|---|
-| W-01 | 代码库理解与依赖梳理 | 本地文件系统 | **PARTIAL** | 未做模块依赖图与符号搜索 |
+| W-01 | 代码库理解与依赖梳理 | 本地文件系统 | **PARTIAL** | 依赖图来自 import/require 正则，符号为静态提取；无 AST/类型解析 |
 | W-02 | 原生二进制静态分析 | binutils | **PARTIAL** | 无 Ghidra，反编译/类型恢复/xref 全图未做 |
 | W-03 | Android APK 静态分析 | 需 jadx | **BLOCKED** | 无 jadx / java / apktool |
 | W-04 | 调用链分析（静态） | binutils | **PARTIAL** | 只解析直接 call；间接调用只计数 |
