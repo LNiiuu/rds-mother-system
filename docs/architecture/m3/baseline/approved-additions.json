@@ -57,7 +57,10 @@
     "mars/src/runtime/task-types.js",
     "mars/src/adapters/provider-anthropic.js",
     "docs/agents.md",
-    "docs/rea.md"
+    "docs/rea.md",
+    "mars/src/runtime/scheduler.js",
+    "mars/src/adapters/fs-workspaces.js",
+    "mars/src/adapters/rea/tool-registry.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -110,7 +113,10 @@
     "mars/src/adapters/rea/registry.js": "M14：REA 工作流注册表与四值状态判定",
     "mars/src/cli-rea.js": "M14：rea CLI 处理（不 require 适配器，走组合根注入）",
     "mars/src/runtime/task-types.js": "M15：八种任务类型、角色链、工作流白名单与证据要求",
-    "mars/src/adapters/provider-anthropic.js": "M16：Anthropic Messages 协议适配器（system 顶层/tool_result 块/input_schema）"
+    "mars/src/adapters/provider-anthropic.js": "M16：Anthropic Messages 协议适配器（system 顶层/tool_result 块/input_schema）",
+    "mars/src/runtime/scheduler.js": "M18：多 Agent 任务编排（依赖/优先级/并发/重试/恢复/合并编排）",
+    "mars/src/adapters/fs-workspaces.js": "M18：工作区隔离与受控合并（shared/copy/worktree、冲突检测）",
+    "mars/src/adapters/rea/tool-registry.js": "M19：REA 统一工具适配层（检测/版本/能力/argv 执行/超时/安装提示）"
   },
   "helpText": {
     "sha256": "2faee1a36b123c0a59258d0d6647cfc128d422ec4e4c02034261596b64151dcc",

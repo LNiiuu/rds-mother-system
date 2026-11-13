@@ -83,7 +83,7 @@ function createMockProvider(options = {}) {
       err.code = turn.failWith;
       throw err;
     }
-    if (typeof turn.delayMs === 'number' && turn.delayMs > 0 && payload.waitForDelay !== false) {
+    if (typeof turn.delayMs === 'number' && turn.delayMs > 0 && payload.waitForDelay !== false && !turn.asyncDelay) {
       // 真睡：给取消/超时留出可观测的时间窗（测试用它验证 race）。
       const until = Date.now() + turn.delayMs;
       while (Date.now() < until) {
@@ -97,29 +97,56 @@ function createMockProvider(options = {}) {
       }
     }
 
-    const inTok = turn.usage && typeof turn.usage.input === 'number'
-      ? turn.usage.input
-      : estimateTokens((payload.messages || []).map((m) => String(m.content || '')).join('\n'));
-    const outTok = turn.usage && typeof turn.usage.output === 'number'
-      ? turn.usage.output
-      : estimateTokens(String(turn.text || ''));
-    s.usage.input += inTok;
-    s.usage.output += outTok;
+    const buildReply = () => {
+      const inTok = turn.usage && typeof turn.usage.input === 'number'
+        ? turn.usage.input
+        : estimateTokens((payload.messages || []).map((m) => String(m.content || '')).join('\n'));
+      const outTok = turn.usage && typeof turn.usage.output === 'number'
+        ? turn.usage.output
+        : estimateTokens(String(turn.text || ''));
+      s.usage.input += inTok;
+      s.usage.output += outTok;
 
-    const toolCalls = Array.isArray(turn.toolCalls) ? turn.toolCalls.map((tc, i) => ({
-      call_id: tc.call_id || `${s.sessionId}-call-${s.cursor}-${i}`,
-      name: tc.name,
-      args: tc.args || {}
-    })) : [];
+      const toolCalls = Array.isArray(turn.toolCalls) ? turn.toolCalls.map((tc, i) => ({
+        call_id: tc.call_id || `${s.sessionId}-call-${s.cursor}-${i}`,
+        name: tc.name,
+        args: tc.args || {}
+      })) : [];
 
-    return {
-      text: String(turn.text || ''),
-      tool_calls: toolCalls,
-      stop_reason: toolCalls.length ? 'tool_use' : 'end_turn',
-      usage: { input: inTok, output: outTok, cached: 0 },
-      // 关键：mock 的用量永远不是 provider 真实用量。
-      usage_source: 'estimated'
+      return {
+        text: String(turn.text || ''),
+        tool_calls: toolCalls,
+        stop_reason: toolCalls.length ? 'tool_use' : 'end_turn',
+        usage: { input: inTok, output: outTok, cached: 0 },
+        // 关键：mock 的用量永远不是 provider 真实用量。
+        usage_source: 'estimated'
+      };
     };
+
+    // M18：异步延迟模式。用于调度器并发验证：真实时间窗内多个 job 可以重叠，
+    // 而不是用 Atomics.wait 把事件循环阻塞成串行。默认仍是同步忙等，保持旧测试行为。
+    if (turn.asyncDelay && typeof turn.delayMs === 'number' && turn.delayMs > 0) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          if (payload.signal && payload.signal.aborted) {
+            const err = new Error('PROVIDER_CANCELLED');
+            err.code = 'PROVIDER_CANCELLED';
+            reject(err);
+            return;
+          }
+          try { resolve(buildReply()); } catch (e) { reject(e); }
+        }, turn.delayMs);
+        if (payload.signal && typeof payload.signal.addEventListener === 'function') {
+          payload.signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            const err = new Error('PROVIDER_CANCELLED');
+            err.code = 'PROVIDER_CANCELLED';
+            reject(err);
+          }, { once: true });
+        }
+      });
+    }
+    return buildReply();
   }
 
   function cancel(sessionId) {

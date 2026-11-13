@@ -285,17 +285,25 @@ const TOPICS = {
   },
 
   orchestrate: {
-    usage: 'rds orchestrate <plan|start|approve|feedback|status|suggest> [选项]',
+    usage: 'rds orchestrate <plan|start|approve|feedback|status|suggest|dispatch|plans|jobs|job|cancel-job|recover|merge> [选项]',
     summary:
-      '编排器：按任务分类给出最小 Agent 集、风险门与预算，记录运行与反馈。' +
-      '规则引擎 rule/1.0.0，离线、可解释，不自动执行任何动作；高风险任务必须人工 approve。',
+      '编排器：M11 的预算计划 + M18 的多 Agent 任务调度。' +
+      'M18 dispatch 按依赖/优先级在 max_concurrency 内并发执行 job，每个 job 独立 Agent run/session/工作区；' +
+      '工作区合并做冲突检测，冲突时停止自动合并。真实模型仍取决于 provider 配置。',
     subcommands: [
       ['plan', 'rds orchestrate plan --project <id> --task <id> --objective <文本> [--tokens <n>]'],
       ['start', 'rds orchestrate start --project <id> --task <id> --objective <文本> [--by <id>]'],
       ['approve', 'rds orchestrate approve --run <id> [--by <id>] [--reason <说明>]'],
       ['feedback', 'rds orchestrate feedback --run <id> --tokens <n> [--quality <0-1>] [--rework <n>]'],
       ['status', 'rds orchestrate status --run <id>'],
-      ['suggest', 'rds orchestrate suggest --project <id>']
+      ['suggest', 'rds orchestrate suggest --project <id>'],
+      ['dispatch', 'rds orchestrate dispatch --project <id> --plan-file <json> [--mode serial|parallel|hybrid] [--max-concurrency <n>] [--workspace shared|copy|worktree] [--no-auto-merge]'],
+      ['plans', 'rds orchestrate plans [--project <id>] [--status <状态>]'],
+      ['jobs', 'rds orchestrate jobs --plan <plan_id>'],
+      ['job', 'rds orchestrate job --job <job_id>'],
+      ['cancel-job', 'rds orchestrate cancel-job --job <job_id> [--reason <说明>]'],
+      ['recover', 'rds orchestrate recover --plan <plan_id> [--stale <ms>]'],
+      ['merge', 'rds orchestrate merge --plan <plan_id> [--apply]']
     ],
     args: [
       ['--project <id>', '项目 ID'],
@@ -307,9 +315,20 @@ const TOPICS = {
       ['--by <id>', '执行者标识'],
       ['--reason <说明>', '审批理由'],
       ['--quality <0-1>', '质量评分'],
-      ['--rework <n>', '返工次数']
+      ['--rework <n>', '返工次数'],
+      ['--plan-file <json>', 'M18 计划 JSON（jobs/deps/agents/writable_paths）'],
+      ['--plan <id>', 'M18 编排计划 ID'],
+      ['--job <id>', 'M18 job ID'],
+      ['--mode <模式>', 'serial | parallel | hybrid'],
+      ['--max-concurrency <n>', '最大并发 job 数'],
+      ['--workspace <模式>', 'shared | copy | worktree'],
+      ['--no-auto-merge', '不自动合并 job 变更'],
+      ['--apply', 'merge 时真正写入（默认只报告冲突）']
     ],
-    examples: ['rds orchestrate plan --project demo --task T-001 --objective "实现登录"']
+    examples: [
+      'rds orchestrate plan --project demo --task T-001 --objective "实现登录"',
+      'rds orchestrate dispatch --project demo --plan-file ./plan.json --max-concurrency 3'
+    ]
   },
 
   budget: {
@@ -562,7 +581,7 @@ const TOPICS = {
   },
 
   rea: {
-    usage: 'rds rea <list|status|preflight|run|inspect|runs> [选项]',
+    usage: 'rds rea <list|status|tools|preflight|run|inspect|runs> [选项]',
     summary:
       'REA 逆向分析工作流（M14）。六套：W-01 代码理解、W-02 原生静态、W-03 APK、W-04 调用链、W-05 PCAP、W-06 Frida。' +
       '状态四值含义严格：PASS 目标达成 / PARTIAL 部分达成（边界写在结果里）/ BLOCKED 前置不满足 / FAILED 跑了但失败。' +
@@ -570,6 +589,7 @@ const TOPICS = {
     subcommands: [
       ['list', '工作流清单与接口 schema'],
       ['status', '当前环境各工作流的工具就绪状态'],
+      ['tools', 'M19 统一工具适配层：名称/版本/路径/能力/安全边界'],
       ['preflight', '只做前置检查（--workflow，样本参数同 run）'],
       ['run', '执行并落证据（--workflow --root 或 --sample）'],
       ['inspect', '查看一次分析（--run）'],

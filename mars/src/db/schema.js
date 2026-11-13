@@ -2,7 +2,7 @@
 // 数据库结构与增量迁移（M3 / B5 从 db.js 拆出）。
 //
 // 只增不改：既有行的含义不变，不删数据、不重写数据。每一步都幂等，可在每次 open 时安全执行。
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 function initSchema(db) {
   db.exec(`
@@ -347,6 +347,70 @@ function initSchema(db) {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_locks_target
       ON workspace_locks (project_id, scope, target);
+
+    -- ============ M18 多 Agent 编排（只加表） ============
+    -- 计划是调度单元；job 是计划内的一个 Agent 任务；状态与 agent_runs 分离，
+    -- 因为“排队/等待依赖”不是 run 的状态（run 只有 PENDING..TIMEOUT）。
+    CREATE TABLE IF NOT EXISTS orchestration_plans (
+      plan_id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      objective TEXT,
+      mode TEXT NOT NULL,
+      status TEXT NOT NULL,
+      max_concurrency INTEGER NOT NULL,
+      workspace_mode TEXT NOT NULL,
+      auto_merge INTEGER NOT NULL DEFAULT 1,
+      base_root TEXT,
+      merge_status TEXT,
+      meta_json TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      started_at TEXT,
+      finished_at TEXT,
+      error_code TEXT,
+      error_message TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_orch_plans_project ON orchestration_plans (project_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS orchestration_jobs (
+      job_id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL,
+      job_key TEXT NOT NULL,
+      title TEXT,
+      role_id TEXT NOT NULL,
+      agent_id TEXT NOT NULL,
+      deps_json TEXT NOT NULL DEFAULT '[]',
+      priority INTEGER NOT NULL DEFAULT 0,
+      isolation TEXT NOT NULL DEFAULT 'shared',
+      writable_paths_json TEXT,
+      status TEXT NOT NULL,
+      cancel_requested INTEGER NOT NULL DEFAULT 0,
+      run_id TEXT,
+      attempt INTEGER NOT NULL DEFAULT 0,
+      max_attempts INTEGER NOT NULL DEFAULT 1,
+      timeout_ms INTEGER,
+      budget_tokens INTEGER,
+      workspace TEXT,
+      result_json TEXT,
+      error_code TEXT,
+      error_message TEXT,
+      created_at TEXT NOT NULL,
+      started_at TEXT,
+      finished_at TEXT,
+      updated_at TEXT NOT NULL,
+      UNIQUE (plan_id, job_key)
+    );
+    CREATE INDEX IF NOT EXISTS idx_orch_jobs_plan ON orchestration_jobs (plan_id, status, priority);
+
+    CREATE TABLE IF NOT EXISTS orchestration_events (
+      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      plan_id TEXT NOT NULL,
+      job_id TEXT,
+      kind TEXT NOT NULL,
+      payload_json TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_orch_events_plan ON orchestration_events (plan_id, event_id);
 
     -- ============ M14 REA 工作流执行记录 ============
     -- 每次分析一行；样本哈希与工具版本必须落库，否则结论无法复核。

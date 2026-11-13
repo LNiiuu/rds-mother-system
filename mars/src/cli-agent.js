@@ -136,7 +136,14 @@ async function agentStart({ db, args, runtime: rt, auth, compilePacket }) {
   if (projectBudget) {
     const gate = reliability.budgetGate(db, { project_id: agent.project_id, limit: projectBudget });
     if (!gate.ok) {
-      json({ refused: true, reason: 'PROJECT_BUDGET_EXCEEDED', gate, note: '项目预算已用尽，未发起模型调用' });
+      // M18：拒绝也要让 run 收敛。此前这里直接 return，会留下永久 PENDING 的 run。
+      const now = new Date().toISOString();
+      db.prepare(`UPDATE agent_runs SET status='FAILED', error_code='PROJECT_BUDGET_EXCEEDED',
+        error_message=?, finished_at=?, updated_at=? WHERE run_id=?`)
+        .run('项目预算已用尽：' + gate.spent + '/' + gate.limit, now, now, run.run_id);
+      runtime.emit(db, run.run_id, 'ERROR', { code: 'PROJECT_BUDGET_EXCEEDED', gate });
+      runtime.emit(db, run.run_id, 'STATE', { from: 'PENDING', to: 'FAILED', note: 'PROJECT_BUDGET_EXCEEDED' });
+      json({ refused: true, reason: 'PROJECT_BUDGET_EXCEEDED', gate, run: runtime.getRun(db, run.run_id), note: '项目预算已用尽，未发起模型调用' });
       return;
     }
   }

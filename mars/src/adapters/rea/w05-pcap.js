@@ -281,7 +281,10 @@ const workflow = {
     const head = fs.readFileSync(sample).slice(0, 24);
     const magic = detectMagic(head);
     checks.push({ check: 'libpcap magic 匹配', ok: Boolean(magic && !magic.pcapng), detail: magic ? (magic.pcapng ? 'pcapng' : magic.endian + (magic.nano ? '/nano' : '/micro')) : '不匹配' });
-    return { ok: Boolean(magic && !magic.pcapng), checks, blocked_reason: !magic ? 'UNSUPPORTED_FORMAT' : (magic.pcapng ? 'UNSUPPORTED_FORMAT:pcapng' : null) };
+    let tshark = null;
+    try { tshark = await require('./tool-registry').detect('tshark'); } catch { /* 探测失败不阻塞内置解析 */ }
+    checks.push({ check: 'tshark 可用（可选，用于交叉核验）', ok: Boolean(tshark && tshark.present), detail: tshark && tshark.present ? `${tshark.path} (${tshark.version})` : '未安装；使用内置纯 JS libpcap 解析' });
+    return { ok: Boolean(magic && !magic.pcapng), checks, tools: { tshark }, blocked_reason: !magic ? 'UNSUPPORTED_FORMAT' : (magic.pcapng ? 'UNSUPPORTED_FORMAT:pcapng' : null) };
   },
 
   async execute(input) {
@@ -289,9 +292,12 @@ const workflow = {
     const hash = await sha256File(sample);
     const buf = fs.readFileSync(sample);
     const analysis = analyzePcap(buf);
+    let tshark = null;
+    try { tshark = await require('./tool-registry').detect('tshark'); } catch { /* 可选工具 */ }
+    const tsharkStatus = tshark ? { present: Boolean(tshark.present), version: tshark.version || null } : { present: false, version: null };
     if (analysis.error) {
       return {
-        result: { sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes }, ...analysis },
+        result: { sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes }, ...analysis, tshark: tsharkStatus },
         tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }],
         commands: [],
         limitations: [analysis.note],
@@ -301,7 +307,8 @@ const workflow = {
     return {
       result: {
         sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes, kind: input.sample_kind || 'unknown' },
-        ...analysis
+        ...analysis,
+        tshark: tsharkStatus
       },
       tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }],
       commands: [],

@@ -178,3 +178,56 @@ test('M16 能力清单：三个适配器的差异是显式声明，不是靠假�
     assert.equal(p.capabilities.resume, false);
   }
 });
+
+// ---------------------------------------------------------------- 多轮历史（M18 修复）
+
+test('M18 openai-compat：第二轮不重复 system/user，历史由 Runtime 提供', async () => {
+  let n = 0;
+  const fetchImpl = fakeFetch(() => {
+    n += 1;
+    if (n === 1) {
+      return { status: 200, body: { choices: [{ finish_reason: 'tool_calls', message: { content: '', tool_calls: [{ id: 'c1', type: 'function', function: { name: 'read_file', arguments: '{"path":"a"}' } }] } }], usage: { prompt_tokens: 10, completion_tokens: 2 } } };
+    }
+    return { status: 200, body: { choices: [{ finish_reason: 'stop', message: { content: 'done' } }], usage: { prompt_tokens: 20, completion_tokens: 3 } } };
+  });
+  const p = createOpenAiCompatProvider({ env: {}, baseUrl: 'https://x/v1', apiKey: 'k', model: 'm', fetchImpl });
+  const s = p.createSession({});
+  const first = await p.sendMessage(s.session_id, { messages: [{ role: 'system', content: 'sys' }, { role: 'user', content: 'do' }] });
+  assert.equal(first.tool_calls.length, 1);
+  await p.sendMessage(s.session_id, {
+    messages: [
+      { role: 'system', content: 'sys' }, { role: 'user', content: 'do' },
+      { role: 'assistant', content: '', tool_calls: first.tool_calls },
+      { role: 'tool', tool_call_id: 'c1', content: 'OK' }
+    ]
+  });
+  const second = fetchImpl.calls[1].body.messages;
+  assert.equal(second.length, 4);
+  assert.equal(second.filter((m) => m.role === 'system').length, 1);
+  assert.equal(second.filter((m) => m.role === 'user').length, 1);
+  assert.equal(second.filter((m) => m.role === 'tool').length, 1);
+});
+
+test('M18 anthropic：第二轮 system 只出现一次，tool_result 只有一条', async () => {
+  const fetchImpl = fakeFetch(() => ({
+    status: 200,
+    body: { content: [{ type: 'tool_use', id: 't1', name: 'read_file', input: { path: 'a' } }], stop_reason: 'tool_use', usage: { input_tokens: 10, output_tokens: 2 } }
+  }));
+  const p = createAnthropicProvider({ env: {}, baseUrl: 'https://a', apiKey: 'k', model: 'm', fetchImpl });
+  const s = p.createSession({});
+  const first = await p.sendMessage(s.session_id, { messages: [{ role: 'system', content: 'sys' }, { role: 'user', content: 'do' }] });
+  await p.sendMessage(s.session_id, {
+    messages: [
+      { role: 'system', content: 'sys' }, { role: 'user', content: 'do' },
+      { role: 'assistant', content: '', tool_calls: first.tool_calls },
+      { role: 'tool', tool_call_id: 't1', content: 'OK' }
+    ]
+  });
+  const req = fetchImpl.calls[1].body;
+  assert.equal(req.system, 'sys');
+  assert.equal(req.messages.length, 3);
+  assert.equal(req.messages[0].role, 'user');
+  assert.equal(req.messages[1].role, 'assistant');
+  assert.equal(req.messages[2].role, 'user');
+  assert.equal(req.messages[2].content[0].type, 'tool_result');
+});

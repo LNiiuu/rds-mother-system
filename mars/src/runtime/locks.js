@@ -52,9 +52,23 @@ function acquire(db, input) {
     acquired_at: nowIso(),
     expires_at: new Date(Date.now() + ttl).toISOString()
   };
-  db.prepare(`INSERT INTO workspace_locks (lock_id, project_id, scope, target, run_id, acquired_at, expires_at)
+  // M18：跨进程竞争时，两个进程可能同时 SELECT 不到行。
+  // 用 INSERT OR IGNORE + 重新 SELECT 收敛，而不是把 SQLITE_CONSTRAINT 抛给上层。
+  const info = db.prepare(`INSERT OR IGNORE INTO workspace_locks
+    (lock_id, project_id, scope, target, run_id, acquired_at, expires_at)
     VALUES (?,?,?,?,?,?,?)`)
     .run(lock.lock_id, lock.project_id, lock.scope, lock.target, lock.run_id, lock.acquired_at, lock.expires_at);
+  if (Number(info.changes || 0) === 0) {
+    const row = db.prepare('SELECT * FROM workspace_locks WHERE project_id = ? AND scope = ? AND target = ?')
+      .get(projectId, scope, target);
+    if (!row) return { ok: false, reason: 'LOCK_BUSY', holder: null };
+    if (row.run_id !== runId) {
+      return { ok: false, reason: 'LOCK_BUSY', holder: { run_id: row.run_id, acquired_at: row.acquired_at, expires_at: row.expires_at } };
+    }
+    const expires = new Date(Date.now() + ttl).toISOString();
+    db.prepare('UPDATE workspace_locks SET expires_at = ? WHERE lock_id = ?').run(expires, row.lock_id);
+    return { ok: true, lock: { ...row, expires_at: expires } };
+  }
   return { ok: true, lock };
 }
 

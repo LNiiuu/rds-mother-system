@@ -123,6 +123,74 @@ function detectTests(root, files) {
   return { files: testFiles.length, samples: testFiles.slice(0, 10).map((f) => f.path), frameworks: sample };
 }
 
+const JS_EXT = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx']);
+
+/** 静态 import/require 扫描：只读字节，不做 AST；结果是“可解析的边”，不是运行时依赖。 */
+function analyzeJsFile(root, rel) {
+  const abs = path.join(root, rel);
+  let text;
+  try { text = fs.readFileSync(abs, 'utf8').slice(0, 200 * 1024); } catch { return null; }
+  const imports = new Set();
+  const patterns = [
+    /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+    /from\s+['"]([^'"]+)['"]/g,
+    /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g
+  ];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(text))) imports.add(m[1]);
+  }
+  const symbols = new Set();
+  for (const re of [
+    /(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/g,
+    /(?:^|\n)\s*class\s+([A-Za-z_$][\w$]*)/g,
+    /(?:^|\n)\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function|\([^)]*\)\s*=>)/g
+  ]) {
+    let m;
+    while ((m = re.exec(text))) symbols.add(m[1]);
+  }
+  const local = [];
+  const external = [];
+  for (const spec of imports) {
+    if (!spec.startsWith('.')) { external.push(spec); continue; }
+    const base = path.posix.normalize(path.posix.join(path.posix.dirname(rel), spec));
+    const candidates = [base, base + '.js', base + '.mjs', base + '.cjs', base + '.ts', base + '.tsx', base + '/index.js'];
+    const found = candidates.find((c) => fs.existsSync(path.join(root, c)) && fs.statSync(path.join(root, c)).isFile());
+    if (found) local.push(found);
+    else external.push(spec);
+  }
+  return { imports: [...imports].sort(), local_edges: [...new Set(local)].sort(), external: [...new Set(external)].sort(), symbols: [...symbols].sort() };
+}
+
+/** 依赖图 + 符号 + 关键模块（按入度）。 */
+function analyzeDependencies(root, files) {
+  const jsFiles = files.filter((f) => JS_EXT.has(f.ext)).slice(0, 500);
+  const nodes = [];
+  const edges = [];
+  const external = new Map();
+  const symbols = [];
+  for (const f of jsFiles) {
+    const a = analyzeJsFile(root, f.path);
+    if (!a) continue;
+    nodes.push(f.path);
+    for (const to of a.local_edges) edges.push({ from: f.path, to, kind: 'static-import' });
+    for (const e of a.external) external.set(e, (external.get(e) || 0) + 1);
+    for (const s of a.symbols) symbols.push({ name: s, file: f.path });
+  }
+  const fanIn = new Map();
+  for (const e of edges) fanIn.set(e.to, (fanIn.get(e.to) || 0) + 1);
+  return {
+    nodes: nodes.length,
+    edges: edges.length,
+    local_edges: edges.slice(0, 2000),
+    external_dependencies: [...external.entries()].map(([name, files]) => ({ name, files })).sort((x, y) => y.files - x.files).slice(0, 30),
+    symbols: symbols.slice(0, 300),
+    key_modules: [...fanIn.entries()].map(([file, inbound]) => ({ file, inbound })).sort((a, b) => b.inbound - a.inbound).slice(0, 10),
+    method: 'static import/require regex; no AST, no dynamic import, no type resolution'
+  };
+}
+
+
 const workflow = {
   workflow_id: 'W-01',
   title: '代码库理解与依赖梳理',
@@ -152,6 +220,8 @@ const workflow = {
       manifests: { type: 'array' },
       entries: { type: 'array' },
       tests: { type: 'object' },
+      dependencies: { type: 'object' },
+      symbols: { type: 'array' },
       largest: { type: 'array' },
       readme: { type: 'object' }
     }
@@ -206,6 +276,8 @@ const workflow = {
     const manifests = readManifest(root);
     const entries = detectEntries(root, state.files, manifests);
     const tests = detectTests(root, state.files);
+    const dependencies = analyzeDependencies(root, state.files);
+    const symbols = dependencies.symbols.slice(0, 100);
     const largest = [...state.files].sort((a, b) => b.bytes - a.bytes).slice(0, 10);
 
     let readme = null;
@@ -229,10 +301,12 @@ const workflow = {
       manifests,
       entries,
       tests,
+      dependencies,
+      symbols,
       largest,
       readme,
       // 目标里没做到的部分，明确列出——避免 PARTIAL 被读成 PASS
-      not_done: ['模块间依赖关系图（需 AST 或 W-04）', '按符号搜索代码（需索引）', '运行时行为'],
+      not_done: ['完整 AST/类型解析', '动态 import 与运行时依赖', '运行时行为'],
       // 明确标注哪些是推断
       inference_notes: [
         'languages 由扩展名映射得出，是推断，不是编译/解析结果',
@@ -246,7 +320,7 @@ const workflow = {
       tool_versions: [{ name: 'node', version: process.version, kind: 'runtime' }],
       commands: [],
       limitations: [
-        '未做 AST 解析，模块依赖关系需要 W-04 或人工确认',
+        '依赖图来自 import/require 正则，不做 AST/类型解析；动态 import 可能漏',
         '二进制文件不会被解析，只统计大小'
       ]
     };
@@ -282,6 +356,18 @@ const workflow = {
     L.push('## 测试');
     L.push('');
     L.push(`测试文件 ${result.tests.files} 个；识别到的框架：${result.tests.frameworks.map((f) => f.name).join(', ') || '未识别'}`);
+    L.push('');
+    L.push('## 静态依赖图（推断）');
+    L.push('');
+    L.push(`节点 ${result.dependencies ? result.dependencies.nodes : 0} 个，边 ${result.dependencies ? result.dependencies.edges : 0} 条；方法：${result.dependencies ? result.dependencies.method : '未执行'}`);
+    L.push('');
+    for (const k of (result.dependencies ? result.dependencies.key_modules : []).slice(0, 5)) {
+      L.push(`- 关键模块 \`${k.file}\` — 入度 ${k.inbound}`);
+    }
+    L.push('');
+    L.push('## 符号（前 20）');
+    L.push('');
+    for (const s of (result.symbols || []).slice(0, 20)) L.push(`- \`${s.name}\` — ${s.file}`);
     L.push('');
     L.push('## 最大的文件');
     L.push('');

@@ -140,12 +140,15 @@ const workflow = {
     const tools = await probe(['objdump']);
     const objdump = tools[0];
     checks.push({ check: 'objdump 可用', ok: objdump.present, detail: objdump.path || '未在 PATH 中找到' });
+    let ghidra = null;
+    try { ghidra = await require('./tool-registry').detect('ghidra'); } catch { /* 可选工具 */ }
+    checks.push({ check: 'Ghidra Headless 可用（可选，用于反编译）', ok: Boolean(ghidra && ghidra.present), detail: ghidra && ghidra.present ? `${ghidra.path} (${ghidra.version})` : '未安装；仅 binutils 结构/符号级分析' });
     const sample = input && input.sample ? path.resolve(String(input.sample)) : null;
     checks.push({ check: 'sample 已提供', ok: Boolean(sample) });
     if (!sample) return { ok: false, checks, blocked_reason: 'SAMPLE_REQUIRED', tools };
     const exists = fs.existsSync(sample) && fs.statSync(sample).isFile();
     checks.push({ check: 'sample 存在且是文件', ok: exists, detail: sample });
-    return { ok: objdump.present && exists, checks, blocked_reason: !objdump.present ? 'TOOL_MISSING:objdump' : (!exists ? 'SAMPLE_NOT_FOUND' : null), tools };
+    return { ok: objdump.present && exists, checks, blocked_reason: !objdump.present ? 'TOOL_MISSING:objdump' : (!exists ? 'SAMPLE_NOT_FOUND' : null), tools: { objdump, ghidra } };
   },
 
   async execute(input, ctx = {}) {
@@ -155,6 +158,9 @@ const workflow = {
     const commands = [];
 
     const hash = await sha256File(sample);
+    let ghidra = null;
+    try { ghidra = await require('./tool-registry').detect('ghidra'); } catch { /* 可选工具 */ }
+    const ghidraStatus = ghidra ? { present: Boolean(ghidra.present), version: ghidra.version || null } : { present: false, version: null };
 
     const f = await run(objdump, ['-f', sample], { timeout: 30000 });
     commands.push(commandRecord(objdump, ['-f', sample], f));
@@ -204,7 +210,8 @@ const workflow = {
       capability: {
         done: ['文件格式与架构', '段表', '导入表（DLL + 符号）', '符号表', '字符串提取与分类', '入口地址'],
         not_done: ['反编译伪代码（需 Ghidra/IDA，本环境无）', '类型恢复', '完整 xref 图', '动态行为'],
-        why_partial: '本环境无 Ghidra 且 WSL 被安全策略封禁；binutils 只能给出结构与符号级事实'
+        why_partial: '本环境无 Ghidra 且 WSL 被安全策略封禁；binutils 只能给出结构与符号级事实',
+        ghidra: ghidraStatus
       },
       inference_notes: [
         'strings 的分类（url/registry/path/ip/module/message）是正则推断，可能误判',

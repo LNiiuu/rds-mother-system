@@ -415,10 +415,13 @@ async function executeRun(ctx) {
 
   // M13：执行前拿工作区写锁。拿不到就明确失败——不排队、不覆盖别人的改动。
   // 只在真的会写东西（注入了执行器）时才拿，只读 run 不互斥。
+  // M18：隔离工作区用 lockScope/lockTarget 区分；默认仍是项目级 '*'。
   let lockHeld = false;
   if (ctx.lockWorkspace !== false && executor) {
     const got = locks.acquire(db, {
       project_id: run.project_id, run_id: run.run_id,
+      scope: ctx.lockScope || 'workspace',
+      target: ctx.lockTarget || '*',
       ttl_ms: Number(run.timeout_ms || 120000) + 30000
     });
     if (!got.ok) {
@@ -431,7 +434,7 @@ async function executeRun(ctx) {
       return { run: getRun(db, run.run_id), skipped: false, output: null, locked: false };
     }
     lockHeld = true;
-    emit(db, run.run_id, 'LOCK', { scope: 'workspace', run_id: run.run_id, expires_at: got.lock.expires_at });
+    emit(db, run.run_id, 'LOCK', { scope: ctx.lockScope || 'workspace', target: ctx.lockTarget || '*', run_id: run.run_id, expires_at: got.lock.expires_at });
   }
 
   const budget = Number(run.budget_tokens || ctx.budgetTokens || 0) || null;

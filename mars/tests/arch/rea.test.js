@@ -45,7 +45,7 @@ test('M14 W-01：真实扫描临时代码库，识别语言/入口/测试，并�
     name: 'demo-app', version: '1.0.0', main: 'src/index.js',
     scripts: { test: 'node --test' }, dependencies: { a: '1' }
   }));
-  fs.writeFileSync(path.join(root, 'src', 'index.js'), 'console.log(1)\n');
+  fs.writeFileSync(path.join(root, 'src', 'index.js'), 'function main() { console.log(1); }\nmodule.exports = { main };\n');
   fs.writeFileSync(path.join(root, 'test', 'a.test.js'), "require('node:test')\n");
   fs.writeFileSync(path.join(root, 'README.md'), '# Demo App\n\n说明\n');
 
@@ -62,7 +62,9 @@ test('M14 W-01：真实扫描临时代码库，识别语言/入口/测试，并�
   assert.ok(out.result.manifests.some((m) => m.name === 'demo-app'));
   assert.ok(out.result.entries.some((e) => e.path === 'src/index.js'));
   assert.equal(out.result.tests.files, 1);
-  assert.ok(out.result.not_done.includes('模块间依赖关系图（需 AST 或 W-04）'));
+  assert.ok(out.result.not_done.includes('动态 import 与运行时依赖'));
+  assert.ok(out.result.dependencies && out.result.dependencies.nodes >= 1, 'W-01 必须产出静态依赖图');
+  assert.ok(out.result.symbols.length >= 1, 'W-01 必须提取符号');
   assert.ok(out.result.inference_notes.length > 0, '必须标明哪些是推断');
 });
 

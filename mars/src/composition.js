@@ -17,6 +17,8 @@ const { createOpenAiCompatProvider } = require('./adapters/provider-openai-compa
 const { createAnthropicProvider } = require('./adapters/provider-anthropic');
 const { createFsToolExecutor } = require('./adapters/fs-tool-executor');
 const rea = require('./adapters/rea/registry');
+const reaTools = require('./adapters/rea/tool-registry');
+const { createWorkspaceManager } = require('./adapters/fs-workspaces');
 const { openDb, attachAuditSink } = require('./db');
 const { KNOWN_CONTRACTS } = require('./ports/asset-resolver');
 const { PACKAGE_ROOT, resolveRoot, resolvePaths, loadRoutingConfig } = require('./paths');
@@ -89,7 +91,7 @@ function createRuntime(options = {}) {
     // 默认允许根是安装根；MCP 保持「未显式设置则不限制」的既有语义。
     projectRoots,
     // M14：REA 工作流注册表。与 provider 一样，域层只拿到接口，不 require 适配器。
-    rea,
+    rea: Object.assign({}, rea, { tools: reaTools }),
     allowedRoots: paths.allowedRootsFromEnv || [paths.root],
     // M12：provider 名称是外部输入，只允许落在注册表内的名字。
     providerNames: Object.keys(providerFactories),
@@ -98,8 +100,11 @@ function createRuntime(options = {}) {
       if (!make) throw new Error('PROVIDER_UNKNOWN ' + name + '（可用：' + Object.keys(providerFactories).join(',') + '）');
       return make(agent);
     },
-    toolExecutorFor(root) {
-      return createFsToolExecutor({ root });
+    toolExecutorFor(root, options = {}) {
+      return createFsToolExecutor({ root, ...options });
+    },
+    workspaceManagerFor(baseDir) {
+      return createWorkspaceManager({ baseDir });
     }
   };
 }

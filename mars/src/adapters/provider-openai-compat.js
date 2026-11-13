@@ -82,11 +82,15 @@ function createOpenAiCompatProvider(options = {}) {
     controllers.set(sessionId, controller);
     const timer = setTimeout(() => controller.abort(), payload.timeoutMs || timeoutMs);
 
-    for (const m of payload.messages || []) s.messages.push(m);
+    // M18：payload.messages 是 Runtime 维护的**完整**对话历史。
+    // 适配器不再把它追加到 session（旧实现会让第二轮重复 system/user），
+    // session 只保存身份、模型与累计用量。
+    const history = payload.messages || [];
+    s.messages = history.slice();
 
     const body = {
       model: payload.model || s.model,
-      messages: toWireMessages(s.messages),
+      messages: toWireMessages(history),
       temperature: 0
     };
     if (Array.isArray(payload.tools) && payload.tools.length) {
@@ -145,8 +149,6 @@ function createOpenAiCompatProvider(options = {}) {
       s.usage.output += usage.output;
       s.usage.cached += usage.cached;
     }
-
-    if (msg.content) s.messages.push({ role: 'assistant', content: msg.content, tool_calls: toolCalls });
 
     return {
       text: msg.content || '',

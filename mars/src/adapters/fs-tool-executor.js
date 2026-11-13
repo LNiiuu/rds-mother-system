@@ -71,6 +71,27 @@ function createFsToolExecutor(options = {}) {
   }
   const root = fs.realpathSync(declaredRoot);
   const testTimeoutMs = Number(options.testTimeoutMs || LIMITS.testTimeoutMs);
+  const allowedWritePaths = Array.isArray(options.allowedWritePaths)
+    ? options.allowedWritePaths.map((p) => String(p).replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, ''))
+    : null;
+
+  /** M18：任务级写路径。null = 不限（兼容旧调用）；数组 = 只允许这些前缀/glob。 */
+  function writeAllowed(rel) {
+    if (!allowedWritePaths) return true;
+    const r = String(rel).replace(/\\/g, '/');
+    return allowedWritePaths.some((p) => {
+      if (!p) return false;
+      if (p.endsWith('/**')) {
+        const base = p.slice(0, -3);
+        return r === base || r.startsWith(base + '/');
+      }
+      if (p.includes('*')) {
+        const re = new RegExp('^' + p.split('*').map((s) => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$');
+        return re.test(r);
+      }
+      return r === p || r.startsWith(p + '/');
+    });
+  }
 
   /** 把用户给的相对路径解析成根内绝对路径；逃逸或绝对路径一律拒绝。 */
   function resolveInside(target) {
@@ -120,6 +141,10 @@ function createFsToolExecutor(options = {}) {
     const bytes = Buffer.byteLength(content, 'utf8');
     if (bytes > LIMITS.writeBytes) return fail('TOOL_TOO_LARGE', `${bytes} B > ${LIMITS.writeBytes} B`, { bytes });
     const abs = resolveInside(args.path);
+    const rel = path.relative(root, abs).replace(/\\/g, '/');
+    if (!writeAllowed(rel)) {
+      return fail('TOOL_PATH_DENIED', '写路径不在任务允许范围内: ' + rel, { path: rel, allowed: allowedWritePaths });
+    }
     fs.mkdirSync(path.dirname(abs), { recursive: true });
     fs.writeFileSync(abs, content, 'utf8');
     return {

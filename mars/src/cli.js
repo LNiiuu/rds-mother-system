@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const os = require('node:os');
 const { audit, dbStats } = require('./db');
 const { loadPrincipals, authenticate, authorize } = require('./authz');
 const store = require('./store');
@@ -360,6 +361,10 @@ function run(args) {
     if (cmd === 'rea') {
       const cliRea = require('./cli-rea');
       const reaCtx = { db, args, runtime, auth, reaEvidenceBase: path.join(path.dirname(p.db), 'rea') };
+      if (sub === 'tools') {
+        return runtime.rea.tools.status().then((rows) => console.log(JSON.stringify({ tools: rows }, null, 2)))
+          .catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e)));
+      }
       if (sub === 'list') { return cliRea.reaList(reaCtx); }
       if (sub === 'status') { return cliRea.reaStatus(reaCtx); }
       if (sub === 'preflight') { return cliRea.reaPreflight(reaCtx).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e))); }
@@ -813,9 +818,79 @@ function run(args) {
     }
     if (cmd === 'orchestrate') {
       const orch = require('./orchestrator');
-      const db = runtime.openDb(p.db);
+      const scheduler = require('./runtime/scheduler');
+            const db = runtime.openDb(p.db);
       const allowed = db.prepare('SELECT project_id FROM projects ORDER BY project_id').all().map((r) => r.project_id);
       const sub = args._[1];
+
+      // M18：多 Agent 任务编排。与 M11 的 budget plan/start 分开，避免改变旧语义。
+      if (sub === 'dispatch') {
+        if (!args.project) die('orchestrate dispatch 需要 --project <id>', 2);
+        if (!args['plan-file']) die('orchestrate dispatch 需要 --plan-file <json>', 2);
+        const data = JSON.parse(fs.readFileSync(path.resolve(String(args['plan-file'])), 'utf8').replace(/^\uFEFF/, ''));
+        const project = db.prepare('SELECT project_id, root_path FROM projects WHERE project_id = ?').get(String(args.project));
+        if (!project) die('项目不存在：' + args.project, 2);
+        const plan = scheduler.createPlan(db, {
+          ...data,
+          project_id: String(args.project),
+          base_root: args['base-root'] || data.base_root || project.root_path,
+          mode: args.mode || data.mode,
+          max_concurrency: args['max-concurrency'] ? Number(args['max-concurrency']) : data.max_concurrency,
+          workspace_mode: args.workspace || data.workspace_mode,
+          auto_merge: args['no-auto-merge'] ? false : data.auto_merge
+        });
+        const workspace = runtime.workspaceManagerFor(args.workdir || path.join(os.tmpdir(), 'mars-orchestration'));
+        const compilePacket = (input) => compileContext(db, auth.principal, auth.routing, {
+          project_id: input.project_id,
+          task_id: input.task_id || 'T-UNKNOWN',
+          role_id: input.role_id,
+          budget: input.budget,
+          task: input.task,
+          objective: input.objective,
+          assets
+        }).packet;
+        return scheduler.executePlan({
+          db, plan, workspace, compilePacket,
+          providerFor: (name, agent) => runtime.providerFor(name, agent),
+          toolExecutorFor: (root, options) => runtime.toolExecutorFor(root, options)
+        }).then((r) => {
+          console.log(JSON.stringify({ plan: r.plan, jobs: r.jobs }, null, 2));
+        }).catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e)));
+      }
+      if (sub === 'plans') {
+        console.log(JSON.stringify(scheduler.listPlans(db, { project_id: args.project, status: args.status, limit: args.limit }), null, 2));
+        return;
+      }
+      if (sub === 'jobs') {
+        if (!args.plan) die('orchestrate jobs 需要 --plan <id>', 2);
+        console.log(JSON.stringify(scheduler.listJobs(db, String(args.plan)), null, 2));
+        return;
+      }
+      if (sub === 'job') {
+        if (!args.job) die('orchestrate job 需要 --job <id>', 2);
+        const job = scheduler.getJob(db, String(args.job));
+        if (!job) die('job 不存在：' + args.job, 2);
+        console.log(JSON.stringify({ job, events: scheduler.listEvents(db, job.plan_id).filter((e) => e.job_id === job.job_id) }, null, 2));
+        return;
+      }
+      if (sub === 'cancel-job') {
+        if (!args.job) die('orchestrate cancel-job 需要 --job <id>', 2);
+        console.log(JSON.stringify(scheduler.cancelJob(db, String(args.job), args.reason), null, 2));
+        return;
+      }
+      if (sub === 'recover') {
+        if (!args.plan) die('orchestrate recover 需要 --plan <id>', 2);
+        console.log(JSON.stringify(scheduler.recoverPlan(db, String(args.plan), { staleMs: args.stale ? Number(args.stale) : undefined }), null, 2));
+        return;
+      }
+      if (sub === 'merge') {
+        if (!args.plan) die('orchestrate merge 需要 --plan <id>', 2);
+        const workspace = runtime.workspaceManagerFor(args.workdir || path.join(os.tmpdir(), 'mars-orchestration'));
+        return scheduler.mergePlan({ db, workspace }, String(args.plan), { apply: args.apply === true || args.apply === '1' })
+          .then((r) => console.log(JSON.stringify(r, null, 2)))
+          .catch((e) => die(describeError(e, args.debug === true), exitCodeFor(e)));
+      }
+
       if (sub === 'plan') {
         const plan = orch.plan({
           project_id: args.project, task_id: args.task, objective: args.objective,

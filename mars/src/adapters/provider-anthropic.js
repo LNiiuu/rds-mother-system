@@ -84,8 +84,11 @@ function createAnthropicProvider(options = {}) {
     controllers.set(sessionId, controller);
     const timer = setTimeout(() => controller.abort(), payload.timeoutMs || timeoutMs);
 
-    for (const m of payload.messages || []) s.messages.push(m);
-    const wire = toWire(s.messages);
+    // M18：payload.messages 是 Runtime 维护的完整历史；适配器不再累计，
+    // 避免第二轮重复 user/system，也避免重试时重复追加。
+    const history = payload.messages || [];
+    s.messages = history.slice();
+    const wire = toWire(history);
 
     const body = {
       model: payload.model || s.model,
@@ -150,8 +153,6 @@ function createAnthropicProvider(options = {}) {
       s.usage.output += usage.output;
       s.usage.cached += usage.cached;
     }
-    if (text) s.messages.push({ role: 'assistant', content: text, tool_calls: toolCalls });
-
     return {
       text,
       tool_calls: toolCalls,
