@@ -1,10 +1,6 @@
 'use strict';
 // 组合根（M3 / B1 建立，B2/B3 扩展）。
-//
-// 唯一职责：把「宿主环境」翻译成域模块能用的几个能力对象，然后交出去。
-// 这里是**唯一**允许读 process.env 的地方；路径规则在 paths.js，契约读取在 adapters/。
-//
-// 硬约束（tooling/layering-check.mjs 检查）：<= 120 行；不含业务分支；不 import 域业务模块。
+// 把「宿主环境」翻译成域模块能用的能力对象；唯一允许读 process.env 的地方。
 const { createFsAssetResolver } = require('./adapters/fs-asset-resolver');
 const projectRoots = require('./adapters/fs-project-roots');
 const { createCliIdentity } = require('./adapters/cli-identity');
@@ -15,10 +11,12 @@ const { createDbAuditSink } = require('./adapters/db-audit-sink');
 const { createMockProvider } = require('./adapters/provider-mock');
 const { createOpenAiCompatProvider } = require('./adapters/provider-openai-compat');
 const { createAnthropicProvider } = require('./adapters/provider-anthropic');
+const { createOllamaProvider } = require('./adapters/provider-ollama');
 const { createFsToolExecutor } = require('./adapters/fs-tool-executor');
 const rea = require('./adapters/rea/registry');
 const reaTools = require('./adapters/rea/tool-registry');
 const { createWorkspaceManager } = require('./adapters/fs-workspaces');
+const platforms = require('./adapters/platform-factory');
 const { openDb, attachAuditSink } = require('./db');
 const { KNOWN_CONTRACTS } = require('./ports/asset-resolver');
 const { PACKAGE_ROOT, resolveRoot, resolvePaths, loadRoutingConfig } = require('./paths');
@@ -76,7 +74,8 @@ function createRuntime(options = {}) {
         : {}
     }),
     'openai-compat': () => createOpenAiCompatProvider({ env }),
-    anthropic: () => createAnthropicProvider({ env })
+    anthropic: () => createAnthropicProvider({ env }),
+    ollama: () => createOllamaProvider({ env })
   };
 
   return {
@@ -88,9 +87,7 @@ function createRuntime(options = {}) {
     sessions,
     openDb: openAuditedDb,
     auditSinkFactory: createDbAuditSink,
-    // 默认允许根是安装根；MCP 保持「未显式设置则不限制」的既有语义。
     projectRoots,
-    // M14：REA 工作流注册表。与 provider 一样，域层只拿到接口，不 require 适配器。
     rea: Object.assign({}, rea, { tools: reaTools }),
     allowedRoots: paths.allowedRootsFromEnv || [paths.root],
     // M12：provider 名称是外部输入，只允许落在注册表内的名字。
@@ -105,7 +102,10 @@ function createRuntime(options = {}) {
     },
     workspaceManagerFor(baseDir) {
       return createWorkspaceManager({ baseDir });
-    }
+    },
+    // M22：平台适配器只通过工厂暴露；域层不 require 任何 platform-*.js。
+    platformCatalog: platforms.platformCatalog(),
+    platformFor: platforms.createPlatform
   };
 }
 

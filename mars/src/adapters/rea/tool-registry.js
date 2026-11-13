@@ -90,6 +90,17 @@ async function detect(name, options = {}) {
   const def = DEFS[name];
   if (!def) throw new Error('TOOL_UNKNOWN ' + name);
   const env = options.env || process.env;
+  // M23：工具装在非 PATH 目录时，用显式路径覆盖；仍然做版本探测，不盲信路径。
+  const overrideKey = 'MARS_' + name.toUpperCase() + '_PATH';
+  const override = env[overrideKey] || env[name.toUpperCase() + '_PATH'];
+  if (override && fs.existsSync(override)) {
+    const r = await run(override, [def.versionArgs[0]], { timeout: 8000 });
+    return {
+      name, label: def.label, present: true, path: override,
+      version: ((r.stdout || r.stderr || '').trim().split(/\r?\n/)[0] || 'unknown').slice(0, 160),
+      capabilities: def.capabilities, safety: def.safety, source: overrideKey, probe_ok: r.ok
+    };
+  }
   if (name === 'ghidra' && ghidraHome(env)) {
     const home = ghidraHome(env);
     const candidates = [

@@ -295,11 +295,33 @@ const workflow = {
     let tshark = null;
     try { tshark = await require('./tool-registry').detect('tshark'); } catch { /* 可选工具 */ }
     const tsharkStatus = tshark ? { present: Boolean(tshark.present), version: tshark.version || null } : { present: false, version: null };
+    // M23：有 tshark 就做真实交叉核验；失败只记录，不否定内置解析结果。
+    let tsharkRun = null;
+    if (tshark && tshark.present) {
+      const tools = require('./tool-registry');
+      const r = await tools.execute('tshark', ['-r', sample, '-q', '-z', 'io,phs'], { timeoutMs: 60000 });
+      const frames = /frame\s+frames:(\d+)/.exec(r.stdout || '');
+      tsharkRun = {
+        ok: r.ok,
+        error_code: r.error_code,
+        version: r.version,
+        argv: r.argv,
+        exit_code: r.exit_code,
+        frame_count: frames ? Number(frames[1]) : null,
+        hierarchy: String(r.stdout || '').split(/\r?\n/).slice(0, 24),
+        stderr: String(r.stderr || '').slice(0, 500)
+      };
+      tsharkStatus.run = tsharkRun;
+      if (tsharkRun.frame_count !== null && tsharkRun.frame_count !== analysis.packets) {
+        tsharkStatus.frame_count_mismatch = { builtin: analysis.packets, tshark: tsharkRun.frame_count };
+      }
+    }
+    const commands = tsharkRun ? [{ tool: 'tshark', argv: tsharkRun.argv, exit_code: tsharkRun.exit_code }] : [];
     if (analysis.error) {
       return {
         result: { sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes }, ...analysis, tshark: tsharkStatus },
-        tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }],
-        commands: [],
+        tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }].concat(tshark ? [{ name: 'tshark', version: tshark.version, kind: 'external' }] : []),
+        commands,
         limitations: [analysis.note],
         sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes, kind: input.sample_kind || 'unknown' }
       };
@@ -310,8 +332,8 @@ const workflow = {
         ...analysis,
         tshark: tsharkStatus
       },
-      tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }],
-      commands: [],
+      tool_versions: [{ name: 'rea-pcap-parser', version: '1.0.0', kind: 'builtin' }].concat(tshark ? [{ name: 'tshark', version: tshark.version, kind: 'external' }] : []),
+      commands,
       limitations: Object.values(analysis.limits),
       sample: { path: sample, sha256: hash.sha256, bytes: hash.bytes, kind: input.sample_kind || 'unknown' }
     };
@@ -351,6 +373,21 @@ const workflow = {
     L.push(result.http_requests.length ? result.http_requests.slice(0, 10).map((r) => `- ${r.method} ${r.host || ''}${r.path}`).join('\n') : '（无）');
     L.push('');
     L.push(`## TLS\n\nClientHello ${result.tls.client_hellos} 个；${result.tls.note}`);
+    L.push('');
+    L.push('## TShark 交叉核验');
+    L.push('');
+    if (result.tshark && result.tshark.run) {
+      const r = result.tshark.run;
+      L.push(`- 版本：${result.tshark.version}`);
+      L.push(`- 退出码：${r.exit_code}；包数：${r.frame_count === null ? '未解析' : r.frame_count}`);
+      if (result.tshark.frame_count_mismatch) L.push(`- **警告**：内置解析 ${result.tshark.frame_count_mismatch.builtin} 包，tshark ${result.tshark.frame_count_mismatch.tshark} 包`);
+      L.push('');
+      L.push('```text');
+      L.push((r.hierarchy || []).join('\n'));
+      L.push('```');
+    } else {
+      L.push(result.tshark && result.tshark.present ? 'tshark 已安装但未执行' : 'tshark 未安装；仅内置解析');
+    }
     L.push('');
     L.push('## 启发式');
     L.push('');

@@ -30,7 +30,7 @@ function cleanText(s) {
   let out = String(s);
   const reps = [
     [ROOT, '<REPO>'], [ROOT.replace(/\\/g, '/'), '<REPO>'],
-    [tmp, '<TEMP>'], [tmp.replace(/\\/g, '/'), '<TEMP>'],
+    [tmp, '<TEMP>'], [tmp.replace(/\\/g, '/'), '<TEMP>'], [tmp.replace(/\\/g, '\\\\'), '<TEMP>'],
     ['D://MinGw//Mingw//mingw64//bin', '<TOOLCHAIN>'],
     ['D:/MinGw/Mingw/mingw64/bin', '<TOOLCHAIN>']
   ];
