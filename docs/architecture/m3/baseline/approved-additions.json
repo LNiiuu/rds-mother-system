@@ -60,7 +60,16 @@
     "docs/rea.md",
     "mars/src/runtime/scheduler.js",
     "mars/src/adapters/fs-workspaces.js",
-    "mars/src/adapters/rea/tool-registry.js"
+    "mars/src/adapters/rea/tool-registry.js",
+    "mars/src/adapters/platform-memory.js",
+    "mars/src/adapters/platform-http.js",
+    "mars/src/adapters/platform-dsh.js",
+    "mars/src/adapters/platform-workbuddy.js",
+    "mars/src/adapters/platform-factory.js",
+    "mars/src/ports/platform-adapter.js",
+    "mars/src/platform-registry.js",
+    "mars/src/platform-client.js",
+    "mars/src/adapters/provider-ollama.js"
   ],
   "reasons": {
     "mars/src/adapters/fs-asset-resolver.js": "B1：唯一允许读契约文件的适配器；域模块不再在 require 期读盘",
@@ -116,7 +125,16 @@
     "mars/src/adapters/provider-anthropic.js": "M16：Anthropic Messages 协议适配器（system 顶层/tool_result 块/input_schema）",
     "mars/src/runtime/scheduler.js": "M18：多 Agent 任务编排（依赖/优先级/并发/重试/恢复/合并编排）",
     "mars/src/adapters/fs-workspaces.js": "M18：工作区隔离与受控合并（shared/copy/worktree、冲突检测）",
-    "mars/src/adapters/rea/tool-registry.js": "M19：REA 统一工具适配层（检测/版本/能力/argv 执行/超时/安装提示）"
+    "mars/src/adapters/rea/tool-registry.js": "M19：REA 统一工具适配层（检测/版本/能力/argv 执行/超时/安装提示）",
+    "mars/src/adapters/platform-memory.js": "M22：内存参考平台适配器（契约基线）",
+    "mars/src/adapters/platform-http.js": "M22：通用 HTTP 平台适配器",
+    "mars/src/adapters/platform-dsh.js": "M22：DSH 文件队列平台适配器",
+    "mars/src/adapters/platform-workbuddy.js": "M22：WorkBuddy guest bridge 适配器",
+    "mars/src/adapters/platform-factory.js": "M22：平台适配器显式登记工厂",
+    "mars/src/ports/platform-adapter.js": "M22：平台适配器端口（5 方法/能力声明）",
+    "mars/src/platform-registry.js": "M22：平台适配器注册表",
+    "mars/src/platform-client.js": "M22：跨适配器统一客户端",
+    "mars/src/adapters/provider-ollama.js": "M21：Ollama 本地模型 Provider"
   },
   "helpText": {
     "sha256": "2faee1a36b123c0a59258d0d6647cfc128d422ec4e4c02034261596b64151dcc",

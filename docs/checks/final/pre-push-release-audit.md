@@ -5,6 +5,7 @@
 **审计对象**：代码基线 `04fb86b` + 本文件所在的文档提交
 **origin/main**：`ada7848`
 **远程写入**：**未执行**。无 Push / PR / Merge / Release / Tag 推送。
+**定稿复查**：`git ls-remote origin refs/heads/main` = `ada7848`（成功）。
 
 > 本文件与 M21–M25 文档在同一提交中落盘；提交后 HEAD 会变化，最终值以
 > `git rev-parse HEAD` / `git rev-list --count origin/main..HEAD` 为准。
@@ -18,7 +19,7 @@
 |---|---|
 | 代码 HEAD（审计时） | `04fb86b` |
 | 本轮新增提交 | `3a8f15c`（M21–M23 代码）、`04fb86b`（M22 复核修复）、文档提交（本文件） |
-| 相对 origin/main | **22 ahead / 0 behind**（文档提交后为 23） |
+| 相对 origin/main | **24 ahead / 0 behind**（含本报告与总体验收提交） |
 | merge commit | 0（线性） |
 | Tag | 20 个，均未指向本轮提交 |
 | 暂存区 | 提交时仅包含明确路径 |
@@ -48,7 +49,7 @@
 | `npm run docs:check` | PASS（本文件落盘后） |
 | `npm run config` | PASS（json=94 / yaml=4） |
 | `npm run baseline` | PASS（7 个面一致，含登记增项） |
-| `npm run pack:check` | PASS（144 文件 / 约 225 kB packed） |
+| `npm run pack:check` | PASS（153 文件 / 234.9 kB packed / 719.2 kB unpacked） |
 | `git diff --check` | 本轮文件无新增空白错误；受保护 M9–M11 工作区版本有既存行尾空格（未动） |
 
 测试增量：302 → 318（+16）= 平台 10 + Ollama 6。

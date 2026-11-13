@@ -188,8 +188,10 @@
 | [m24/final-acceptance.md](m24/final-acceptance.md) | 真实模型多 Agent `BLOCKED`；编排/REA 真实 |
 | [m24/scenario.md](m24/scenario.md) | 平台→RDS 端到端 `NOT RUN` |
 | [m25/independent-review.md](m25/independent-review.md) | 第一轮独立审核（不可发布 → 整改项） |
-| [m25/second-review.md](m25/second-review.md) | 第二轮复核（待生成） |
-| [final/pre-push-release-audit.md](final/pre-push-release-audit.md) | 当前 HEAD 发布审计（待生成） |
+| [m25/second-review.md](m25/second-review.md) | 第二轮复核：整改验证与新增问题 |
+| [m25/final-acceptance.md](m25/final-acceptance.md) | M25 四层闭环：`PASS`（流程）/ `CONDITIONAL GO` |
+| [final/pre-push-release-audit.md](final/pre-push-release-audit.md) | 发布审计：范围/测试/敏感信息/清单/`CONDITIONAL GO` |
+| [m21-m25/final-acceptance.md](m21-m25/final-acceptance.md) | M21–M25 总体 A–H 验收（`PARTIAL`） |
 
 > M21/M22/M23/M24 判定均为 **`PARTIAL`**；M21 真实推理、M23 W-03/W-06、M24 真实模型多 Agent 为 `BLOCKED`。
 > 平台层是“库 + 契约测试”，尚未接入 runtime/scheduler。
