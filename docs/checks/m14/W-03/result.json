@@ -21,7 +21,7 @@
       {
         "check": "sample 存在",
         "ok": true,
-        "detail": "C:\\Users\\liuch\\AppData\\Local\\Temp\\rea\\fake.apk"
+        "detail": "<TEMP>\\rea\\fake.apk"
       },
       {
         "check": "sample 是 ZIP/APK",
@@ -53,7 +53,7 @@
   },
   "result": {
     "sample": {
-      "path": "C:\\Users\\liuch\\AppData\\Local\\Temp\\rea\\fake.apk",
+      "path": "<TEMP>\\rea\\fake.apk",
       "sha256": "bff9d88838d62ca288f42f1249417a8e89a78fa01b79a226c5000c8a267b635a",
       "bytes": 839,
       "kind": "authorized-local-file"

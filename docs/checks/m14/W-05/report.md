@@ -1,6 +1,6 @@
 # W-05 PCAP 流量分析
 
-样本：`C:\Users\liuch\AppData\Local\Temp\rea\synthetic.pcap`（kind=synthetic）
+样本：`<TEMP>\rea\synthetic.pcap`（kind=synthetic）
 
 - SHA-256：`088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8`
 - 链路类型：Ethernet（1）

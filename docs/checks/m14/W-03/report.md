@@ -1,6 +1,6 @@
 # W-03 Android APK 静态分析（BLOCKED）
 
-样本：`C:\Users\liuch\AppData\Local\Temp\rea\fake.apk`
+样本：`<TEMP>\rea\fake.apk`
 
 - SHA-256：`bff9d88838d62ca288f42f1249417a8e89a78fa01b79a226c5000c8a267b635a`
 - 大小：839 B

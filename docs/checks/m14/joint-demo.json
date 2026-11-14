@@ -25,7 +25,7 @@
         "workflow_id": "W-02",
         "status": "PARTIAL",
         "sample_sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
-        "evidence_dir": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\rea\\W-02\\reacaad13e0ee9c",
+        "evidence_dir": "<TEMP>\\m15-joint-JNpysT\\rea\\W-02\\reacaad13e0ee9c",
         "tool_versions": [
           {
             "name": "objdump",
@@ -46,7 +46,7 @@
         "workflow_id": "W-04",
         "status": "PARTIAL",
         "sample_sha256": "f51fab8041e5023d7290b540a2106f051ef0bd2bc3443c9daf318628b560fa29",
-        "evidence_dir": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\rea\\W-04\\reaf7298e9aa276",
+        "evidence_dir": "<TEMP>\\m15-joint-JNpysT\\rea\\W-04\\reaf7298e9aa276",
         "tool_versions": [
           {
             "name": "objdump",
@@ -67,7 +67,7 @@
       "verdict": "审核通过：W-02 的结构事实与 W-04 的调用图都带样本哈希与工具版本，结论限定在\"外部输入进入命令拼接属高风险\"，未超出证据范围。",
       "reviewed": true
     },
-    "evidence_summary": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m15-joint-JNpysT\\ws\\rea\\SUMMARY.md"
+    "evidence_summary": "<TEMP>\\m15-joint-JNpysT\\ws\\rea\\SUMMARY.md"
   },
   "case_b": {
     "task_type": "development",

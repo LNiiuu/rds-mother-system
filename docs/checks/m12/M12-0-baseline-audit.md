@@ -31,7 +31,7 @@
 
 ### 1.2 受保护工作指纹
 
-基线文件 `D:/M1-migration/m5-protected-baseline.txt`（51 条，M5 时点建立）。
+基线文件 `<LOCAL_EVIDENCE>/m5-protected-baseline.txt`（51 条，M5 时点建立）。
 
 | 项 | 结果 |
 |---|---|
@@ -39,7 +39,7 @@
 | 新增 | **1**（即上面那份被格式化的已跟踪文档，不在旧基线范围内） |
 | 已入库 | **2**（`core/templates/role-packet.md`、`core/templates/run-record.json`，M5-B6 有意提交） |
 
-即：**49 项未跟踪受保护工作，逐字节零漂移**。本轮已重建 `D:/M1-migration/m12-protected-baseline.txt`（50 条）作为 M12–M17 的比对基准。
+即：**49 项未跟踪受保护工作，逐字节零漂移**。本轮已重建 `<LOCAL_EVIDENCE>/m12-protected-baseline.txt`（50 条）作为 M12–M17 的比对基准。
 
 ---
 
@@ -48,7 +48,7 @@
 | 动作 | 结果 |
 |---|---|
 | 本机开发库 | `mars/var/mars.db`，589,824 B |
-| 备份路径 | `D:/M1-migration/m12-backup/mars-before-m12.db` |
+| 备份路径 | `<LOCAL_EVIDENCE>/m12-backup/mars-before-m12.db` |
 | SHA-256（原库 = 副本） | `9e810fa555b2ceec1891c73491052a2c6d63472fa1a4d928b340af7d1ec0cecc` |
 | 副本 `PRAGMA integrity_check` | `ok` |
 | 副本 `meta.schema_version` | `4` |

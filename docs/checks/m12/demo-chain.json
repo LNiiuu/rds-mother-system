@@ -2,7 +2,7 @@
   "demo": "m12-multi-agent-chain",
   "simulated": true,
   "note": "模型为确定性 mock（provider=mock，usage_source=estimated），不是真实模型调用；执行层、会话、交接、工具与测试是真实的",
-  "workspace": "C:\\Users\\liuch\\AppData\\Local\\Temp\\m12-demo-4KOuBx\\ws",
+  "workspace": "<TEMP>\\m12-demo-4KOuBx\\ws",
   "agents": [
     {
       "agent_id": "agentd546d7ab20e8",

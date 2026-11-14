@@ -35,7 +35,7 @@ rds-mother-system
 | `mars/src/` | MARS | 引擎全部实现 | 是 |
 | `mars/contracts/` | MARS | 4 份 JSON Schema（memory / context-packet / manifest / ledger）+ role-routing | 是 |
 | `mars/config/` | MARS | `role-routing.json`（角色路由）、`principals.example.json`（身份示例） | 是（仅这两个） |
-| `mars/tests/` | MARS | 173 项 Required 测试 + External 测试 | **否** |
+| `mars/tests/` | MARS | 318 项 Required 测试 + External 测试 | **否** |
 | `mars/scripts/` | MARS | 运维脚本（备份、回滚、MCP 注册表操作、开发期压测） | **否** |
 | `mars/docs/` | MARS | 历史设计与评审记录（40 份） | **否** |
 | `tooling/` | 仓库 | 门禁与检查脚本（测试门禁、分层、基线、打包、配置、smoke） | 仅 `manifest/` |
@@ -61,14 +61,14 @@ MARS 的代码不是按「文件类型」分的，是按**依赖方向**分的�
 └───────────────────────┬──────────────────────────────────┘
                         │ 只调组合根
 ┌───────────────────────▼──────────────────────────────────┐
-│ L1 组合根  mars/src/composition.js（82 行，上限 120）      │
+│ L1 组合根  mars/src/composition.js（120 行，上限 120）     │
 │   唯一允许读 process.env 的地方                            │
 │   职责：解析路径 → 加载契约 → 冻结配置快照 → 选身份/数据源  │
 │        → 返回一个 runtime 对象                            │
 └───────┬───────────────────────────────┬──────────────────┘
         │ 注入                            │ 注入
 ┌───────▼──────────┐          ┌─────────▼──────────────────┐
-│ L2 端口（5 个）   │          │ L2 适配器（8 个）           │
+│ L2 端口（8 个）   │          │ L2 适配器（按能力分组）     │
 │ ports/*.js        │◄─────────│ adapters/*.js               │
 │ 零 require        │  实现     │ 唯一碰宿主的地方             │
 └───────┬──────────┘          └────────────────────────────┘
@@ -88,7 +88,7 @@ MARS 的代码不是按「文件类型」分的，是按**依赖方向**分的�
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 五个端口
+### 端口（8 个）
 
 | 端口 | 方法 | 隔离的是什么宿主 |
 |---|---|---|
@@ -97,8 +97,16 @@ MARS 的代码不是按「文件类型」分的，是按**依赖方向**分的�
 | `SessionSource` | `kind` / `sniff` / `parse` | 会话数据源（当前只有 DSH v4） |
 | `AuditSink` | `record` | 审计写到哪（SQLite / 空实现） |
 | `HostRegistry` | `detect` / `list` / `backup` / `removeByPrefix` | 外部宿主注册表（DSH 的 MCP 配置） |
+| `ModelProvider` | `createSession` / `sendMessage` / `cancel` / `getUsage` / `healthCheck` | 模型服务（mock / OpenAI-compatible / Anthropic / **Ollama**） |
+| `ToolExecutor` | 读/写/列目录/跑测试 | 文件工具与写路径白名单 |
+| `PlatformAdapter` | `describe` / `healthCheck` / `receive` / `send` / `cancel` | 平台任务网关（memory / HTTP / DSH / WorkBuddy bridge） |
 
 端口准入规则（三条至少满足一条）：≥2 个真实实现、需要测试替身、存在安全边界。每端口 ≤5 个方法，端口之间零依赖。
+**M21/M22 新增模块**：`adapters/provider-ollama.js`（本地模型）、
+`ports/platform-adapter.js` + `platform-registry.js` + `platform-client.js` +
+`adapters/platform-{memory,http,dsh,workbuddy,factory}.js`（平台适配层）。
+平台层目前是“库 + 契约测试”，**尚未接入 `runtime/scheduler`**；WorkBuddy/DSH 真实宿主 `NOT RUN`。
+
 
 **刻意不做的抽象**（不是遗漏）：`FileSystem`、`Clock`、`IdGen`、`Logger`、`PluginLoader`、把 `authz` 包成端口、`Repository` 层。理由见 [architecture/m3/host-adapter-design.md](architecture/m3/host-adapter-design.md) §3。
 

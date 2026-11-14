@@ -5,7 +5,7 @@
 **审计对象**：代码基线 `04fb86b` + 本文件所在的文档提交
 **origin/main**：`ada7848`
 **远程写入**：**未执行**。无 Push / PR / Merge / Release / Tag 推送。
-**定稿复查**：`git ls-remote origin refs/heads/main` = `ada7848`（成功）。
+**远程只读查询**：上次成功（2026-11-14 定稿）为 `ada7848`；本轮若失败则标 `BLOCKED`，以最终报告为准。
 
 > 本文件与 M21–M25 文档在同一提交中落盘；提交后 HEAD 会变化，最终值以
 > `git rev-parse HEAD` / `git rev-list --count origin/main..HEAD` 为准。
@@ -18,8 +18,8 @@
 | 项 | 值 |
 |---|---|
 | 代码 HEAD（审计时） | `04fb86b` |
-| 本轮新增提交 | `3a8f15c`（M21–M23 代码）、`04fb86b`（M22 复核修复）、文档提交（本文件） |
-| 相对 origin/main | **24 ahead / 0 behind**（含本报告与总体验收提交） |
+| 本轮新增提交 | `3a8f15c`（M21–M23 代码）、`04fb86b`（M22 复核修复）、`8ea84c2`（M21–M25 文档+两轮审核）、`9330878`（总体验收/发布审计）、本次 docs-only 提交（README/PROJECT-MAP/历史路径） |
+| 相对 origin/main | **25 ahead / 0 behind**（含本次 docs-only 提交） |
 | merge commit | 0（线性） |
 | Tag | 20 个，均未指向本轮提交 |
 | 暂存区 | 提交时仅包含明确路径 |
@@ -35,7 +35,7 @@
 - 测试：`platform-adapters.test.js`、`provider-ollama.test.js`
 - 工具：`tooling/m21-ollama-verify.cjs`、`tooling/m19-rea-evidence.cjs`
 
-累计 22 个提交（`origin/main..HEAD`）共 192 文件、+29,368/−114；其中大部分是 M7–M20 的历史成果，
+累计 25 个提交（`origin/main..HEAD`）共 207 文件、+31,401/−118；审计基线 `9330878` 为 24 提交 / 207 文件 / +31,376/−114。其中大部分是 M7–M20 的历史成果，
 不是本轮新增。发布审批应把它当作**整个 M7–M25 的首次推送**，而不是只审 M21–M25。
 
 ---
@@ -83,9 +83,9 @@
 - 密钥特征扫描（`sk-`/`ghp_`/`github_pat_`/`AKIA`/`xox*`/私钥头）：本轮提交 **0 命中**；
 - 本轮提交无 `liuch`、`C:\Users\...`、`D:/tools/...`；
 - W-05 证据已用 `<TOOL_HOME>` / `<TEMP>` 脱敏；
-- **历史残留**：M12–M15 的 9 个证据/审计文件（`m12/demo-chain.json`、`m14/W-03/W-05`、`m14/joint-demo.json`、
-  `m12/M12-0-baseline-audit.md`、`m12/install-flow.txt` 旧 blob）仍含临时路径或 `D:/M1-migration/...`；
-  属前 14 个提交，不含密钥/账号；不重写历史；
+- **历史路径已清理**：M12–M15 的 9 个证据文件中的 `C://Users//...//Temp` 与 `D:/M1-migration` 已替换为
+  `<TEMP>` / `<LOCAL_EVIDENCE>`，JSON 仍可解析；旧提交中的 blob 仍在未推送历史里，但 HEAD 不再包含这些路径；
+- 仍存在的 `D:/M1-migration` 字样仅用于说明基线/备份路径（M7 基线、发布审计/总体验收自引用、两轮审核引用），不含凭据；
 - 工作区两个约 18.5 MB 的 `docs/history/.../*.jsonl` 仍未跟踪，**禁止 `git add -A`**。
 
 ---
@@ -135,7 +135,7 @@ protected 50  ok 50  changed 0  missing 0
 | 风险 | 等级 | 说明 |
 |---|---|---|
 | 把 PARTIAL 读成“全部完成” | **高** | 报告已逐项标注；Push 说明必须保留 `PARTIAL/BLOCKED` 字样 |
-| 公开仓库的历史临时路径 | 低 | 9 个 M12–M15 证据文件；无密钥 |
+| 公开仓库的历史临时路径 | 低 | HEAD 已清理 9 个 M12–M15 证据文件；旧 blob 在未推送历史中；无密钥 |
 | 模型下载损坏被误用 | 低 | 损坏模型已删除；Provider 对 404/超时/取消有错误码 |
 | 平台层被误认为已接入生产 | 中 | 文档已标“库 + 契约测试，未接 scheduler” |
 | 依赖/安装变化 | 低 | 未新增 npm 依赖；工具为本地可选，未写入 package.json |

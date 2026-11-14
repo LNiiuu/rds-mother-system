@@ -2,7 +2,7 @@
   "rea_run_id": "rea455f35ef7c33",
   "workflow_id": "W-05",
   "sample": {
-    "path": "C:/Users/liuch/AppData/Local/Temp/rea/synthetic.pcap",
+    "path": "<TEMP>/rea/synthetic.pcap",
     "sha256": "088411ea1d320d9b9e8783658e5d95c86f58a2d345e708719678c94861b2b1c8",
     "bytes": 516,
     "kind": "synthetic"

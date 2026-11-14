@@ -242,10 +242,9 @@ T20-01（模型自主拆解）与 T20-07（独立模型审查）只能 `PARTIAL`
 - **已修复**：本轮 4 个提交的 M18/M19 证据里含 7 处 Windows 临时绝对路径
   （`C:\Users\<user>\AppData\Local\Temp\...`）与 2 处 `<LOCAL_BASELINE>` 路径，
   已在后续提交替换为 `<TEMP>` / `<LOCAL_BASELINE>`；JSON 仍可解析，数字未变。
-- **残留**：M12–M15 的 9 个历史证据文件（`m12/demo-chain.json`、`m12/M12-0-baseline-audit.md`、
-  `m14/W-03/*`、`m14/W-05/*`、`m14/joint-demo.json`）与 `m12/install-flow.txt` 的旧 blob，
-  仍含本机临时路径或 `D:/M1-migration/...`。它们属前 14 个提交的历史证据，未改写以避免变更证据内容；
-  不含密钥、账号或个人数据。
+- **残留（已处理）**：M12–M15 的 9 个历史证据文件中的本机临时路径与 `D:/M1-migration` 字样，
+  已在 M21–M25 发布整改中替换为 `<TEMP>` / `<LOCAL_EVIDENCE>`；JSON 仍可解析。
+  旧提交中的 blob 仍在未推送历史里，但 HEAD 不再包含这些路径。
 - `docs/checks/m12/install-flow.txt` 另有一处 `ASSET_MISSING` 是**修复前复现**，已在文件内标注。
 
 **Fast-forward 条件**：`git merge-base origin/main HEAD = ada7848`，`0 behind`，远程 `refs/heads/main`

@@ -109,7 +109,7 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `rds` 入口 / `doctor` / `validate` | 已实现，Windows 实机通过 | E1 |
 | MARS CLI 闭环（init→put→review→search→compile） | 已实现，Windows 实机通过 | E1 |
 | MCP stdio 服务（initialize / tools/list / tools/call） | 已实现，冒烟通过 | E1 |
-| 测试 | **290 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2；工作区与干净克隆各跑一遍） | E1 |
+| 测试 | **318 项全通过，fail=0，skipped=0**（Windows × Node 22.22.2；工作区与干净克隆各跑一遍） | E1 |
 | 多项目与上下文预算 | `project create|show|remove`、`budget show`、`context list|restore`；项目隔离 5 例、回退/恢复 7 例 | E1 |
 | 上下文压缩 | 确定性去重/折叠/L3 归档；演示样本 806 → 264 tokens（67.2%），L0 100% 保留，原文可恢复 | E1 |
 | 多 Agent 协作基础 | `role` / `task`（11 态）/ `handoff` / `cost`；调度把「实现+测试」拆成 R2/R3 | E1 |
@@ -118,6 +118,12 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | **REA 可执行工作流（M14）** | W-01/W-02/W-04/W-05 实跑（PARTIAL）；W-03/W-06 因缺 jadx/frida 为 BLOCKED；每次分析落 result/report/evidence | E1 |
 | **研发 × REA 联合（M15）** | 八种任务类型 + 类型-工作流校验；逆向→审核→重构案例实跑 | E1 |
 | **Provider 适配器（M16）** | `openai-compat` 与 `anthropic` 两种真实协议 + 契约测试；**真实网络调用 NOT RUN**（无凭据） | E1（契约）/ NOT RUN（真实） |
+| **多 Agent 编排（M18–M20）** | DAG 调度、并发、工作区隔离、冲突检测、恢复、成本账本；REA 联合场景实跑 | E1（调度/工具真实；模型 mock） |
+| **本地模型（M21）** | Ollama Provider + 6 个契约测试；模型下载损坏，**真实推理 BLOCKED** | E1（契约）/ BLOCKED（真实） |
+| **平台适配（M22）** | 5 方法端口 + memory/http/dsh/workbuddy 四适配器 + 10 个契约测试；WorkBuddy/DSH 宿主 **NOT RUN**，未接 scheduler | E1（契约）/ NOT RUN（宿主） |
+| **REA 工具链（M23）** | TShark 4.6.9 真实交叉核验 W-05；W-01/W-02/W-04/W-05 `PARTIAL`；W-03/W-06 `BLOCKED` | E1（部分） |
+| **真实多 Agent（M24）** | 编排/隔离/恢复真实；**真实模型多 Agent BLOCKED**，平台端到端 `NOT RUN` | BLOCKED |
+| **审核与发布（M25）** | 两轮独立审核 + 发布审计；结论 `CONDITIONAL GO` | E1 |
 | CI（Windows + Ubuntu × Node 22/24 + macOS） | **7 个 job 全绿**：[run 43051690255](https://github.com/LNiiuu/rds-mother-system/actions/runs/43051690255)，1m06s（2026-11-11）。M8 改动尚未推送，暂无对应 CI | E1 |
 | Linux / Ubuntu | 由 CI 实测通过（Node 22 / 24 各一格） | E1 |
 | macOS | **CI 实测通过**（`macos-latest` / arm64 / Node 22.x）。Intel Mac 与其他 macOS 版本未覆盖 | E1 |
@@ -127,9 +133,15 @@ rds compile  # 按角色与预算编译上下文包，带 manifest 与哈希
 | `render-role` 角色包渲染 | **模板已入库，渲染器未入库**。`core/templates/role-packet.md` 与 `run-record.json` 定义执行包格式并随包分发；生成它的 `rds-render-role.ps1` 只存在于本地工作区，不随包分发 | — |
 | `rds principal` / `rds upgrade` / `rds uninstall` | **未实现**。追加身份用 `rds init-dev --add`；升级为覆盖安装 | — |
 
+**M21–M25 能力边界（2026-11-14）**：整体 **`PARTIAL`**。本地模型 Provider 已实现，但真实推理 `BLOCKED`（模型下载损坏）；
+WorkBuddy/DSH 仅完成 Adapter 契约，宿主 `NOT RUN`；真实模型多 Agent `BLOCKED`，平台→RDS 端到端 `NOT RUN`；
+Ghidra、JADX、Frida 均未完成，W-03/W-06 为 `BLOCKED`。TShark 4.6.9 对 W-05 有真实交叉核验，
+**不代表整个 REA 已完成**。详见 [M21–M25 总体验收](docs/checks/m21-m25/final-acceptance.md) 与
+[发布审计](docs/checks/final/pre-push-release-audit.md)。
+
 未实现的能力不会以空壳命令出现：`rds <未知命令>` 直接报「未知命令」，不会假装已实现。
 
-测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 228/228**。
+测试已完全去环境化：不再读取作者会话、不依赖 `DSH.exe`、不含本机绝对路径，**在干净克隆里同样 318/318**。
 `npm test` 走门禁 `tooling/test-gate.mjs`，要求 `tests>0 && fail=0 && skipped=0`；
 缺 fixture 或静默 skip 会让门禁失败，而不是显示绿灯。分类与运行方式见 [docs/testing.md](docs/testing.md)。
 
